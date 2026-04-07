@@ -1,0 +1,27 @@
+
+@import url('https://fonts.googleapis.com/css2?family=Bebas+Neue:wght@400;700&family=Montserrat:wght@700&family=Roboto:wght@400&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Michroma&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Archivo+Black&family=Inter:wght@400;700;900&family=JetBrains+Mono:wght@400;700;800&display=swap');
+
+@import "tailwindcss";
+
+@import "@/assets/style/base.css";
+@import "@/assets/style/animation.css";
+@import "@/assets/style/cursor.css";
+
+
+@font-face {
+  font-family: 'Planet Kosmos';
+  src: url('@/assets/fonts/PlanetKosmos.TTF') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+};
+
+@font-face {
+  font-family: 'LTWave';
+  src: url('@/assets/fonts/LTWave.otf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+  font-display: swap;
+};

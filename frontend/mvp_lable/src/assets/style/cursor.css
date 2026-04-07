@@ -1,0 +1,47 @@
+/* 1. Глобальный курсор (Стрелка) */
+/* УБРАЛИ '*', теперь курсор мягко наследуется */
+html, body {
+  cursor: url('@/assets/cursors/default_arrow.cur'), auto;
+}
+
+/* 2. Ссылки, кнопки и интерактивные элементы (Рука) */
+/* ДОБАВИЛИ 'a *', 'button *' и т.д., чтобы все внутренности карточек тоже были кликабельными */
+button, 
+button *,
+.cursor-pointer, 
+.cursor-pointer *,
+[role="button"],
+[role="button"] *,
+select {
+  cursor: url('@/assets/cursors/default_link.cur'), pointer !important;
+}
+
+/* 3. Поля ввода текста (I-образный курсор) */
+input[type="text"], 
+input[type="email"], 
+input[type="password"], 
+input[type="search"], 
+textarea, 
+[contenteditable="true"] {
+  cursor: url('@/assets/cursors/default_beam.cur'), text;
+}
+
+/* 4. При наведении на картинки или объекты */
+.philosophy-card,
+.philosophy-card * {
+  cursor: url('@/assets/cursors/default_cross.cur'), crosshair !important;
+}
+
+/* 5. Состояние загрузки (Песочные часы) */
+body.loading,
+body.loading * {
+  cursor: url('@/assets/cursors/default_wait.cur'), wait !important;
+}
+
+/* 6. Запрещенные действия (Красный круг) */
+[disabled], 
+[disabled] *,
+.cursor-not-allowed,
+.cursor-not-allowed * {
+  cursor: url('@/assets/cursors/default_no.cur'), not-allowed !important;
+}

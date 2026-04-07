@@ -1,0 +1,100 @@
+@keyframes real-port-flicker {
+  /* Тот же хаотичный цикл вспышек */
+  0%, 10%, 20%, 30%, 40%, 50%, 60%, 70%, 80%, 90%, 100% { opacity: 1; filter: drop-shadow(0 0 8px #ff0000); }
+  2%, 6% { opacity: 0.1; filter: none; }
+  4%, 8% { opacity: 1; filter: drop-shadow(0 0 10px #ff0000); }
+  25% { opacity: 0.3; filter: drop-shadow(0 0 2px #ff0000); }
+  26% { opacity: 1; }
+  42% { opacity: 0; filter: none; }
+  43% { opacity: 1; }
+  44% { opacity: 0.2; }
+  46% { opacity: 1; }
+  88% { opacity: 0.1; }
+  89% { opacity: 1; }
+}
+
+.animate-led {
+  /* Убираем фиксированное время здесь, оно придет из :style */
+  animation-name: real-port-flicker;
+  animation-iteration-count: infinite;
+  animation-timing-function: steps(1);
+  will-change: opacity, filter;
+}
+
+
+@keyframes noise {
+  0% { transform: translate(0,0) }
+  10% { transform: translate(-5%,-5%) }
+  20% { transform: translate(-10%,5%) }
+  30% { transform: translate(5%,-10%) }
+  40% { transform: translate(-5%,15%) }
+  50% { transform: translate(-10%,5%) }
+  60% { transform: translate(15%,0) }
+  70% { transform: translate(0,10%) }
+  80% { transform: translate(-15%,0) }
+  90% { transform: translate(10%,5%) }
+  100% { transform: translate(5%,0) }
+}
+.animate-noise {
+  animation: noise 2s infinite;
+}
+
+
+@keyframes glitch {
+  0% { transform: translate(0) }
+  20% { transform: translate(-1px, 1px) }
+  40% { transform: translate(-1px, -1px) }
+  60% { transform: translate(1px, 1px) }
+  80% { transform: translate(1px, -1px) }
+  100% { transform: translate(0) }
+}
+
+
+@keyframes tracking-line {
+  0% { top: 110%; opacity: 0; }
+  10% { opacity: 0.1; }
+  90% { opacity: 0.1; }
+  100% { top: -10%; opacity: 0; }
+}
+
+@keyframes scan-roll {
+  0% { background-position: 0 0; }
+  100% { background-position: 0 100%; }
+}
+
+@keyframes noise-anim {
+  0%, 100% { background-position: 0 0; }
+  25% { background-position: 10% 10%; }
+  50% { background-position: -5% 5%; }
+  75% { background-position: -10% -5%; }
+}
+
+.animate-noise {
+  animation: noise-anim 0.2s steps(5) infinite;
+  will-change: background-position;
+}
+
+@keyframes vhs-jitter {
+    0% { transform: translate(0,0); }
+    25% { transform: translate(-0.2px, 0.2px); }
+    50% { transform: translate(0.2px, -0.2px); }
+    75% { transform: translate(-0.2px, -0.2px); }
+    100% { transform: translate(0,0); }
+}
+
+@keyframes vhs-shift-red {
+    0% { left: -1px; opacity: 0.7; }
+    50% { left: -2px; opacity: 0.4; }
+    100% { left: -1px; opacity: 0.7; }
+}
+
+@keyframes vhs-shift-blue {
+    0% { left: 1px; opacity: 0.7; }
+    50% { left: 4px; opacity: 0.4; }
+    100% { left: 1px; opacity: 0.7; }
+}
+
+@keyframes metal-shine {
+  from { background-position: 200% 0; }
+  to { background-position: 0% 0; }
+}

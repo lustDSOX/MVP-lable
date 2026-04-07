@@ -1,6 +1,6 @@
 <template>
   <div id="app" class="flex flex-col min-h-screen bg-black overflow-x-hidden selection:bg-[#39FF14] selection:text-black font-['Impact','Arial_Black',sans-serif]">
-    
+
     <!-- 1. ГЛОБАЛЬНЫЙ ФОН: Он лежит ПОД всем -->
     <div class="fixed inset-0 z-0 pointer-events-none select-none">
       <!-- Слой 1: Техническая сетка -->
@@ -12,7 +12,7 @@
     </div>
 
     <!-- 2. HEADER: Над фоном (z-50) -->
-    <Header  ></Header>
+    <Header></Header>
 
     <!-- 3. MAIN: Зона контента (Прозрачная!) -->
     <main class="relative z-10 flex-1 flex flex-col">
@@ -21,7 +21,7 @@
     </main>
 
     <!-- 4. FOOTER: Над фоном (z-50) -->
-    <Footer  ></Footer>
+    <Footer></Footer>
   </div>
 </template>
 

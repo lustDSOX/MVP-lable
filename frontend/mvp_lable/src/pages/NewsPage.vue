@@ -6,7 +6,7 @@
     <div class="max-w-6xl mx-auto relative z-10">
       
       <!-- HEADER: Световое табло -->
-      <div class="flex flex-col md:flex-row justify-between items-end  pb-6 relative">
+      <div class="flex flex-col md:flex-row justify-between items-end pb-6 relative">
         <div class="relative">
           <h1 class="font-planet h1-metal-textured" data-text="NEWS_LOG">
             NEWS_LOG

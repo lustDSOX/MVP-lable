@@ -59,9 +59,7 @@
             </router-link>
           </li>
 
-          <!-- Авторизация / Кнопки действия: Стиль "Прожатая кнопка PS2" -->
          <li v-if="!authed.isAuthenticated" class="flex items-center pl-6">
-            <!-- Контейнер-стабилизатор (предотвращает дерганье сетки) -->
             <div class="w-40 h-11.5 relative"> 
               <router-link to="/login" class="absolute inset-0 bg-[#39FF14] text-black uppercase text-xl flex items-center justify-center border-2 border-black shadow-[4px_4px_0_#fff] hover:shadow-none hover:translate-x-1 hover:translate-y-1 hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14] transition-none whitespace-nowrap">
                 [ ВХОД ]
@@ -70,11 +68,9 @@
           </li>
 
           <li v-else class="flex items-center pl-6">
-            <!-- Контейнер-стабилизатор -->
             <div class="w-45 h-11.5 relative group"> 
               <router-link to="/dashboard" class="absolute inset-0 bg-[#39FF14] text-black uppercase text-xl flex items-center justify-center border-2 border-black shadow-[4px_4px_0_#fff] hover:shadow-none hover:translate-x-1 hover:translate-y-1 hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14] transition-none whitespace-nowrap">
                 [ КАБИНЕТ ]
-                <!-- Используем invisible вместо hidden, чтобы ширина не прыгала -->
                 <span class="invisible group-hover:visible animate-ping ml-1">_</span>
               </router-link>
             </div>

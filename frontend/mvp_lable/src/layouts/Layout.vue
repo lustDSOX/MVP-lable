@@ -1,5 +1,5 @@
 <template>
-  <div id="app" class="flex flex-col min-h-screen bg-black overflow-x-hidden selection:bg-[#39FF14] selection:text-black font-['Impact','Arial_Black',sans-serif]">
+  <div id="app" class="flex flex-col min-h-screen justify-around bg-black overflow-x-hidden selection:bg-[#39FF14] selection:text-black font-['Impact','Arial_Black',sans-serif]">
     
     <!-- 1. ГЛОБАЛЬНЫЙ ФОН: Он лежит ПОД всем -->
     <div class="fixed inset-0 z-0 pointer-events-none select-none">

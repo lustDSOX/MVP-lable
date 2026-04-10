@@ -1,118 +1,97 @@
 <template>
-  <!-- ОСНОВНОЙ КОНТЕЙНЕР: Стиль "Заблокированный терминал" -->
-  <div class="min-h-screen flex items-center justify-center bg-black text-white px-4 font-['Impact','Arial_Black',sans-serif] selection:bg-[#39FF14] selection:text-black overflow-hidden relative">
+  <div class="flex flex-1 items-center justify-center text-white p-7 font-['Inter',sans-serif] selection:bg-[#ff0000] selection:text-white overflow-hidden relative">
     
-    <!-- ФОН: Сканлайны, шум и "битые пиксели" -->
-    <div class="absolute inset-0 z-0 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] opacity-20 pointer-events-none"></div>
-    <div class="absolute inset-0 z-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.25)_50%),linear-gradient(90deg,rgba(255,0,0,0.06),rgba(0,255,0,0.02),rgba(0,0,255,0.06))] bg-size-[100%_4px,3px_100%] pointer-events-none opacity-40"></div>
+    <div class="bg-chain-placeholder absolute w-[120%] h-16 bg-repeat-x bg-center bg-size-[auto_100%] rotate-25 -right-30 top-2/4 z-10 mix-blend-screen pointer-events-none"></div>
+    <div class="bg-chain-placeholder absolute w-[120%] h-16 bg-repeat-x bg-center bg-size-[auto_100%] -rotate-12 -left-10 bottom-1/4 z-10  mix-blend-screen pointer-events-none"></div>
 
-    <!-- Декоративные провода по углам экрана -->
-    <div class="absolute top-0 left-1/4 w-0.5 h-32 bg-[#333] shadow-[0_0_10px_#ff0000]"></div>
-    <div class="absolute bottom-0 right-1/4 w-0.5 h-32 bg-[#333] shadow-[0_0_10px_#39FF14]"></div>
-
-    <!-- ФОРМА: Системная консоль -->
     <form 
       @submit.prevent="handleSubmit" 
-      class="relative w-full max-w-lg bg-[#0a0a0a] border-[6px] border-[#333] p-0 shadow-[30px_30px_0_rgba(0,0,0,0.8)] flex flex-col group overflow-hidden"
+      class="relative w-full max-w-3xl bg-black border border-white/20 p-0 shadow-[0_40px_80px_rgba(0,0,0,0.7)] z-20 overflow-hidden"
     >
-      <!-- HEADER БАР: Стиль "Security Access" -->
-      <div class="bg-[#333] p-3 flex justify-between items-center border-b-4 border-black">
-        <div class="flex items-center gap-3 px-2">
-          <div class="w-3 h-3 bg-[#ff0000] animate-led shadow-[0_0_10px_#ff0000]"></div>
-          <span class="text-sm font-mono text-gray-300 tracking-[0.3em] uppercase italic">SYSTEM_AUTH_V.03 // SECURE_UPLINK</span>
+      <!-- HEADER -->
+      <div class=" bg-white/20 text-black p-2 flex justify-between items-center">
+        <div class="flex items-center gap-3">
+          <div class="w-3 h-3 bg-[#ff0000] animate-pulse"></div>
+          <span class="text-[10px] font-['JetBrains_Mono',monospace] font-black uppercase tracking-widest italic">
+            AUTH_PROTOCOL // SECURITY_LEVEL: RED
+          </span>
         </div>
-        <div class="flex gap-1">
-          <div class="w-4 h-4 bg-black/50"></div>
-          <div class="w-4 h-4 bg-[#ff0000]/20"></div>
-        </div>
+        <span class="text-[10px] font-['JetBrains_Mono',monospace] opacity-50 uppercase">V.2026.03</span>
       </div>
 
       <!-- ВНУТРЕННИЙ КОНТЕНТ -->
-      <div class="p-8 md:p-12 space-y-8 bg-[url('https://www.transparenttextures.com/patterns/black-linen.png')] relative">
+      <div class="p-6 md:p-10 relative">
         
-        <!-- ЛОГОТИП: Хром + Глитч -->
-        <div class="text-center relative">
-          <h1 class="text-7xl md:text-8xl tracking-tight uppercase leading-[0.8] transform scale-y-125 mb-2">
-            <span class="text-transparent bg-clip-text bg-linear-to-b from-white via-gray-400 to-black drop-shadow-[4px_4px_0_#39FF14]">CLASS</span><br>
-            <span class="text-[#39FF14] drop-shadow-[4px_4px_0_#000]">TICKETS</span>
-          </h1>
-          <div class="h-1 w-full bg-[#333] mt-4 relative overflow-hidden">
-            <div class="absolute inset-0 bg-[#39FF14] w-1/4 animate-signal"></div>
-          </div>
-          <p class="text-sm font-mono text-gray-500 uppercase tracking-[0.5em] mt-4 italic">ARTIST_RESTRICTED_AREA</p>
-        </div>
-
-        <!-- ПОЛЯ ВВОДА: "Вдавленные" слоты -->
-        <div class="space-y-6">
-          <div class="flex flex-col gap-2 group/input">
-            <label class="text-sm uppercase tracking-[0.4em] text-[#39FF14] font-mono  flex items-center gap-2">
-              <span class="w-1.5 h-1.5 bg-[#39FF14]"></span> EMAIL_ADDRESS
-            </label>
-            <div class="relative">
-              <input
-                v-model="email"
-                type="email"
-                required
-                :disabled="authStore.isLoading"
-                class="w-full px-6 py-4 bg-black border-2 border-[#333] text-white font-mono text-lg focus:outline-none focus:border-[#39FF14] focus:shadow-[0_0_15px_rgba(57,255,20,0.2)] shadow-[inset_0_4px_10px_rgba(0,0,0,1)] transition-none placeholder:text-gray-800 uppercase"
-                placeholder="ID@LABEL.SOX"
-              />
-              <div class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-mono text-gray-700 pointer-events-none">_CHIP_01</div>
-            </div>
-          </div>
-
-          <div class="flex flex-col gap-2 group/input">
-            <label class="text-sm uppercase tracking-[0.4em] text-[#39FF14] font-mono  flex items-center gap-2">
-              <span class="w-1.5 h-1.5 bg-[#39FF14]"></span> ACCESS_KEY
-            </label>
-            <div class="relative">
-              <input
-                v-model="password"
-                type="password"
-                required
-                :disabled="authStore.isLoading"
-                class="w-full px-6 py-4 bg-black border-2 border-[#333] text-white font-mono text-lg focus:outline-none focus:border-[#39FF14] focus:shadow-[0_0_15px_rgba(57,255,20,0.2)] shadow-[inset_0_4px_10px_rgba(0,0,0,1)] transition-none placeholder:text-gray-800 uppercase"
-                placeholder="********"
-              />
-              <div class="absolute right-4 top-1/2 -translate-y-1/2 text-sm font-mono text-gray-700 pointer-events-none">_CHIP_02</div>
-            </div>
-          </div>
-        </div>
-
-        <!-- ОШИБКА: Стиль "Critical Failure" -->
-        <div v-if="error" class="bg-[#ff0000] text-black p-4  uppercase text-xs italic flex items-center gap-3 animate-strobe border-4 border-black">
-          <span class="text-2xl">[!]</span>
-          <div>
-            <p>CRITICAL_ERROR: AUTH_FAILED</p>
-            <p class="font-mono text-sm opacity-80">{{ error }}</p>
-          </div>
-        </div>
-
-        <!-- КНОПКА ВХОДА: Массивный переключатель -->
-        <button
-          type="submit"
-          :disabled="authStore.isLoading"
-          class="group relative w-full bg-[#39FF14] text-black  uppercase py-6 border-4 border-black shadow-[8px_8px_0_#fff] hover:shadow-none hover:translate-x-1 hover:translate-y-1 active:translate-x-2 active:translate-y-2 transition-none disabled:opacity-50 overflow-hidden"
-        >
-          <div class="relative z-10 flex items-center justify-center gap-4 text-2xl italic tracking-tighter">
-            <span v-if="!authStore.isLoading">INITIATE_LOGIN</span>
-            <span v-else class="flex items-center gap-3">
-              <!-- Спиннер как вращающийся CD -->
-              <div class="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-              UPLOADING...
-            </span>
-          </div>
-          <!-- Глитч-полоса при ховере -->
-          <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 animate-pulse pointer-events-none"></div>
-        </button>
-
-        <!-- FOOTER: Техническая пометка -->
-        <div class="text-center pt-4 border-t-2 border-dashed border-[#222]">
-           <div class="text-[9px] font-mono text-gray-600 uppercase tracking-widest flex justify-between items-center">
-             <span>ENCRYPTION: AES_256</span>
-             <span class="text-white">DEMO_MODE: ENABLED</span>
+        <!-- ЛОГОТИП: Используем ваш стиль с коррекцией -->
+        <div class="mb-8 relative text-center">
+           <h1 class="h1-metal-textured text-6xl md:text-7xl m-0 leading-[0.8]" data-text="CLASS TICKETS">
+             CLASS TICKETS
+           </h1>
+           <div class="mt-6 flex justify-center items-center gap-2">
+              <div class="h-px w-12 bg-[#ff0000]"></div>
+              <span class="text-[8px] font-['JetBrains_Mono',monospace] text-gray-500 uppercase tracking-[0.6em]">Artist_Terminal</span>
+              <div class="h-px w-12 bg-[#ff0000]"></div>
            </div>
-           <p class="text-[8px] font-mono text-gray-800 mt-2 italic">BY_SOX_HEAVY_INDUSTRIES_2003</p>
+        </div>
+
+        <!-- ПОЛЯ ВВОДА -->
+        <div class="space-y-10">
+          <!-- EMAIL -->
+          <div class="relative group/input">
+            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-['JetBrains_Mono',monospace] text-[#ff0000] uppercase tracking-widest z-20">
+              User_ID
+            </label>
+            <input
+              v-model="email"
+              type="email"
+              required
+              class="w-full bg-transparent border-2 border-white/10 p-3 font-['Archivo_Black',sans-serif] text-xl focus:outline-none focus:border-[#ff0000] transition-colors placeholder:opacity-10 uppercase tracking-tighter"
+              placeholder="YOUR_IDENTIFIER"
+            />
+            <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-[#ff0000] group-focus-within/input:w-full transition-all"></div>
+          </div>
+
+          <!-- PASSWORD -->
+          <div class="relative group/input">
+            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-['JetBrains_Mono',monospace] text-[#ff0000] uppercase tracking-widest z-20">
+              Access_Key
+            </label>
+            <input
+              v-model="password"
+              type="password"
+              required
+              class="w-full bg-transparent border-2 border-white/10 p-3 font-['Archivo_Black',sans-serif] text-xl focus:outline-none focus:border-[#ff0000] transition-colors placeholder:opacity-10 uppercase tracking-tighter"
+              placeholder="••••••••"
+            />
+            <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-[#ff0000] group-focus-within/input:w-full transition-all"></div>
+          </div>
+        </div>
+
+        <!-- ERROR MESSAGE (с animate-ping) -->
+        <div v-if="error" class="mt-8 bg-[#ff0000]/10 border-2 border-[#ff0000] text-white p-4 font-['Archivo_Black',sans-serif] uppercase text-xs flex items-center gap-4">
+          <div class="relative flex h-5 w-5 items-center justify-center">
+             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff0000] opacity-75"></span>
+             <span class="relative inline-flex h-3 w-3 items-center justify-center rounded-full bg-[#ff0000] text-black text-xs font-black">!</span>
+          </div>
+          <div class="leading-none tracking-tighter">
+            Access_Denied: {{ error }}
+          </div>
+        </div>
+
+        <!-- SUBMIT BUTTON -->
+        <div class="mt-14 relative group">
+            <button
+              type="submit"
+              :disabled="authStore.isLoading"
+              class="relative w-full bg-white text-black font-['Archivo_Black',sans-serif] text-2xl uppercase py-3 transition-all hover:bg-[#ff0000] hover:text-white overflow-hidden disabled:opacity-30 z-10"
+            >
+              <span class="relative z-10 flex items-center justify-center gap-4">
+                {{ authStore.isLoading ? 'Processing...' : 'Enter_System' }}
+                <span class="text-sm">>>></span>
+              </span>
+              <div class="absolute inset-0 crt-noise opacity-20 pointer-events-none"></div>
+            </button>
+            <div class="absolute inset-0 bg-white/20 translate-x-2 translate-y-2 -z-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform"></div>
         </div>
       </div>
     </form>
@@ -120,58 +99,46 @@
 </template>
 
 <style scoped>
-/* Анимация мигающего LED (из прошлого сета) */
-@keyframes real-port-flicker {
-  0%, 100% { opacity: 1; filter: drop-shadow(0 0 8px #ff0000); }
-  2%, 6% { opacity: 0.1; filter: none; }
-  4%, 8% { opacity: 1; filter: drop-shadow(0 0 10px #ff0000); }
-  42% { opacity: 0; filter: none; }
-  43% { opacity: 1; }
-  88% { opacity: 0.1; }
-  89% { opacity: 1; }
+/* СТИЛЬ ДЛЯ ЦЕПЕЙ (из вашего примера) */
+.bg-chain-placeholder {
+    background-image: url("@/assets/chrome/chain_bg.png");
 }
-.animate-led {
-  animation: real-port-flicker 4s infinite steps(1);
+.bg-size-\[auto_100\%\] {
+  background-size: auto 100%;
 }
 
-/* Бегущий сигнал в разделителе */
-@keyframes signal-flow {
-  0% { transform: translateX(-100%); }
-  100% { transform: translateX(400%); }
+/* КОРРЕКЦИЯ ДЛЯ ВАШЕГО h1-metal-textured ПОД ШРИФТ Archivo Black */
+.h1-metal-textured {
+  font-family: 'Archivo Black', 'Impact', sans-serif;
+  letter-spacing: -0.05em; /* Делаем буквы плотнее */
+  padding-right: 0; /* Убираем лишний отступ */
 }
-.animate-signal {
-  animation: signal-flow 2s infinite linear;
-}
-
-/* Стробоскоп для ошибки */
-@keyframes strobe {
-  0%, 100% { background-color: #ff0000; color: #000; }
-  50% { background-color: #000; color: #ff0000; }
-}
-.animate-strobe {
-  animation: strobe 0.2s infinite steps(1);
+/* Смещаем блик ниже, чтобы он попадал на массивные буквы Archivo Black */
+.h1-metal-textured::after {
+  top: 2rem;
+  animation: metal-shine 6s linear infinite; /* Ускоряем анимацию */
 }
 
-/* Эффект CRT монитора */
-.min-h-screen::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3Ffilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.65'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)' opacity='.03'/%3E%3C/svg%3E");
-  pointer-events: none;
-  z-index: 50;
+/* СЕТКА */
+.y2k-bg-grid {
+  background-size: 24px 24px;
+  background-image: radial-gradient(circle, #222 1px, transparent 1px);
+}
+
+/* ШУМ */
+.crt-noise {
+  background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
 }
 </style>
 
-
 <script lang="ts" setup>
+// Ваш JS-код остается без изменений
 import { useAuthStore } from '@/stores/auth'
 import { useRouter } from 'vue-router'
 import { ref } from 'vue'
 
 const authStore = useAuthStore()
 const router = useRouter()
-
 const email = ref('')
 const password = ref('')
 const error = ref('')
@@ -184,7 +151,7 @@ async function handleSubmit() {
       router.push('/dashboard')
     }
   } catch (err: any) {
-    error.value = err.message || 'Ошибка входа'
+    error.value = err.message || 'AUTH_FAILURE'
   }
 }
 </script>

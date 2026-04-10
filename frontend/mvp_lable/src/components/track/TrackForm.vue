@@ -1,85 +1,96 @@
 <template>
-  <!-- Оставляем только форму. Весь "корпус" теперь снаружи в ContractModal -->
-  <form @submit.prevent="onSubmit" class="flex flex-col gap-8 relative z-10 font-['Impact','Arial_Black',sans-serif]">
+  <form @submit.prevent="onSubmit" class="contract-form font-['Inter',sans-serif]">
     
     <!-- Секция 1: Личные данные -->
-    <div class="space-y-6">
-      <div class="flex items-center gap-4 mb-4">
-        <h4 class="text-2xl font-black text-white italic uppercase tracking-tighter">01_SUBJECT_INFO</h4>
-        <div class="flex-1 h-0.5 bg-[#333]"></div>
+    <div class="form-section">
+      <div class="section-header">
+        <h4 class="section-title">01 // SUBJECT_INFO</h4>
+        <div class="section-line"></div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-mono text-[#39FF14] uppercase tracking-widest flex justify-between">
+        <div class="input-group">
+          <label class="input-label">
             <span>FULL_LEGAL_NAME</span>
-            <span class="text-[#ff0000]">*REQUIRED</span>
+            <span class="required-mark">*REQ</span>
           </label>
-          <input v-model="form.fullName" type="text" required placeholder="IVANOV IVAN" class="modal-input" />
+          <input v-model="form.fullName" type="text" required placeholder="IVANOV IVAN" class="form-input" />
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-mono text-[#39FF14] uppercase tracking-widest flex justify-between">
+        <div class="input-group">
+          <label class="input-label">
             <span>UPLINK_MAIL</span>
-            <span class="text-[#ff0000]">*REQUIRED</span>
+            <span class="required-mark">*REQ</span>
           </label>
-          <input v-model="form.email" type="email" required placeholder="USER@SOX.NET" class="modal-input" />
+          <input v-model="form.email" type="email" required placeholder="USER@SOX.NET" class="form-input" />
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-mono text-[#39FF14] uppercase tracking-widest flex justify-between">
+        <div class="input-group">
+          <label class="input-label">
             <span>COMM_PHONE</span>
-            <span class="text-[#ff0000]">*REQUIRED</span>
+            <span class="required-mark">*REQ</span>
           </label>
-          <input v-model="form.phone" type="tel" required placeholder="+7 (___) ___-__-__" class="modal-input" />
+          <input v-model="form.phone" type="tel" required placeholder="+7 (___) ___-__-__" class="form-input" />
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-mono text-[#39FF14] uppercase tracking-widest flex justify-between">
+        <div class="input-group">
+          <label class="input-label">
             <span>ARTIST_ALIAS</span>
-            <span class="text-[#ff0000]">*REQUIRED</span>
+            <span class="required-mark">*REQ</span>
           </label>
-          <input v-model="form.nicknames" type="text" required placeholder="DJ_NEON" class="modal-input" />
+          <input v-model="form.nicknames" type="text" required placeholder="DJ_NEON" class="form-input" />
         </div>
 
-        <div class="flex flex-col gap-2 md:col-span-2">
-          <label class="text-[10px] font-mono text-[#39FF14] uppercase tracking-widest italic">NETWORK_CREDENTIALS</label>
-          <input v-model="form.socialNetworks" type="text" required placeholder="VK.COM/ARTIST // TG/ALIAS" class="modal-input" />
+        <div class="input-group md:col-span-2">
+          <label class="input-label">
+            <span>NETWORK_CREDENTIALS</span>
+            <span class="required-mark">*REQ</span>
+          </label>
+          <input v-model="form.socialNetworks" type="text" required placeholder="VK.COM/ARTIST // TG/ALIAS" class="form-input" />
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-mono text-[#39FF14] uppercase tracking-widest">AUDIO_GENRE</label>
-          <input v-model="form.genre" type="text" placeholder="INDUSTRIAL/TRAP" class="modal-input" />
+        <div class="input-group">
+          <label class="input-label"><span>AUDIO_GENRE</span></label>
+          <input v-model="form.genre" type="text" placeholder="INDUSTRIAL / TRAP" class="form-input" />
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-mono text-[#39FF14] uppercase tracking-widest">SUBJECT_AGE</label>
-          <input v-model.number="form.age" type="number" required min="14" max="100" placeholder="18" class="modal-input" />
+        <div class="input-group">
+          <label class="input-label">
+            <span>SUBJECT_AGE</span>
+            <span class="required-mark">*REQ</span>
+          </label>
+          <input v-model.number="form.age" type="number" required min="14" max="100" placeholder="18" class="form-input" />
         </div>
 
-        <div class="flex flex-col gap-2 md:col-span-2">
-          <label class="text-[10px] font-mono text-[#39FF14] uppercase tracking-widest">LOCATION_ZONE</label>
-          <input v-model="form.city" type="text" required placeholder="MOSCOW_UNDERGROUND" class="modal-input" />
+        <div class="input-group md:col-span-2">
+          <label class="input-label">
+            <span>LOCATION_ZONE</span>
+            <span class="required-mark">*REQ</span>
+          </label>
+          <input v-model="form.city" type="text" required placeholder="MOSCOW_UNDERGROUND" class="form-input" />
         </div>
       </div>
     </div>
 
     <!-- Секция 2: Релиз -->
-    <div class="pt-8 border-t-4 border-dashed border-[#222]">
-      <div class="flex items-center gap-4 mb-6">
-        <h4 class="text-2xl font-black text-[#ff0000] italic uppercase tracking-tighter">02_RELEASE_DATA</h4>
-        <div class="flex-1 h-0.5 bg-[#333]"></div>
+    <div class="form-section">
+      <div class="section-header">
+        <h4 class="section-title text-red">02 // RELEASE_DATA</h4>
+        <div class="section-line bg-red"></div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-mono text-[#ff0000] uppercase tracking-widest">PRIMARY_TRACK_TITLE</label>
-          <input v-model="form.trackTitle" type="text" required placeholder="TRACK_NAME_01" class="modal-input-red" />
+        <div class="input-group">
+          <label class="input-label">
+            <span class="text-[#ff0000]">PRIMARY_TRACK_TITLE</span>
+            <span class="required-mark">*REQ</span>
+          </label>
+          <input v-model="form.trackTitle" type="text" required placeholder="TRACK_NAME_01" class="form-input border-red" />
         </div>
 
-        <div class="flex flex-col gap-2">
-          <label class="text-[10px] font-mono text-gray-600 uppercase tracking-widest">CO_AUTHORS</label>
-          <input v-model="form.coAuthors" type="text" placeholder="FEAT_NAME / EMPTY" class="modal-input" />
+        <div class="input-group">
+          <label class="input-label"><span>CO_AUTHORS</span></label>
+          <input v-model="form.coAuthors" type="text" placeholder="FEAT_NAME / EMPTY" class="form-input" />
         </div>
       </div>
     </div>
@@ -88,16 +99,15 @@
     <button 
       type="submit" 
       :disabled="isLoading"
-      class="group relative w-full py-6 bg-[#39FF14] text-black font-black uppercase text-3xl border-4 border-black shadow-[10px_10px_0_#fff] hover:shadow-none hover:translate-x-1 hover:translate-y-1 active:translate-x-2 active:translate-y-2 disabled:bg-gray-800 disabled:text-gray-500 disabled:shadow-none transition-none overflow-hidden"
+      class="submit-button group"
     >
-      <div class="relative z-10 flex items-center justify-center gap-4 italic tracking-tighter">
-        <span v-if="!isLoading">>> GENERATE_CONTRACT</span>
-        <span v-else class="flex items-center gap-3 uppercase">
-           <div class="w-6 h-6 border-4 border-black border-t-transparent rounded-full animate-spin"></div>
-           PROCESSING...
-        </span>
-      </div>
-      <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-10 pointer-events-none"></div>
+      <span v-if="!isLoading" class="button-content">
+        >>> GENERATE_CONTRACT
+      </span>
+      <span v-else class="button-content processing">
+        <div class="spinner"></div>
+        PROCESSING_DATA...
+      </span>
     </button>
   </form>
 </template>
@@ -145,16 +155,157 @@ export default defineComponent({
 </script>
 
 <style scoped>
-@reference "tailwindcss"; 
-
-.modal-input {
-  @apply w-full px-4 py-3 bg-black border-2 border-[#333] text-white font-mono text-lg 
-         focus:outline-none focus:border-[#39FF14] shadow-[inset_0_4px_10px_rgba(0,0,0,1)] 
-         transition-none placeholder:text-gray-800 uppercase;
+/* Контейнер формы */
+.contract-form {
+  display: flex;
+  flex-direction: column;
+  gap: 2.5rem;
+  position: relative;
+  z-index: 10;
 }
-.modal-input-red {
-  @apply w-full px-4 py-3 bg-black border-2 border-[#333] text-white font-mono text-lg 
-         focus:outline-none focus:border-[#ff0000] shadow-[inset_0_4px_10px_rgba(0,0,0,1)] 
-         transition-none placeholder:text-gray-800 uppercase;
+
+/* Секции и заголовки */
+.form-section {
+  display: flex;
+  flex-direction: column;
+  gap: 1.5rem;
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+  margin-bottom: 0.5rem;
+}
+.section-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.5rem;
+  color: white;
+  text-transform: uppercase;
+  letter-spacing: -0.025em;
+  margin: 0;
+}
+.section-title.text-red {
+  color: #ff0000;
+}
+.section-line {
+  flex: 1;
+  height: 2px;
+  background-color: #333;
+}
+.section-line.bg-red {
+  background-color: #ff0000;
+  opacity: 0.5;
+}
+
+/* Группы инпутов */
+.input-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+.input-label {
+  display: flex;
+  justify-content: space-between;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.625rem; /* 10px */
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+}
+.required-mark {
+  color: #ff0000;
+}
+
+/* Сами поля ввода (Брутализм) */
+.form-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  background-color: black;
+  border: 2px solid #333;
+  color: white;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1rem;
+  text-transform: uppercase;
+  transition: border-color 0.2s, background-color 0.2s;
+}
+.form-input::placeholder {
+  color: #333;
+}
+.form-input:focus {
+  outline: none;
+  border-color: #ffffff;
+  background-color: #050505;
+}
+/* Спец-инпут для названия трека */
+.form-input.border-red:focus {
+  border-color: #ff0000;
+}
+
+/* Кнопка отправки */
+.submit-button {
+  width: 100%;
+  padding: 1.5rem;
+  background-color: white;
+  color: black;
+  border: 4px solid black;
+  text-transform: uppercase;
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.5rem;
+  box-shadow: 6px 6px 0 #ff0000;
+  transition: all 0.15s;
+  cursor: pointer;
+  margin-top: 1rem;
+}
+.submit-button:hover:not(:disabled) {
+  box-shadow: none;
+  transform: translate(6px, 6px);
+  background-color: #ff0000;
+  color: white;
+}
+.submit-button:active:not(:disabled) {
+  transform: translate(4px, 4px);
+  box-shadow: 2px 2px 0 #000;
+}
+.submit-button:disabled {
+  background-color: #222;
+  color: #555;
+  box-shadow: none;
+  border-color: #111;
+  cursor: not-allowed;
+}
+
+/* Внутренности кнопки */
+.button-content {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  letter-spacing: -0.025em;
+}
+.processing {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 1.25rem;
+  font-weight: bold;
+}
+
+/* Спиннер загрузки */
+.spinner {
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 3px solid black;
+  border-top-color: transparent;
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+.submit-button:disabled .spinner {
+  border-color: #555;
+  border-top-color: transparent;
+}
+
+@keyframes spin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
 }
 </style>

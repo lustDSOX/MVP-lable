@@ -1,6 +1,6 @@
 <template>
   <!-- Хедер: Жесткий карбоновый фон, толстая кроваво-красная граница снизу -->
-  <header class="z-50 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] bg-[#050505] font-['Impact','Arial_Black',sans-serif]">
+  <header class="z-30 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] bg-[#050505] font-['Impact','Arial_Black',sans-serif]">
     
 
     <nav class="max-w-7xl mx-auto px-4 lg:px-6">
@@ -69,7 +69,9 @@
 
           <li v-else class="flex items-center pl-6">
             <div class="w-45 h-11.5 relative group"> 
-              <router-link to="/dashboard" class="absolute inset-0 bg-[#39FF14] text-black uppercase text-xl flex items-center justify-center border-2 border-black shadow-[4px_4px_0_#fff] hover:shadow-none hover:translate-x-1 hover:translate-y-1 hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14] transition-none whitespace-nowrap">
+              <router-link 
+              :to="cabinetPath"
+              class="absolute inset-0 bg-[#39FF14] text-black uppercase text-xl flex items-center justify-center border-2 border-black shadow-[4px_4px_0_#fff] hover:shadow-none hover:translate-x-1 hover:translate-y-1 hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14] transition-none whitespace-nowrap">
                 [ КАБИНЕТ ]
                 <span class="invisible group-hover:visible animate-ping ml-1">_</span>
               </router-link>
@@ -101,8 +103,21 @@ export default defineComponent({
   setup(){
     const authed = useAuthStore()
 
+    const cabinetPath = computed(() => {
+      switch (authed.role) {
+        case 'admin':
+          return '/admin'
+        case 'manager':
+          return '/moderator'
+        case 'artist':
+        default:
+          return '/dashboard'
+      }
+    })
+
     return {
       authed,
+      cabinetPath,
     }
   }
 })

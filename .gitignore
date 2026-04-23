@@ -1,4 +1,4 @@
-# Logs
+# --- Logs & Debug ---
 logs
 *.log
 npm-debug.log*
@@ -6,34 +6,99 @@ yarn-debug.log*
 yarn-error.log*
 pnpm-debug.log*
 lerna-debug.log*
+*.cpuprofile
+*.heapprofile
 
+# --- Runtime & Dependencies ---
 node_modules
-.DS_Store
 dist
 dist-ssr
+build
+out
 coverage
-*.local
+.eslintcache
+.stylelintcache
+*.tsbuildinfo
 
-# Editor directories and files
+# --- Environments (Secrets) ---
+**/.env
+**/.env.local
+**/.env.development.local
+**/.env.test.local
+**/.env.production.local
+**/.env.development
+**/.env.test
+**/.env.production
+**/.env.staging
+**/.env.staging.local
+
+# Игнорируем специфичные файлы окружения (например, для docker или других тулзов)
+**/docker-compose.override.yml
+**/.env.backup
+**/.env.old
+
+
+# --- Python ---
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+env/
+venv/
+.venv/
+pip-log.txt
+pip-delete-this-directory.txt
+.history/
+.tox/
+.nox/
+.coverage
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+.pytest_cache/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# --- Editor: VS Code ---
 .vscode/*
 !.vscode/extensions.json
-.idea
+!.vscode/settings.json
+!.vscode/launch.json
+!.vscode/tasks.json
+*.code-workspace
+# История изменений (плагин Local History)
+.history/
+
+# --- Editor: JetBrains (WebStorm, PyCharm, etc.) ---
+.idea/
+*.iws
+*.iml
+*.ipr
+
+# --- Vite / Vitest ---
+.vite/
+*.timestamp-*-*.mjs
+*.timestamp-*-*.js
+.vitest-reports/
+__screenshots__/
+__traces__/
+
+# --- Cypress ---
+/cypress/videos/
+/cypress/screenshots/
+/cypress/downloads/
+
+# --- System files ---
+.DS_Store
+Thumbs.db
+desktop.ini
 *.suo
 *.ntvs*
 *.njsproj
 *.sln
 *.sw?
-
-*.tsbuildinfo
-
-.eslintcache
-
-# Cypress
-/cypress/videos/
-/cypress/screenshots/
-
-# Vitest
-__screenshots__/
-
-# Vite
-*.timestamp-*-*.mjs

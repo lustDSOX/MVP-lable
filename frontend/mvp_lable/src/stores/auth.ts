@@ -4,59 +4,58 @@ import { ref, computed } from 'vue'
 
 const TOKEN_KEY = 'jwt_token'
 const ARTIST_NAME_KEY = 'artist_name'
+const ROLE_KEY = 'user_role' // Добавляем ключ для роли
+
+export type UserRole = 'artist' | 'manager' | 'admin'
 
 export const useAuthStore = defineStore('auth', () => {
-  // состояние
   const token = ref<string | null>(localStorage.getItem(TOKEN_KEY))
   const artistName = ref<string>(localStorage.getItem(ARTIST_NAME_KEY) || '')
+  const role = ref<UserRole | null>(localStorage.getItem(ROLE_KEY) as UserRole)
   const isLoading = ref(false)
 
-  // computed
   const isAuthenticated = computed(() => !!token.value)
 
-  // actions
-  function setCredentials(jwtToken: string, name: string) {
+  function setCredentials(jwtToken: string, name: string, userRole: UserRole) {
     token.value = jwtToken
     artistName.value = name
+    role.value = userRole
     localStorage.setItem(TOKEN_KEY, jwtToken)
     localStorage.setItem(ARTIST_NAME_KEY, name)
+    localStorage.setItem(ROLE_KEY, userRole)
   }
 
   function logout() {
     token.value = null
     artistName.value = ''
+    role.value = null
     localStorage.removeItem(TOKEN_KEY)
     localStorage.removeItem(ARTIST_NAME_KEY)
+    localStorage.removeItem(ROLE_KEY)
   }
 
   async function login(email: string, password: string) {
     isLoading.value = true
     try {
-      // заглушка API с реальным JWT-подобным токеном
-      await new Promise(resolve => setTimeout(resolve, 1500))
+      await new Promise(resolve => setTimeout(resolve, 1000))
       
-      if (email === 'demo@label.ru' && password === 'demo123') {
-        // РЕАЛЬНЫЙ JWT-ТОКЕН (можно декодировать на jwt.io)
-        const jwtToken = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkRKIE5lb24iLCJpYXQiOjE3MjAwMDAwMDAsImV4cCI6MTc1MTUzNjAwMH0.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c'
-        setCredentials(jwtToken, 'DJ Neon')
+      // Имитация разных ролей для тестов
+      if (email === 'admin@label.ru' && password === 'admin123') {
+        setCredentials('fake-jwt-admin', 'System Overlord', 'admin')
+        return true
+      } else if (email === 'manager@label.ru' && password === 'manager123') {
+        setCredentials('fake-jwt-manager', 'Chief Editor', 'manager')
+        return true
+      } else if (email === 'demo@label.ru' && password === 'demo123') {
+        setCredentials('fake-jwt-artist', 'DJ Neon', 'artist')
         return true
       } else {
         throw new Error('Неверные данные')
       }
-    } catch (error) {
-      throw error
     } finally {
       isLoading.value = false
     }
   }
 
-  return {
-    token,
-    artistName,
-    isAuthenticated,
-    isLoading,
-    login,
-    logout,
-    setCredentials,
-  }
+  return { token, artistName, role, isAuthenticated, isLoading, login, logout }
 })

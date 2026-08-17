@@ -15,9 +15,11 @@
         </div>
       </div>
 
-      <!-- Mobile: thin bar; desktop: chain texture (CSS bg only ≥768px) -->
       <div class="relative w-screen left-1/2 -translate-x-1/2 h-2 md:h-10 mb-10 md:mb-20 flex items-center justify-center overflow-hidden">
-        <div class="absolute inset-0 bg-[#39FF14]/30 md:bg-transparent md:bg-chain-placeholder md:bg-repeat-x md:bg-center md:bg-size-[auto_300%]"></div>
+        <div
+          class="absolute inset-0 bg-[#39FF14]/30"
+          :class="decorReady ? 'md:bg-transparent md:bg-chain-placeholder md:bg-repeat-x md:bg-center md:bg-size-[auto_300%]' : ''"
+        ></div>
       </div>
 
       <div v-if="newsList.length > 0" class="space-y-12">
@@ -39,18 +41,43 @@
       </div>
     </div>
 
-    <!-- Mount heavy assets only on desktop — avoids download on phone -->
-    <template v-if="showDecor">
-      <img src="@/assets/chrome/chain.png" alt="" decoding="async" class="absolute h-250 rotate-35 -top-28 -left-70 pointer-events-none select-none" aria-hidden="true">
-      <div class="absolute bg-chain-placeholder w-[110%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] rotate-10 -right-10 top-1/4 pointer-events-none" aria-hidden="true"></div>
-      <div class="absolute bg-chain-placeholder w-[110%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] -rotate-10 -right-10 top-1/2 pointer-events-none" aria-hidden="true"></div>
-      <div class="absolute bg-chain-placeholder w-[120%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] rotate-30 -right-40 bottom-1/3 pointer-events-none" aria-hidden="true"></div>
-      <img src="@/assets/chrome/chain_circle.png" alt="" decoding="async" class="absolute h-180 top-5/11 -right-25 rotate-2 z-10 pointer-events-none select-none" aria-hidden="true">
-      <img src="@/assets/chrome/chain_flow.png" alt="" decoding="async" class="absolute h-180 -left-50 bottom-10 rotate-100 pointer-events-none select-none" aria-hidden="true">
-      <div class="absolute h-30 w-30 left-20 top-5/11 mask-star-face bg-[#1b1b1b11] -rotate-25 pointer-events-none" aria-hidden="true"></div>
-      <div class="absolute h-80 w-80 right-20 -bottom-15 mask-fairy-cat bg-[linear-gradient(135deg,#333_0%,#999_38%,#fff_48%,#fff_50%,#000_52%,#333_75%,#111_100%)] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] pointer-events-none" aria-hidden="true"></div>
-      <div class="absolute h-80 w-80 right-20 -bottom-15 mask-text bg-[linear-gradient(135deg,#333_0%,#999_38%,#fff_48%,#fff_50%,#000_52%,#333_75%,#111_100%)] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] pointer-events-none" aria-hidden="true"></div>
-    </template>
+    <div
+      v-if="showDecor"
+      class="absolute inset-0 pointer-events-none overflow-hidden"
+      :class="{ 'decor-ready': decorReady }"
+      aria-hidden="true"
+    >
+      <img
+        src="@/assets/chrome/chain.png"
+        alt=""
+        decoding="async"
+        fetchpriority="low"
+        class="decor-fade absolute h-250 rotate-35 -top-28 -left-70 select-none"
+        @load="onDecorImg"
+      >
+      <div class="decor-fade absolute bg-chain-placeholder w-[110%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] rotate-10 -right-10 top-1/4"></div>
+      <div class="decor-fade absolute bg-chain-placeholder w-[110%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] -rotate-10 -right-10 top-1/2"></div>
+      <div class="decor-fade absolute bg-chain-placeholder w-[120%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] rotate-30 -right-40 bottom-1/3"></div>
+      <img
+        src="@/assets/chrome/chain_circle.png"
+        alt=""
+        decoding="async"
+        fetchpriority="low"
+        class="decor-fade absolute h-180 top-5/11 -right-25 rotate-2 z-10 select-none"
+        @load="onDecorImg"
+      >
+      <img
+        src="@/assets/chrome/chain_flow.png"
+        alt=""
+        decoding="async"
+        fetchpriority="low"
+        class="decor-fade absolute h-180 -left-50 bottom-10 rotate-100 select-none"
+        @load="onDecorImg"
+      >
+      <div class="decor-fade absolute h-30 w-30 left-20 top-5/11 mask-star-face bg-[#1b1b1b11] -rotate-25"></div>
+      <div class="decor-fade absolute h-80 w-80 right-20 -bottom-15 mask-fairy-cat bg-[linear-gradient(135deg,#333_0%,#999_38%,#fff_48%,#fff_50%,#000_52%,#333_75%,#111_100%)] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"></div>
+      <div class="decor-fade absolute h-80 w-80 right-20 -bottom-15 mask-text bg-[linear-gradient(135deg,#333_0%,#999_38%,#fff_48%,#fff_50%,#000_52%,#333_75%,#111_100%)] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)]"></div>
+    </div>
   </section>
 </template>
 
@@ -90,6 +117,13 @@
     background-image: url("@/assets/chrome/chain_bg.png");
   }
 }
+.decor-fade {
+  opacity: 0;
+  transition: opacity 0.8s ease;
+}
+.decor-ready .decor-fade {
+  opacity: 1;
+}
 </style>
 
 <script lang="ts">
@@ -103,22 +137,50 @@ export default defineComponent({
     return {
       newsList: [] as NewsItemData[],
       showDecor: false,
+      decorReady: false,
+      _decorLoaded: 0,
+      _idleHandle: 0 as number,
     }
   },
   mounted() {
     const mq = window.matchMedia('(min-width: 768px)')
-    const apply = () => {
-      this.showDecor = mq.matches
+    const schedule = () => {
+      if (!mq.matches) {
+        this.showDecor = false
+        this.decorReady = false
+        return
+      }
+      const start = () => {
+        this.showDecor = true
+        window.setTimeout(() => {
+          this.decorReady = true
+        }, 400)
+      }
+      if ('requestIdleCallback' in window) {
+        this._idleHandle = (window as any).requestIdleCallback(start, { timeout: 1200 })
+      } else {
+        this._idleHandle = window.setTimeout(start, 600) as unknown as number
+      }
     }
-    apply()
-    mq.addEventListener?.('change', apply)
+    schedule()
+    mq.addEventListener?.('change', schedule)
     ;(this as any)._mq = mq
-    ;(this as any)._mqHandler = apply
+    ;(this as any)._mqHandler = schedule
   },
   unmounted() {
     const mq = (this as any)._mq
-    const apply = (this as any)._mqHandler
-    if (mq && apply) mq.removeEventListener?.('change', apply)
+    const handler = (this as any)._mqHandler
+    if (mq && handler) mq.removeEventListener?.('change', handler)
+    if (this._idleHandle) {
+      if ('cancelIdleCallback' in window) (window as any).cancelIdleCallback(this._idleHandle)
+      else clearTimeout(this._idleHandle)
+    }
+  },
+  methods: {
+    onDecorImg() {
+      this._decorLoaded += 1
+      if (this._decorLoaded >= 2) this.decorReady = true
+    },
   },
   created() {
     this.newsList = [

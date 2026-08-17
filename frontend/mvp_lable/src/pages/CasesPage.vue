@@ -59,6 +59,7 @@
     <Transition name="glitch-fade">
       <CaseDetail 
         v-if="activeCase" 
+        :key="activeCase.id"
         :caseData="activeCase" 
         @close="activeCase = null" 
       />

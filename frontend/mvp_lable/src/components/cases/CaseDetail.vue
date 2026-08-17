@@ -1,8 +1,9 @@
 <template>
-  <!-- BACKDROP -->
+  <Teleport to="body">
+  <!-- BACKDROP — teleported so Header (z-30) cannot cover close btn -->
   <div 
     @click.self="$emit('close')"
-    class="fixed inset-0 z-50 flex items-end sm:items-center justify-center p-0 sm:p-4 font-['VT323',monospace] text-white overflow-hidden selection:bg-[#39FF14] selection:text-black"
+    class="fixed inset-0 z-[200] flex items-end sm:items-center justify-center p-0 sm:p-4 font-['VT323',monospace] text-white overflow-hidden selection:bg-[#39FF14] selection:text-black"
   >
     <div class="absolute inset-0 bg-black/70 backdrop-blur-sm z-0"></div>
     <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-30 mix-blend-color-dodge pointer-events-none z-0 hidden sm:block"></div>
@@ -13,14 +14,14 @@
     >
       <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.4)_50%)] bg-size-[100%_4px] pointer-events-none z-20 hidden sm:block"></div>
 
-      <div class="bg-[#39FF14]/50 p-2 text-black flex justify-between items-center shrink-0 border-b-2 border-black/50 relative z-30">
+      <div class="bg-[#39FF14] p-2 text-black flex justify-between items-center shrink-0 border-b-2 border-black relative z-[210]">
         <span class="text-base sm:text-xl px-2 tracking-wider truncate">
           SYSTEM_LOG: DOSSIER_00{{ caseData.id }}
         </span>
         <button 
           type="button"
-          @click="$emit('close')"
-          class="relative z-40 w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center bg-black text-white border-2 border-black text-2xl font-black leading-none hover:bg-[#ff0000] hover:border-[#ff0000] active:scale-95 transition-colors shrink-0"
+          @click.stop="$emit('close')"
+          class="relative z-[210] w-11 h-11 sm:w-10 sm:h-10 flex items-center justify-center bg-black text-white border-2 border-black text-3xl font-black leading-none hover:bg-[#ff0000] hover:border-[#ff0000] active:scale-95 shrink-0"
           aria-label="Close"
         >
           ×
@@ -67,6 +68,7 @@
       </div>
     </div>
   </div>
+  </Teleport>
 </template>
 
 <script lang="ts">

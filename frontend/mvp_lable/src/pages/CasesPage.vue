@@ -1,5 +1,5 @@
 <template>
-  <section class="min-h-screen px-4 lg:px-32 py-20 pb-12 font-['Impact','Arial_Black',sans-serif] selection:bg-[#39FF14] selection:text-black relative overflow-hidden bg-[#050805]">
+  <section class="min-h-screen px-4 sm:px-6 lg:px-16 xl:px-32 py-10 sm:py-16 lg:py-20 pb-12 font-['Impact','Arial_Black',sans-serif] selection:bg-[#39FF14] selection:text-black relative overflow-hidden bg-[#050805]">
 
     <div class="absolute inset-0 z-100 pointer-events-none select-none overflow-hidden">
 
@@ -8,7 +8,7 @@
       <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(57,255,20,0.02)_100%)] bg-size-[100%_8px] animate-[scan-roll_20s_linear_infinite] transform-gpu"></div>
       <div class="fixed inset-0 z-40 pointer-events-none bg-[radial-gradient(circle,transparent_50%,rgba(0,0,0,0.5)_80%,rgba(0,0,0,1)_100%)] transform-gpu"></div>
 
-      <div class="absolute top-20 right-30 font-mono text-[#39FF14] text-xs opacity-70 pointer-events-none select-none">
+      <div class="absolute top-10 sm:top-20 right-4 sm:right-30 font-mono text-[#39FF14] text-[10px] sm:text-xs opacity-70 pointer-events-none select-none hidden sm:block">
         <div class="flex items-center gap-2">
           <div class="w-2 h-2 bg-[#39FF14] rounded-full animate-pulse"></div>
           PLAY 00:44
@@ -20,7 +20,7 @@
         <div class="absolute w-full h-32 bg-white/5 blur-3xl animate-[tracking-line_12s_linear_infinite]"></div>
       </div>
 
-      <div class="absolute left-15 top-1/2 -translate-y-1/2 flex flex-col gap-4 opacity-40 font-mono text-[8px] text-[#39FF14] lg:flex">
+      <div class="absolute left-15 top-1/2 -translate-y-1/2 flex-col gap-4 opacity-40 font-mono text-[8px] text-[#39FF14] hidden lg:flex">
         <span v-for="n in 5" :key="n" class="border-t border-[#39FF14] w-2">{{ 100 - n * 20 }}%</span>
       </div>
 
@@ -28,10 +28,9 @@
 
 <div class="fixed inset-0 pointer-events-none z-50 shadow-[inset_0_0_150px_rgba(0,0,0,0.8)]"></div>
 
-    <div class="max-w-7xl mx-auto relative z-10 transform scale-y-[1.02] scale-x-[0.98] rounded-[100px/40px]">
+    <div class="max-w-7xl mx-auto relative z-10 sm:transform sm:scale-y-[1.02] sm:scale-x-[0.98] sm:rounded-[100px/40px]">
       
-      <!-- АГРЕССИВНЫЙ ЗАГОЛОВОК -->
-      <div class="mb-16 border-b-8 border-[#39FF14] pb-4 inline-block transform">
+      <div class="mb-8 sm:mb-16 border-b-4 sm:border-b-8 border-[#39FF14] pb-4 inline-block transform max-w-full">
         <h1 class="variant-vhs py-0 mb-10" data-text="CASE_FILES">
          CASE_FILES
         </h1>
@@ -40,7 +39,6 @@
         </div>
       </div>
 
-      <!-- СЕТКА: ЖЕСТКИЕ ПАНЕЛИ (Gap-0 для эффекта монолитности) -->
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-4 border-[#222] bg-[#222]">
         <CaseItem
           v-for="caseItem in cases"
@@ -68,7 +66,7 @@
 <script lang="ts">
 import { defineComponent } from 'vue'
 import CaseItem from '@/components/cases/CaseItem.vue'
-import CaseDetail from '@/components/cases/CaseDetail.vue';
+import CaseDetail from '@/components/cases/CaseDetail.vue'
 
 export default defineComponent({
   name: 'CasesPage',

@@ -51,11 +51,21 @@
       <div class="col-span-1 lg:col-span-1 lg:col-start-4 relative p-4 sm:p-6 flex items-center justify-center overflow-hidden order-2">
 
         <div class="w-full max-w-md mx-auto aspect-4/3 relative shadow-[6px_6px_0_#000] sm:shadow-[10px_10px_0_#000] group z-20">
+            <!-- Mobile: no 1.3MB GIF — static VHS panel -->
+            <div
+              class="md:hidden absolute inset-0 m-1.5 bg-[#0a0a0a] flex flex-col items-center justify-center gap-2 select-none pointer-events-none"
+              aria-hidden="true"
+            >
+              <div class="w-full h-full absolute inset-0 opacity-30 bg-[repeating-linear-gradient(0deg,transparent,transparent_2px,rgba(0,0,0,0.4)_2px,rgba(0,0,0,0.4)_4px)]"></div>
+              <span class="relative font-mono text-[10px] text-red-500 tracking-widest">NO_SIGNAL // MOBILE</span>
+            </div>
+            <!-- Desktop: animated GIF -->
             <img 
+              v-if="showHeroGif"
               src="@/assets/kai-angel-viperr.gif" 
               alt="vhs-effect" 
-              loading="eager" decoding="async"
-              class="absolute inset-0 w-full h-full object-cover object-center p-1.5 sm:p-2 blur-[0.5px] sm:blur-[1px] select-none pointer-events-none"
+              loading="lazy" decoding="async"
+              class="hidden md:block absolute inset-0 w-full h-full object-cover object-center p-2 blur-[1px] select-none pointer-events-none"
             />
           <div class="absolute top-0 left-0 w-3 h-3 sm:w-4 sm:h-4 border-t-2 sm:border-t-4 border-l-2 sm:border-l-4 border-red-500"></div>
           <div class="absolute top-0 right-0 w-3 h-3 sm:w-4 sm:h-4 border-t-2 sm:border-t-4 border-r-2 sm:border-r-4 border-red-500"></div>
@@ -114,4 +124,11 @@
 </style>
 
 <script setup lang="ts">
+import { ref, onMounted } from 'vue'
+
+/** 1.3MB GIF only on desktop — mobile keeps static VHS panel */
+const showHeroGif = ref(false)
+onMounted(() => {
+  showHeroGif.value = window.matchMedia('(min-width: 768px)').matches
+})
 </script>

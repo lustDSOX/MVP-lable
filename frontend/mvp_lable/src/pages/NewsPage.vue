@@ -2,7 +2,7 @@
   <section class="min-h-screen pt-20 sm:pt-28 md:pt-32 pb-12 sm:pb-20 px-4 lg:px-10 font-['Impact','Arial_Black',sans-serif] text-white overflow-hidden relative selection:bg-[#ff0000] selection:text-white">
 
     <div class="max-w-6xl mx-auto relative z-10">
-      <div class="flex flex-col md:flex-row justify-between items-end pb-2 sm:pb-4 md:pb-6 relative">
+      <div class="flex flex-col md:flex-row justify-between items-end pb-4 sm:pb-4 md:pb-6 relative">
         <div class="relative">
           <h1 class="font-planet h1-metal-textured" data-text="NEWS_LOG">
             NEWS_LOG
@@ -15,16 +15,7 @@
         </div>
       </div>
 
-      <!-- Mobile: metal double-line divider (not a solid green bar) -->
-      <div class="md:hidden mb-6 mt-1 px-1" aria-hidden="true">
-        <div class="h-px bg-gradient-to-r from-transparent via-[#39FF14] to-transparent opacity-80"></div>
-        <div class="flex items-center justify-center gap-1 my-1.5">
-          <span v-for="n in 12" :key="n" class="w-1.5 h-1.5 border border-[#39FF14]/70 bg-black rotate-45"></span>
-        </div>
-        <div class="h-px bg-gradient-to-r from-transparent via-[#555] to-transparent"></div>
-      </div>
-
-      <!-- Desktop: chain strip -->
+      <!-- Desktop: chain strip only -->
       <div class="hidden md:flex relative w-screen left-1/2 -translate-x-1/2 h-10 mb-20 items-center justify-center overflow-hidden">
         <div
           class="absolute inset-0"
@@ -32,7 +23,7 @@
         ></div>
       </div>
 
-      <div v-if="newsList.length > 0" class="space-y-5 sm:space-y-8 md:space-y-12">
+      <div v-if="newsList.length > 0" class="space-y-5 sm:space-y-8 md:space-y-12 mt-2 md:mt-0">
         <NewsItem
           v-for="(news, index) in newsList"
           :key="news.id"

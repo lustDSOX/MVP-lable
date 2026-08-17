@@ -113,5 +113,4 @@
 </style>
 
 <script setup lang="ts">
-import LineIcon from '@/assets/svg/line.svg'
 </script>

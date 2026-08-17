@@ -20,10 +20,10 @@
         <button 
           type="button"
           @click="$emit('close')"
-          class="w-11 h-11 sm:w-8 sm:h-8 flex items-center justify-center bg-black/20 text-[#39FF14] text-2xl hover:bg-black hover:text-[#ff0000] transition-colors shrink-0"
+          class="relative z-40 w-11 h-11 sm:w-9 sm:h-9 flex items-center justify-center bg-black text-white border-2 border-black text-2xl font-black leading-none hover:bg-[#ff0000] hover:border-[#ff0000] active:scale-95 transition-colors shrink-0"
           aria-label="Close"
         >
-          X
+          ×
         </button>
       </div>
 

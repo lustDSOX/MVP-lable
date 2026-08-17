@@ -1,75 +1,69 @@
-
-import CaseDetail from '@/components/cases/CaseDetail.vue'
-import GuideDetail from '@/components/guides/GuideDetail.vue'
-import TrackForm from '@/components/track/TrackForm.vue'
 import Layout from '@/layouts/Layout.vue'
-import About from '@/pages/About.vue'
-import CasesPage from '@/pages/CasesPage.vue'
-import Dashboard from '@/pages/Dashboard.vue'
-import EventsPage from '@/pages/EventsPage.vue'
-import GuidesPage from '@/pages/GuidesPage.vue'
 import Home from '@/pages/Home.vue'
-import Login from '@/pages/Login.vue'
-import NewsPage from '@/pages/NewsPage.vue'
-import ModeratorCabinet from '@/pages/ModeratorCabinet.vue'
-import AdminCabinet from '@/pages/AdminCabinet.vue'
-
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
     {
-      path:'/',
-      component:Layout,
-      children:[
-        {path:'',component:Home},
-        {path: 'about', component:About},
-        {path: 'cases', component:CasesPage},
-        {path: 'cases/:id', component:CaseDetail, name:"CaseDetail", props:true},
-        {path: 'news', component:NewsPage},
-        {path: 'events', component:EventsPage},
-        {path: 'guides', component:GuidesPage},
-        {path: 'guides/:id', component:GuideDetail, name:"GuideDetail", props:true},
-        {path: 'upload', component:TrackForm},
-        {path: 'login', component:Login},
-        { 
-          path: 'dashboard', 
-          component: Dashboard,
-          meta: { requiresAuth: true, roles: ['artist'] } 
+      path: '/',
+      component: Layout,
+      children: [
+        { path: '', component: Home },
+        { path: 'about', component: () => import('@/pages/About.vue') },
+        { path: 'cases', component: () => import('@/pages/CasesPage.vue') },
+        {
+          path: 'cases/:id',
+          name: 'CaseDetail',
+          component: () => import('@/components/cases/CaseDetail.vue'),
+          props: true,
         },
-        { 
-          path: 'moderator', 
-          component: ModeratorCabinet,
-          meta: { requiresAuth: true, roles: ['manager', 'admin'] } 
+        { path: 'news', component: () => import('@/pages/NewsPage.vue') },
+        { path: 'events', component: () => import('@/pages/EventsPage.vue') },
+        { path: 'guides', component: () => import('@/pages/GuidesPage.vue') },
+        {
+          path: 'guides/:id',
+          name: 'GuideDetail',
+          component: () => import('@/components/guides/GuideDetail.vue'),
+          props: true,
         },
-        { 
-          path: 'admin', 
-          component: AdminCabinet,
-          meta: { requiresAuth: true, roles: ['admin'] } 
+        { path: 'upload', component: () => import('@/components/track/TrackForm.vue') },
+        { path: 'login', component: () => import('@/pages/Login.vue') },
+        { path: 'purchase', component: () => import('@/pages/PurchaseStub.vue') },
+        {
+          path: 'dashboard',
+          component: () => import('@/pages/Dashboard.vue'),
+          meta: { requiresAuth: true, roles: ['artist'] },
         },
-      ]
-    }
+        {
+          path: 'moderator',
+          component: () => import('@/pages/ModeratorCabinet.vue'),
+          meta: { requiresAuth: true, roles: ['manager', 'admin'] },
+        },
+        {
+          path: 'admin',
+          component: () => import('@/pages/AdminCabinet.vue'),
+          meta: { requiresAuth: true, roles: ['admin'] },
+        },
+      ],
+    },
   ],
+  scrollBehavior() {
+    return { top: 0 }
+  },
 })
 
-router.beforeEach((to, from, next) => {
+router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore()
-  
-  // 1. Проверяем, нужна ли авторизация для страницы
-  const requiresAuth = to.matched.some(record => record.meta.requiresAuth)
+  const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const allowedRoles = to.meta.roles as string[] | undefined
 
   if (requiresAuth && !authStore.isAuthenticated) {
     next('/login')
-  } 
-  else if (requiresAuth && allowedRoles && !allowedRoles.includes(authStore.role || '')) {
-    alert('ACCESS DENIED: Insufficient permissions')
-    next('/dashboard') 
-  } 
-  else {
+  } else if (requiresAuth && allowedRoles && !allowedRoles.includes(authStore.role || '')) {
+    next('/dashboard')
+  } else {
     next()
   }
 })

@@ -20,12 +20,21 @@
           <li class="flex items-stretch" v-for="link in navLinks" :key="link.to">
             <router-link
               :to="link.to"
-              class="nav-link flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative"
-              :active-class="link.to === '/' ? '' : '!text-black !bg-[#39FF14] !shadow-none'"
-              exact-active-class="!text-black !bg-[#39FF14] !shadow-none"
+              custom
+              v-slot="{ href, navigate, isActive, isExactActive }"
             >
-              <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">{{ link.label }}</span>
-              <span class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14] opacity-0 group-hover:opacity-100"></span>
+              <a
+                :href="href"
+                @click="navigate"
+                class="flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative"
+                :class="isNavActive(link.to, isActive, isExactActive) ? '!text-black !bg-[#39FF14] !shadow-none' : ''"
+              >
+                <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">{{ link.label }}</span>
+                <span
+                  class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14]"
+                  :class="isNavActive(link.to, isActive, isExactActive) ? 'opacity-100' : 'opacity-0 group-hover:opacity-100'"
+                ></span>
+              </a>
             </router-link>
           </li>
 
@@ -70,12 +79,17 @@
         <li v-for="link in navLinks" :key="link.to">
           <router-link 
             :to="link.to" 
-            @click="menuOpen = false"
-            class="block px-4 py-3.5 min-h-[48px] border-b border-[#222] text-gray-400 font-mono text-sm tracking-widest hover:bg-white hover:text-black"
-            :active-class="link.to === '/' ? '' : '!bg-[#39FF14] !text-black font-black'"
-            exact-active-class="!bg-[#39FF14] !text-black font-black"
+            custom
+            v-slot="{ href, navigate, isActive, isExactActive }"
           >
-            {{ link.label }}
+            <a
+              :href="href"
+              @click="(e) => { navigate(e); menuOpen = false }"
+              class="block px-4 py-3.5 min-h-[48px] border-b border-[#222] text-gray-400 font-mono text-sm tracking-widest hover:bg-white hover:text-black"
+              :class="isNavActive(link.to, isActive, isExactActive) ? '!bg-[#39FF14] !text-black font-black' : ''"
+            >
+              {{ link.label }}
+            </a>
           </router-link>
         </li>
         <li class="p-4">
@@ -129,6 +143,10 @@ export default defineComponent({
       { to: '/guides', label: 'ДЛЯ_АРТИСТОВ' },
     ]
 
+    /** `/` matches every path — only highlight home on exact match */
+    const isNavActive = (to: string, isActive: boolean, isExactActive: boolean) =>
+      to === '/' ? isExactActive : isActive
+
     const cabinetPath = computed(() => {
       const role = authed.role
       if (role === 'admin') return '/admin'
@@ -136,7 +154,7 @@ export default defineComponent({
       return '/dashboard'
     })
 
-    return { authed, menuOpen, navLinks, cabinetPath }
+    return { authed, menuOpen, navLinks, cabinetPath, isNavActive }
   },
 })
 </script>

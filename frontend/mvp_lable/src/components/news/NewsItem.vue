@@ -1,7 +1,7 @@
 <template>
-  <div class="group relative max-w-4xl mx-auto mb-16 ">
+  <div class="group relative max-w-4xl mx-auto mb-6 sm:mb-10 md:mb-16">
     
-    <!-- ДЕКОРАТИВНЫЙ ЭЛЕМЕНТ: Правый верхний угол -->
+    <!-- Chrome decor — desktop only -->
     <div class="hidden md:block absolute -top-1/7 -right-70 w-2/3 z-10 pointer-events-none -rotate-12">
       <img src="@/assets/chrome/t_chrome.webp" 
            loading="lazy"
@@ -10,7 +10,6 @@
            alt="">
     </div>
 
-    <!-- ДЕКОРАТИВНЫЙ ЭЛЕМЕНТ: Левый нижний угол -->
     <div class="hidden md:block absolute -bottom-1/12 -left-1/5 w-1/2 z-10 pointer-events-none">
       <img src="@/assets/chrome/b_chrome.webp" 
            loading="lazy"
@@ -19,50 +18,40 @@
            alt="">
     </div>
 
-    <div class="y2k-metal p-10 lg:p-16">
+    <div class="y2k-metal news-card p-4 sm:p-6 md:p-10 lg:p-16">
 
-      <!-- Контент поверх текстуры -->
       <div class="relative z-20">
         
-        <!-- Мета-информация (Штамповка) -->
-        <div class="flex items-center justify-between mb-10">
-          
-          <div class="flex items-center gap-4 text-sm font-mono tracking-[0.4em] uppercase text-engraved-light">
+        <div class="flex items-center justify-between gap-2 mb-4 sm:mb-6 md:mb-10">
+          <div class="flex items-center gap-2 sm:gap-4 text-[10px] sm:text-sm font-mono tracking-[0.2em] sm:tracking-[0.4em] uppercase text-engraved-light">
             SOURCE SOX
           </div>
-
-          <div class="text-sm font-mono text-engraved-light uppercase tracking-[0.2em]">
+          <div class="text-[10px] sm:text-sm font-mono text-engraved-light uppercase tracking-[0.15em] sm:tracking-[0.2em] shrink-0">
             [{{ publishedAt }}]
           </div>
         </div>
 
-        <!-- Заголовок: Вспыхивает белым (настройка в CSS .group:hover .text-engraved) -->
-        <h2 class="text-4xl md:text-6xl font-cindie uppercase italic tracking-tighter leading-none mb-8 
-                   text-engraved">
+        <h2 class="text-xl sm:text-3xl md:text-6xl font-cindie uppercase italic tracking-tighter leading-tight sm:leading-none mb-3 sm:mb-6 md:mb-8 text-engraved">
           {{ title }}
         </h2>
 
-        <!-- Описание: Вспыхивает светло-серым -->
-        <p class="text-engraved-light font-montserrat leading-relaxed max-w-2xl mb-12 text-2xl">
+        <p class="text-engraved-light font-montserrat leading-snug sm:leading-relaxed max-w-2xl mb-4 sm:mb-8 md:mb-12 text-sm sm:text-lg md:text-2xl">
           {{ description }}
         </p>
 
-        <!-- Ссылка: Оставили голубой неон только для самой интерактивной кнопки -->
         <div class="flex justify-start">
           <a :href="sourceLink" target="_blank"
-             class="group/link flex items-center gap-6 text-xl uppercase
-                    text-engraved tracking-widest transition-all duration-300">
-            <!-- Линия фрезеровки -->
-            <span class="w-12 h-0.5 bg-black/80 shadow-[0_1px_0_rgba(255,255,255,0.4)] 
-                         group-hover/link:w-24 group-hover:bg-white transition-all duration-500"></span>
+             class="group/link flex items-center gap-3 sm:gap-6 text-sm sm:text-xl uppercase
+                    text-engraved tracking-widest transition-all duration-300 min-h-[44px]">
+            <span class="w-8 sm:w-12 h-0.5 bg-black/80 shadow-[0_1px_0_rgba(255,255,255,0.4)] 
+                         group-hover/link:w-16 sm:group-hover/link:w-24 group-hover:bg-white transition-all duration-500"></span>
             Access Terminal
           </a>
         </div>
       </div>
 
-      <!-- Декор: Серийный номер -->
-      <div class="absolute right-6 bottom-6 font-mono text-[10px] tracking-widest text-engraved-light opacity-60">
-        LOG_ID: 00{{ Math.floor(Math.random() * 999) }} / SECTOR_01
+      <div class="absolute right-3 bottom-2 sm:right-6 sm:bottom-6 font-mono text-[8px] sm:text-[10px] tracking-widest text-engraved-light opacity-60">
+        LOG_ID: 00{{ id }} / SECTOR_01
       </div>
 
     </div>
@@ -70,13 +59,30 @@
 </template>
 
 <style scoped>
-
-  .metal-card {
-      background: linear-gradient(135deg, #0f0f0f 0%, #1a1a1a 100%);
-      border: 1px solid #2a2a2a;
-      box-shadow: inset 0 0 20px rgba(0,0,0,0.5);
+/* Mobile: always "lit" — no hover needed */
+@media (max-width: 767px) {
+  .news-card :deep(.text-engraved),
+  .group .text-engraved {
+    color: #ffffff !important;
+    text-shadow:
+      -1px -1px 1px rgba(0, 0, 0, 0.9),
+      0 0 12px rgba(255, 255, 255, 0.25);
   }
-
+  .news-card :deep(.text-engraved-light),
+  .group .text-engraved-light {
+    color: #e4e4e7 !important;
+  }
+  .news-card.y2k-metal {
+    box-shadow:
+      inset 2px 2px 5px rgba(255, 255, 255, 0.45),
+      inset -3px -3px 6px rgba(0, 0, 0, 0.9),
+      0 0 18px rgba(57, 255, 20, 0.2),
+      8px 8px 0 rgba(0, 0, 0, 0.85) !important;
+  }
+  .news-card.y2k-metal::before {
+    filter: contrast(1.05) brightness(0.85) saturate(0.5) !important;
+  }
+}
 </style>
 
 <script lang="ts">

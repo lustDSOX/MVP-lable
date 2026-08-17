@@ -9,7 +9,7 @@
     
     <div 
       class="relative z-10 w-full sm:max-w-5xl h-[100dvh] sm:h-auto max-h-[100dvh] sm:max-h-[90vh] bg-black/95 sm:bg-black/90 border-0 sm:border-2 border-[#39FF14]/50 flex flex-col 
-             shadow-none sm:shadow-[0_0_25px_5px_rgba(57,255,20,0.2)] sm:animate-window-flicker rounded-none"
+             shadow-none sm:shadow-[0_0_25px_5px_rgba(57,255,20,0.2)] rounded-none"
     >
       <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(0,0,0,0.4)_50%)] bg-size-[100%_4px] pointer-events-none z-20 hidden sm:block"></div>
 
@@ -35,12 +35,12 @@
         </div>
 
         <div class="lg:col-span-8 p-4 sm:p-6 md:p-8 flex flex-col">
-          <h2 class="text-3xl sm:text-5xl md:text-6xl text-[#39FF14]/50 mb-4 sm:mb-6 vhs-text" :data-text="caseData.title">
+          <h2 class="text-2xl sm:text-5xl md:text-6xl text-[#39FF14] mb-4 sm:mb-6 font-black leading-tight case-title">
             {{ caseData.title }}
           </h2>
           
           <div class="mb-6 sm:mb-8">
-            <p class="text-base sm:text-xl text-white/80 leading-snug tracking-wide vhs-text" :data-text="caseData.description">
+            <p class="text-base sm:text-xl text-white/90 leading-relaxed tracking-wide case-body">
               {{ caseData.description }}
             </p>
           </div>
@@ -58,7 +58,7 @@
                   'ACCESS: GRANTED'
                 ]" :key="res" class="flex items-center gap-2 text-base sm:text-lg">
                 <div class="w-2 h-2 bg-[#ff0000] shrink-0"></div>
-                <span class="vhs-text" :data-text="res">{{ res }}</span>
+                <span class="case-stat">{{ res }}</span>
               </li>
             </ul>
           </div>
@@ -102,59 +102,32 @@ export default defineComponent({
   background-size: 100% 4px;
 }
 
-.vhs-text {
-  position: relative;
-  color: white;
-  text-shadow: 0 0 2px rgba(57, 255, 20, 0.7);
+/* Readable solid text — no glitch jitter */
+.case-title {
+  text-shadow: 0 0 8px rgba(57, 255, 20, 0.35);
 }
-
-.vhs-text::before {
-  content: attr(data-text);
-  position: absolute;
-  left: 0;
-  top: 0;
+.case-body {
+  text-shadow: none;
+}
+.case-stat {
   color: #39FF14;
-  z-index: 1;
-  animation: text-glitch 0.05s infinite;
-}
-
-.vhs-text::after {
-  content: attr(data-text);
-  position: absolute;
-  left: -2px;
-  top: 0;
-  color: #ff0000;
-  mix-blend-mode: screen;
-  opacity: 0.7;
-  z-index: 0;
-  animation: text-glitch 0.07s infinite;
+  text-shadow: none;
 }
 
 .filter-vhs {
   filter: grayscale(40%) contrast(1.2) brightness(0.9) drop-shadow(0 0 5px rgba(57, 255, 20, 0.3));
 }
 
-@keyframes text-glitch {
-  0% { transform: translate(0, 0); }
-  25% { transform: translate(1px, -1px); }
-  50% { transform: translate(-1px, 1px); }
-  75% { transform: translate(1px, 1px); }
-  100% { transform: translate(-1px, -1px); }
-}
-
-@keyframes window-flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.98; }
-}
-.animate-window-flicker {
-  animation: window-flicker 0.2s infinite;
+@media (min-width: 640px) {
+  .case-title {
+    position: relative;
+    color: rgba(57, 255, 20, 0.95);
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
-  .vhs-text::before,
-  .vhs-text::after,
   .animate-window-flicker {
-    animation: none;
+    animation: none !important;
   }
 }
 </style>

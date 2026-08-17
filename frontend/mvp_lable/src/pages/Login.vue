@@ -107,16 +107,17 @@
   background-size: auto 100%;
 }
 
-/* КОРРЕКЦИЯ ДЛЯ ВАШЕГО h1-metal-textured ПОД ШРИФТ Archivo Black */
+/* Archivo Black + align shine with glyph box (no fixed 2rem — broke mobile) */
 .h1-metal-textured {
   font-family: 'Archivo Black', 'Impact', sans-serif;
-  letter-spacing: -0.05em; /* Делаем буквы плотнее */
-  padding-right: 0; /* Убираем лишний отступ */
+  letter-spacing: -0.05em;
+  padding-right: 0;
+  padding-top: 0 !important;
+  padding-bottom: 0 !important;
 }
-/* Смещаем блик ниже, чтобы он попадал на массивные буквы Archivo Black */
 .h1-metal-textured::after {
-  top: 2rem;
-  animation: metal-shine 6s linear infinite; /* Ускоряем анимацию */
+  top: 0 !important;
+  animation: metal-shine 6s linear infinite;
 }
 
 /* СЕТКА */

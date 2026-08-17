@@ -21,7 +21,8 @@
             <router-link
               :to="link.to"
               class="nav-link flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative"
-              active-class="!text-black !bg-[#39FF14] !shadow-none"
+              :active-class="link.to === '/' ? '' : '!text-black !bg-[#39FF14] !shadow-none'"
+              exact-active-class="!text-black !bg-[#39FF14] !shadow-none"
             >
               <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">{{ link.label }}</span>
               <span class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14] opacity-0 group-hover:opacity-100"></span>
@@ -71,7 +72,8 @@
             :to="link.to" 
             @click="menuOpen = false"
             class="block px-4 py-3.5 min-h-[48px] border-b border-[#222] text-gray-400 font-mono text-sm tracking-widest hover:bg-white hover:text-black"
-            active-class="!bg-[#39FF14] !text-black font-black"
+            :active-class="link.to === '/' ? '' : '!bg-[#39FF14] !text-black font-black'"
+            exact-active-class="!bg-[#39FF14] !text-black font-black"
           >
             {{ link.label }}
           </router-link>

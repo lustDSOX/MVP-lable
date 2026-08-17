@@ -1,6 +1,6 @@
 <template>
   <!-- Главный контейнер -->
-  <div class="relative flex-1 overflow-hidden w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 min-h-[70vh]">
+  <div class="relative flex-1 overflow-hidden w-full max-w-[100vw] grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 min-h-[70vh]">
 
       <!-- ЦЕНТРАЛЬНЫЙ БЛОК -->
       <div class="col-span-1 lg:col-span-2 p-4 sm:p-6 flex flex-col justify-center relative order-1">
@@ -54,6 +54,7 @@
             <img 
               src="@/assets/kai-angel-viperr.gif" 
               alt="vhs-effect" 
+              loading="eager" decoding="async"
               class="absolute inset-0 w-full h-full object-cover object-center p-1.5 sm:p-2 blur-[0.5px] sm:blur-[1px] select-none pointer-events-none"
             />
           <div class="absolute top-0 left-0 w-3 h-3 sm:w-4 sm:h-4 border-t-2 sm:border-t-4 border-l-2 sm:border-l-4 border-red-500"></div>

@@ -1,81 +1,68 @@
 <template>
-  <!-- Главный контейнер: Кастомный курсор-прицел, жесткий черный фон, сетка и сканлайны -->
-  <div class="relative flex-1 overflow-hidden w-full grid grid-cols-2 lg:grid-cols-4">
+  <!-- Главный контейнер -->
+  <div class="relative flex-1 overflow-hidden w-full grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 min-h-[70vh]">
 
-      <!-- ЦЕНТРАЛЬНЫЙ БЛОК: Агрессивная типографика и CTA -->
-      <div class="col-span-1 lg:col-span-2 p-6 flex flex-col justify-center relative">
+      <!-- ЦЕНТРАЛЬНЫЙ БЛОК -->
+      <div class="col-span-1 lg:col-span-2 p-4 sm:p-6 flex flex-col justify-center relative order-1">
 
-        <!-- Заголовок: Хром + Неон -->
         <div class="relative z-10 transform">
           
-          <h1 class="">
+          <h1 class="text-4xl sm:text-5xl md:text-6xl lg:text-8xl">
             <span class="block text-transparent bg-clip-text bg-linear-to-b from-white via-gray-300 to-gray-700 drop-shadow-[2px_2px_0_#39FF14]">
               CL4SS
             </span>
-            <span class="block text-[#39FF14] drop-shadow-[2px_2px_0_#fff] pb-2">
-              <!-- y2k stars -->
-              <img src="@/assets/svg/y2k/stars.svg" alt="y2k_start" class="z-20 absolute -top-20 left-26 w-70 pointer-events-none select-none">
+            <span class="block text-[#39FF14] drop-shadow-[2px_2px_0_#fff] pb-2 relative">
+              <img 
+                src="@/assets/svg/y2k/stars.svg" 
+                alt="y2k_start" 
+                class="z-20 absolute -top-8 sm:-top-12 md:-top-16 lg:-top-20 left-4 sm:left-10 md:left-16 lg:left-26 w-24 sm:w-40 md:w-56 lg:w-70 max-w-[40vw] pointer-events-none select-none hidden sm:block"
+              >
               T1CK3T$
             </span>
           </h1>
         </div>
 
-        <!-- Главная кнопка: Никаких плавных транзишенов, только удар -->
         <router-link to="/purchase" 
-          class="block z-10 bg-[#39FF14] text-black border-4 border-black font-black text-4xl p-6 text-center uppercase 
+          class="block z-10 bg-[#39FF14] text-black border-4 border-black font-black text-xl sm:text-2xl md:text-3xl lg:text-4xl p-4 sm:p-5 md:p-6 text-center uppercase 
           hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14] shadow-[8px_8px_0_#ff0000] hover:shadow-[-8px_-8px_0_#39FF14] 
-          active:translate-y-2 active:translate-x-2 active:shadow-none transition-none relative overflow-hidden group mt-10">
+          active:translate-y-2 active:translate-x-2 active:shadow-none transition-none relative overflow-hidden group mt-6 sm:mt-10">
 
-          <span class="relative flex items-center justify-center gap-4">
-            <span class="text-red-600 text-3xl">✖</span> PURCHASE_ACCESS
+          <span class="relative flex items-center justify-center gap-2 sm:gap-4">
+            <span class="text-red-600 text-2xl sm:text-3xl">✖</span> PURCHASE_ACCESS
           </span>
 
-          <!-- Глитч-вспышка при наведении -->
           <div class="absolute inset-0 bg-white opacity-0 group-hover:opacity-20 group-hover:animate-ping pointer-events-none"></div>
 
         </router-link>
-
-               <!-- Текст: Терминальный лог -->
-        <!-- <div class=" absolute bg-black border border-[#39FF14] p-4 font-mono text-sm text-[#39FF14] my-6 bottom-0 w-full">
-          <div class="absolute top-0 left-0 w-full h-full bg-[#39FF14] opacity-10 animate-pulse pointer-events-none"></div>
-          <p class="leading-tight">
-            > INITIALIZING... <br>
-            > URBAN_STREET_ENERGY: LOADED.<br>
-            > ERROR: TOO MUCH SWAG DETECTED.<br>
-            Быстрая покупка классов и пакетов. Зеленые билеты. Мы не делаем красиво, мы делаем громко.
-          </p>
-        </div> -->
-
       </div>
 
+      <img 
+        src="@/assets/svg/y2k/b_star.svg" 
+        alt="y2k_star" 
+        class="absolute z-10 w-[60%] sm:w-1/2 max-w-[280px] sm:max-w-none -top-20 sm:-top-40 md:-top-56 lg:-top-70 -right-16 sm:-right-32 md:-right-48 lg:-right-60 -rotate-30 blur-sm pointer-events-none opacity-60 sm:opacity-100"
+      >
 
-      <!-- yk2 star -->
-      <img src="@/assets/svg/y2k/b_star.svg" alt="y2k_l_moon" class="absolute z-10 w-1/2 -top-70 -right-60 -rotate-30 blur-sm pointer-events-none">
+      <img 
+        src="@/assets/watermark-class-tickets.png" 
+        alt="" 
+        class="pointer-events-none opacity-5 absolute bottom-0 left-4 sm:left-10 md:left-20 max-w-[80%] sm:max-w-none h-auto"
+      >
 
-      <!-- yk2 disc -->
-      <!-- <img src="@/assets/svg/pic/disc.svg" alt="y2k_l_moon" class="absolute w-3/5 -top-1/2 -left-1/4 opacity-40 blur-[1px] mix-blend-overlay animate-spin-slow pointer-events-none" > -->
+      <div class="col-span-1 lg:col-span-1 lg:col-start-4 relative p-4 sm:p-6 flex items-center justify-center overflow-hidden order-2">
 
-      <img src="@/assets/watermark-class-tickets.png" alt="" class="pointer-events-none opacity-5 absolute bottom-0 left-20">
-
-      <!-- ПРАВЫЙ БЛОК: Изображения / Визуальный мусор 4:3 -->
-      <div class="col-span-1 lg:col-span-1 lg:col-start-4 relative p-6 flex items-center justify-center overflow-hidden">
-
-
-        <!-- Контейнер для фото 4:3 (Слот для арта) -->
-        <div class="w-full aspect-4/3 relative shadow-[10px_10px_0_#000] group z-20">
+        <div class="w-full max-w-md mx-auto aspect-4/3 relative shadow-[6px_6px_0_#000] sm:shadow-[10px_10px_0_#000] group z-20">
             <img 
               src="@/assets/kai-angel-viperr.gif" 
               alt="vhs-effect" 
-              class="absolute inset-0 w-full h-full object-cover p-2 blur-[1px] select-none pointer-events-none"
+              class="absolute inset-0 w-full h-full object-cover object-center p-1.5 sm:p-2 blur-[0.5px] sm:blur-[1px] select-none pointer-events-none"
             />
-          <!-- Рамка записи видеокамеры -->
-          <div class="absolute top-0 left-0 w-4 h-4 border-t-4 border-l-4 border-red-500"></div>
-          <div class="absolute top-0 right-0 w-4 h-4 border-t-4 border-r-4 border-red-500"></div>
-          <div class="absolute bottom-0 left-0 w-4 h-4 border-b-4 border-l-4 border-red-500"></div>
-          <div class="absolute bottom-0 right-0 w-4 h-4 border-b-4 border-r-4 border-red-500"></div>
+          <div class="absolute top-0 left-0 w-3 h-3 sm:w-4 sm:h-4 border-t-2 sm:border-t-4 border-l-2 sm:border-l-4 border-red-500"></div>
+          <div class="absolute top-0 right-0 w-3 h-3 sm:w-4 sm:h-4 border-t-2 sm:border-t-4 border-r-2 sm:border-r-4 border-red-500"></div>
+          <div class="absolute bottom-0 left-0 w-3 h-3 sm:w-4 sm:h-4 border-b-2 sm:border-b-4 border-l-2 sm:border-l-4 border-red-500"></div>
+          <div class="absolute bottom-0 right-0 w-3 h-3 sm:w-4 sm:h-4 border-b-2 sm:border-b-4 border-r-2 sm:border-r-4 border-red-500"></div>
           
-          <div class="absolute top-4 left-4 text-red-500 font-mono text-ls flex items-center gap-2 animate-pulse">
-            <div class="w-3 h-3 bg-red-500 rounded-full"></div> REC
+          <div class="absolute top-2 sm:top-4 left-2 sm:left-4 text-red-500 font-mono text-xs sm:text-sm flex items-center gap-1.5 sm:gap-2 animate-pulse">
+            <div class="w-2 h-2 sm:w-3 sm:h-3 bg-red-500 rounded-full"></div> REC
           </div>
         </div>
       </div>
@@ -83,8 +70,6 @@
 </template>
 
 <style scoped>
-/* Кастомные анимации и эффекты, которые невозможно или нецелесообразно делать через inline Tailwind */
-
 .crt-overlay {
   background: linear-gradient(
     rgba(18, 16, 16, 0) 50%,
@@ -120,7 +105,6 @@
   to { transform: rotate(360deg); }
 }
 
-/* Грязное выделение текста */
 ::selection {
   background: #39FF14;
   color: #000;

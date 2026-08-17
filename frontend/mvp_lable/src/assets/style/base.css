@@ -53,7 +53,8 @@
 
     .h1-metal-textured::after {
         content: attr(data-text);
-        @apply absolute inset-0 left-0 top-8 pointer-events-none opacity-40;
+        /* top matches h1 padding: py-4 sm:py-6 md:py-8 — fixed top-8 misaligned shine on mobile */
+        @apply absolute inset-0 left-0 top-4 sm:top-6 md:top-8 pointer-events-none opacity-40;
         background: linear-gradient(
         110deg, 
         transparent 40%, 

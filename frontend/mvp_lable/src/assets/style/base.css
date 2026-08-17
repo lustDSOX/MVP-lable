@@ -222,7 +222,7 @@
     content: '';
     @apply absolute inset-0 rounded-xl pointer-events-none transition-all duration-500;
     
-    background-image: url('@/assets/texture/metall.png');
+    background-image: url('@/assets/texture/metall.jpg');
     background-size: cover;
     background-position: center;
     

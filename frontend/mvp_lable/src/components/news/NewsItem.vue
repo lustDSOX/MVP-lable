@@ -2,17 +2,21 @@
   <div class="group relative max-w-4xl mx-auto mb-16 ">
     
     <!-- ДЕКОРАТИВНЫЙ ЭЛЕМЕНТ: Правый верхний угол -->
-    <div class="absolute -top-1/7 -right-70 w-2/3 z-10 pointer-events-none -rotate-12">
+    <div class="hidden md:block absolute -top-1/7 -right-70 w-2/3 z-10 pointer-events-none -rotate-12">
       <img src="@/assets/chrome/t_chrome.webp" 
+           loading="lazy"
+           decoding="async"
            class="sigil-metal w-full h-full object-contain rotate-0" 
-           alt="sigil-decoration">
+           alt="">
     </div>
 
     <!-- ДЕКОРАТИВНЫЙ ЭЛЕМЕНТ: Левый нижний угол -->
-    <div class="absolute -bottom-1/12 -left-1/5 w-1/2 z-10 pointer-events-none">
+    <div class="hidden md:block absolute -bottom-1/12 -left-1/5 w-1/2 z-10 pointer-events-none">
       <img src="@/assets/chrome/b_chrome.webp" 
+           loading="lazy"
+           decoding="async"
            class="sigil-metal w-full h-full object-contain" 
-           alt="sigil-decoration">
+           alt="">
     </div>
 
     <div class="y2k-metal p-10 lg:p-16">

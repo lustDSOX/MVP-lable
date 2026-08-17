@@ -1,3 +1,16 @@
+/* Design tokens — Sprint C */
+:root {
+  --acid: #39FF14;
+  --alert: #ff0000;
+  --ink: #050505;
+  --panel: #111111;
+  --muted: #666666;
+  --border: #222222;
+  --font-display: 'Impact', 'Arial Black', sans-serif;
+  --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+  --font-body: 'Inter', system-ui, sans-serif;
+}
+
 @layer base {
     img{
         @apply pointer-events-none select-none max-w-full h-auto;
@@ -269,17 +282,20 @@
   }
 
 
-::-webkit-scrollbar {
-  width: 16px;
-  background-color: #222;
-}
-::-webkit-scrollbar-thumb {
-  background-color: #555;
-  border: 2px solid #222;
-  box-shadow: inset 1px 1px 0 #888, inset -1px -1px 0 #333;
-}
-::-webkit-scrollbar-button {
-  background-color: #555;
-  height: 16px;
-  box-shadow: inset 1px 1px 0 #888;
+/* Custom scrollbar — desktop only; mobile keeps native system scroll */
+@media (min-width: 768px) {
+  ::-webkit-scrollbar {
+    width: 16px;
+    background-color: #222;
+  }
+  ::-webkit-scrollbar-thumb {
+    background-color: #555;
+    border: 2px solid #222;
+    box-shadow: inset 1px 1px 0 #888, inset -1px -1px 0 #333;
+  }
+  ::-webkit-scrollbar-button {
+    background-color: #555;
+    height: 16px;
+    box-shadow: inset 1px 1px 0 #888;
+  }
 }

@@ -1,11 +1,10 @@
 <template>
-  <section class="min-h-screen py-20 px-4 lg:px-10 font-['Impact','Arial_Black',sans-serif] text-white overflow-hidden relative selection:bg-[#ff0000]">
+  <section class="min-h-screen py-10 sm:py-16 lg:py-20 px-4 lg:px-10 font-['Impact','Arial_Black',sans-serif] text-white overflow-hidden relative selection:bg-[#ff0000]">
 
     <div class="max-w-7xl mx-auto relative z-10">
       
-      <!-- HEADER -->
-      <div class="mb-20 flex flex-col md:flex-row items-end justify-between border-b-5 border-[#333] p-6 border-double">
-        <h1 class="text-7xl lg:text-[140px] leading-none scale-y-125 uppercase tracking-tight text-white drop-shadow-[5px_5px_0_#39FF14]">
+      <div class="mb-10 sm:mb-20 flex flex-col md:flex-row items-start md:items-end justify-between border-b-5 border-[#333] p-4 sm:p-6 border-double gap-4">
+        <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-[140px] leading-none scale-y-110 sm:scale-y-125 uppercase tracking-tight text-white drop-shadow-[3px_3px_0_#39FF14] sm:drop-shadow-[5px_5px_0_#39FF14]">
           EV<span class="text-[#ff0000]">E</span>NTS_
         </h1>
         <div class="bg-[#ff0000] text-black px-4 py-2 font-mono text-xs font-bold animate-pulse mt-4 md:mt-0 shadow-[4px_4px_0_#fff] bottom-0">
@@ -13,16 +12,13 @@
         </div>
       </div>
 
-      <!-- СПИСОК МЕРОПРИЯТИЙ -->
-      <div class="grid grid-cols-1 gap-12">
+      <div class="grid grid-cols-1 gap-6 sm:gap-8 lg:gap-12">
         <div
           v-for="event in events"
           :key="event.id"
           class="group relative bg-[#0a0a0a] border-4 border-[#222] transition-none hover:border-[#39FF14] flex flex-col lg:flex-row shadow-[15px_15px_0_#111] hover:shadow-[15px_15px_0_#39FF14] overflow-hidden"
         >
-          <!-- 1. ЛЕВАЯ ЧАСТЬ: Дата (Отрывной край билета) -->
           <div class="lg:w-48 bg-[#111] border-b-4 lg:border-b-0 lg:border-r-4 border-dashed border-[#333] p-6 flex flex-col items-center justify-center relative group-hover:bg-[#ff0000] transition-none">
-            <!-- Перфорация (дырки как на билете) -->
             <div class="absolute -top-4 -right-4 w-8 h-8 bg-[#050505] rounded-full border-4 border-[#222] hidden lg:block"></div>
             <div class="absolute -bottom-4 -right-4 w-8 h-8 bg-[#050505] rounded-full border-4 border-[#222] hidden lg:block"></div>
 
@@ -33,33 +29,29 @@
             </div>
           </div>
 
-          <!-- 2. ЦЕНТРАЛЬНАЯ ЧАСТЬ: Инфо -->
-          <div class="flex-1 p-8 relative overflow-hidden">
-            <!-- Глитч-подложка -->
+          <div class="flex-1 p-4 sm:p-6 md:p-8 relative overflow-hidden">
             <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dust.png')] opacity-10 pointer-events-none"></div>
             
             <div class="relative z-10">
-              <h3 class="text-4xl lg:text-5xl  uppercase text-white group-hover:text-[#39FF14] leading-none mb-4 tracking-tighter italic transition-none">
+              <h3 class="text-2xl sm:text-3xl lg:text-5xl uppercase text-white group-hover:text-[#39FF14] leading-none mb-4 tracking-tighter italic transition-none">
                 {{ event.title }}
               </h3>
               
-              <div class="flex gap-4 mb-6">
+              <div class="flex gap-4 mb-6 flex-wrap">
                 <span class="bg-[#333] text-sm px-2 py-0.5 font-mono text-gray-400 group-hover:bg-white group-hover:text-black transition-none uppercase">ID: 0{{ event.id }}_ENTRY</span>
                 <span class="bg-[#333] text-sm px-2 py-0.5 font-mono text-gray-400 group-hover:bg-white group-hover:text-black transition-none uppercase italic">Location: [REDACTED]</span>
               </div>
 
-              <p class="text-gray-400 font-mono text-lg leading-tight uppercase group-hover:text-white transition-none mb-4 max-w-2xl">
+              <p class="text-gray-400 font-mono text-sm sm:text-base md:text-lg leading-tight uppercase group-hover:text-white transition-none mb-4 max-w-2xl">
                 {{ event.description }}
               </p>
             </div>
           </div>
 
-          <!-- 3. ПРАВАЯ ЧАСТЬ: CTA (Штрих-код и Кнопка) -->
-          <div class="lg:w-72 bg-[#050505] p-8 flex flex-col justify-between border-t-4 lg:border-t-0 lg:border-l-4 border-[#222] group-hover:bg-black transition-none">
+          <div class="lg:w-72 bg-[#050505] p-4 sm:p-6 md:p-8 flex flex-col justify-between border-t-4 lg:border-t-0 lg:border-l-4 border-[#222] group-hover:bg-black transition-none">
             
-            <!-- Декор: Штрих-код -->
             <div class="opacity-20 group-hover:opacity-100 transition-opacity mb-8 flex justify-center">
-               <img src="https://pngimg.com/uploads/barcode/barcode_PNG13.png" class="h-16 invert contrast-200" alt="code">
+               <img src="https://pngimg.com/uploads/barcode/barcode_PNG13.png" class="h-10 sm:h-16 max-w-full object-contain invert contrast-200" alt="code">
             </div>
 
             <a
@@ -74,7 +66,6 @@
         </div>
       </div>
 
-      <!-- ВИЗУАЛЬНЫЙ МУСОР (Декор внизу) -->
       <div class="mt-24 border-t-4 border-[#222] pt-8 flex flex-wrap gap-12 opacity-30">
         <div v-for="i in 3" :key="i" class="flex items-center gap-4">
            <div class="w-12 h-12 rounded-full border-4 border-[#333] flex items-center justify-center">
@@ -87,17 +78,13 @@
       </div>
     </div>
 
-    <!-- Вертикальный глитч-разделитель -->
     <div class="absolute left-0 top-0 h-full w-1 bg-[#ff0000] blur-2xl opacity-100 drop-shadow-[0px_0px_20px_#ff0000] animate-ping"></div>
     <div class="absolute right-0 top-0 h-full w-1 bg-[#ff0000] blur-2xl opacity-100 drop-shadow-[0px_0px_20px_#ff0000] animate-ping"></div>
-
-
 
   </section>
 </template>
 
 <style scoped>
-/* Агрессивное мерцание для "SELLING OUT" */
 @keyframes flicker-red {
   0%, 100% { background-color: #ff0000; color: #000; }
   50% { background-color: #000; color: #ff0000; }
@@ -106,7 +93,6 @@
   animation: flicker-red 0.5s infinite steps(1);
 }
 
-/* Эффект "старого телевизора" для всей секции */
 section::after {
   content: "";
   position: absolute;

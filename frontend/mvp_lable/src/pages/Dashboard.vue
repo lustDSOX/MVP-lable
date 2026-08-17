@@ -4,7 +4,6 @@
       
       <!-- СЕКЦИЯ 1: КОМАНДНЫЙ ЦЕНТР -->
       <section class="command-center-grid">
-        <!-- Блок приветствия (теперь на всю ширину) -->
         <div class="welcome-block">
           <h1 class="font-planet h1-metal-textured" :data-text="authStore.artistName || 'UNKNOWN'">
             {{ authStore.artistName || 'UNKNOWN' }}
@@ -12,7 +11,6 @@
           <span class="welcome-subtitle">Artist_Terminal</span>
         </div>
 
-        <!-- Блок поиска (нижний левый) -->
         <div class="search-wrapper">
           <input 
             type="text" 
@@ -22,16 +20,13 @@
           />
         </div>
 
-        <!-- Кнопка загрузки (нижняя правая) -->
         <button @click="isContractModalOpen = true" class="upload-button group">
           <span class="relative z-10 text-2xl">Upload New Release</span>
           <div class="absolute inset-0 crt-noise opacity-30"></div>
         </button>
       </section>
 
-      <!-- СЕКЦИЯ 2: ПАНЕЛЬ ДАННЫХ С ВКЛАДКАМИ -->
       <section class="data-panel-container">
-        <!-- Вкладки платформ -->
         <div class="platform-tabs">
           <button
             v-for="platform in platforms"
@@ -42,7 +37,6 @@
             {{ platform }}
           </button>
         </div>
-        <!-- Отображение статистики -->
         <div class="data-panel-content">
           <div class="stat-item">
             <span class="label">Total Plays</span>
@@ -59,9 +53,30 @@
         </div>
       </section>
 
-      <!-- СЕКЦИЯ 3: ТАБЛИЦА РЕЛИЗОВ -->
       <section class="bg-black border border-[#333]">
-        <div class="overflow-x-auto">
+        <!-- Mobile track cards -->
+        <div class="md:hidden space-y-3 p-3 mobile-track-cards">
+          <article
+            v-for="track in filteredTracks"
+            :key="'m-' + track.id"
+            class="border-2 border-[#333] bg-[#0a0a0a] p-4 flex flex-col gap-2"
+          >
+            <div class="flex justify-between gap-2 items-start">
+              <h3 class="font-bold text-white uppercase text-sm leading-tight">{{ track.title }}</h3>
+              <span class="text-[10px] font-mono uppercase shrink-0 border border-[#444] px-2 py-0.5">{{ track.status }}</span>
+            </div>
+            <p class="text-xs text-gray-500 font-mono">Plays: {{ track.plays ?? 0 }}</p>
+            <button
+              v-if="track.status === 'draft'"
+              type="button"
+              @click="continueDraft(track.id)"
+              class="action-button draft-button min-h-[44px] w-full"
+            >[CONTINUE]</button>
+          </article>
+          <p v-if="!filteredTracks.length" class="text-center text-gray-600 py-8 font-mono text-sm">NO_RELEASES</p>
+        </div>
+
+        <div class="overflow-x-auto hidden md:block">
           <table class="w-full text-left min-w-[700px]">
             <thead class="table-header">
               <tr>
@@ -83,7 +98,6 @@
                    <img :src="'/placeholder-cover.png'" class="w-12 h-12 object-cover bg-[#111]" alt="Cover">
                    <div>
                       <h3 class="track-title">{{ track.title }}</h3>
-                      <!-- Отображение причины отказа -->
                       <div v-if="track.status === 'rejected'" class="rejection-reason">
                          REASON: {{ track.rejectReason }}
                       </div>
@@ -119,7 +133,6 @@
       </section>
     </div>
 
-     <!-- Модальные окна -->
     <ContractModal 
       :is-open="isContractModalOpen" 
       @close="isContractModalOpen = false"
@@ -135,34 +148,24 @@
 </template>
 
 <style scoped>
-
-
 .command-center-grid {
   display: grid;
-  /* Две колонки: левая гибкая (1fr), правая фиксированная или по контенту */
   grid-template-columns: 1fr 380px; 
   gap: 2rem;
-  /* Ключевое свойство: прижимает все элементы к низу их сетки */
   align-items: end; 
 }
-
 .welcome-block {
-  /* Заставляет блок занимать все колонки (от 1 до последней) */
   grid-column: 1 / -1; 
   width: 100%;
-  /* Выравниваем заголовок по верху, если нужно, или оставляем */
   align-self: start;
   margin-bottom: 1rem;
 }
-
 .search-wrapper {
   position: relative;
   width: 100%;
 }
-
 .upload-button {
   width: 100%;
-  /* Конкретная высота или padding, чтобы кнопка была массивной */
   padding: 1rem;
   background-color: white;
   color: black;
@@ -173,33 +176,25 @@
   transition: all 0.15s;
   position: relative;
   overflow: hidden;
-  /* Чтобы кнопка не растягивалась по высоте инпута, если тот выше */
   height: fit-content; 
 }
-
 .upload-button:hover{
   box-shadow: none;
   transform: translate(2px, 2px);
 }
-
-/* Мобильная адаптация: всё в одну колонку */
 @media (max-width: 1024px) {
   .command-center-grid {
     grid-template-columns: 1fr;
     gap: 1.5rem;
   }
-  
   .welcome-block {
     margin-bottom: 0;
   }
-
   .upload-button {
     width: 100%;
-    order: 3; /* Кнопка в самом низу на мобилках */
+    order: 3;
   }
 }
-
-/* Остальные ваши стили (search-input, subtitle и т.д.) */
 .welcome-subtitle {
   font-family: 'JetBrains Mono', monospace;
   font-size: 10px;
@@ -209,7 +204,6 @@
   margin-top: 0.5rem;
   display: block;
 }
-
 .search-input {
   width: 100%;
   background-color: black;
@@ -220,13 +214,10 @@
   color: white;
   text-transform: uppercase;
 }
-
 .search-input:focus {
   outline: none;
   border-color: #ff0000;
 }
-
-/* Панель данных и вкладки */
 .data-panel-container {
   border: 2px solid #333;
   background-color: black;
@@ -234,6 +225,7 @@
 .platform-tabs {
   display: flex;
   border-bottom: 2px solid #333;
+  overflow-x: auto;
 }
 .platform-tab {
   padding: 0.75rem 1.5rem;
@@ -243,6 +235,7 @@
   color: #6b7280;
   border-right: 2px solid #333;
   background-color: transparent;
+  white-space: nowrap;
 }
 .platform-tab:last-child { border-right: none; }
 .platform-tab.active {
@@ -275,8 +268,6 @@
   line-height: 1;
   letter-spacing: -0.05em;
 }
-
-/* Таблица */
 .table-header { border-bottom: 2px solid #333; }
 .table-th {
   padding: 1rem;
@@ -292,7 +283,6 @@
 }
 .table-row:last-child { border-bottom: none; }
 .table-row:hover { background-color: #0a0a0a; }
-
 .track-title {
   font-family: 'Archivo Black', sans-serif;
   font-size: 1.25rem;
@@ -319,7 +309,6 @@
 .status-scanning { background-color: #2563eb; color: white; }
 .status-error { background-color: #ff0000; color: white; }
 .status-draft { background-color: #f59e0b; color: black; }
-
 .action-button {
   background-color: #222;
   color: #9ca3af;
@@ -338,8 +327,6 @@
   padding: 0.5rem 0.75rem;
 }
 .action-button.draft-button:hover { background-color: white; }
-
-/* Медиа-запрос для мобильных устройств */
 @media (max-width: 1024px) {
   .command-center-grid {
     grid-template-columns: 1fr;
@@ -348,9 +335,8 @@
 }
 @media (max-width: 768px) {
   .data-panel-content { grid-template-columns: 1fr; }
+  .stat-item .value { font-size: 2rem; }
 }
-
-/* Вспомогательные классы */
 .crt-noise {
   background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
 }
@@ -361,27 +347,22 @@ import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
 import { useTracksStore, type Track } from '@/stores/tracks'
 
-// Импорт компонентов
 import ContractModal from '@/components/track/ContractModal.vue'
 import TrackUploadForm from '@/components/track/TrackUploadForm.vue'
 
-// Инициализация
 const authStore = useAuthStore()
 const tracksStore = useTracksStore()
 
-// Локальное состояние
 const isContractModalOpen = ref(false)
 const activeDraftId = ref<string | null>(null)
 const searchQuery = ref('')
 const platforms = ref(['Total', 'ЯМ', 'VK', 'Apple', 'Spotify'])
 const activePlatform = ref('Total')
 
-// --- Логика для вкладок статистики (симуляция) ---
 const displayedPlays = computed(() => {
   if (activePlatform.value === 'Total') {
     return tracksStore.totalPlays
   }
-  // Симуляция данных для других платформ
   const seed = platforms.value.indexOf(activePlatform.value)
   return Math.floor(tracksStore.totalPlays * (0.4 + seed * 0.1) + Math.random() * 1000)
 })
@@ -390,9 +371,7 @@ const platformShare = computed(() => {
   if (activePlatform.value === 'Total' || tracksStore.totalPlays === 0) return 100
   return Math.round((displayedPlays.value / tracksStore.totalPlays) * 100)
 })
-// --- Конец симуляции ---
 
-// Фильтрация треков
 const filteredTracks = computed(() => {
   if (!searchQuery.value.trim()) return tracksStore.tracks
   const query = searchQuery.value.toLowerCase()
@@ -401,7 +380,6 @@ const filteredTracks = computed(() => {
   )
 })
 
-// Методы
 const handleContractSuccess = (contractData: { trackTitle: string }) => {
   isContractModalOpen.value = false
   const title = contractData.trackTitle || 'Новый релиз'
@@ -414,6 +392,5 @@ const onTrackUploaded = (trackId: string) => {
   activeDraftId.value = null
 }
 
-// Загрузка данных
 onMounted(() => { tracksStore.fetchTracks() })
 </script>

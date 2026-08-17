@@ -2,8 +2,6 @@
   <section class="min-h-screen px-4 sm:px-6 lg:px-16 xl:px-32 py-10 sm:py-16 lg:py-20 pb-12 font-['Impact','Arial_Black',sans-serif] selection:bg-[#39FF14] selection:text-black relative overflow-hidden bg-[#050805]">
 
     <div class="absolute inset-0 z-100 pointer-events-none select-none overflow-hidden">
-
-      <!-- Light texture always; heavy vignette / scan / tracking only desktop -->
       <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 md:opacity-20 mix-blend-screen md:animate-noise transform-gpu"></div>
       <div class="hidden md:block absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.4)_80%,rgba(0,0,0,0.9)_90%,#000_100%)] z-10 transform-gpu"></div>
       <div class="hidden md:block absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(57,255,20,0.02)_100%)] bg-size-[100%_8px] animate-[scan-roll_20s_linear_infinite] transform-gpu"></div>
@@ -17,7 +15,6 @@
         <div class="text-right">SP</div>
       </div>
 
-      <!-- Running dark/light tracking strip — desktop only -->
       <div class="hidden md:block absolute inset-0 pointer-events-none z-40 overflow-hidden">
         <div class="absolute w-full h-32 bg-white/5 blur-3xl animate-[tracking-line_12s_linear_infinite]"></div>
       </div>
@@ -25,20 +22,22 @@
       <div class="absolute left-15 top-1/2 -translate-y-1/2 flex-col gap-4 opacity-40 font-mono text-[8px] text-[#39FF14] hidden lg:flex">
         <span v-for="n in 5" :key="n" class="border-t border-[#39FF14] w-2">{{ 100 - n * 20 }}%</span>
       </div>
-
     </div>
 
-<!-- Inset vignette — desktop only (was darkening whole mobile screen) -->
 <div class="hidden md:block fixed inset-0 pointer-events-none z-50 shadow-[inset_0_0_150px_rgba(0,0,0,0.8)]"></div>
 
     <div class="max-w-7xl mx-auto relative z-10 sm:transform sm:scale-y-[1.02] sm:scale-x-[0.98] sm:rounded-[100px/40px]">
-      
       <div class="mb-8 sm:mb-16 border-b-4 sm:border-b-8 border-[#39FF14] pb-4 inline-block transform max-w-full">
         <h1 class="variant-vhs py-0 mb-10" data-text="CASE_FILES">
          CASE_FILES
         </h1>
         <div class="text-[10px] font-mono text-[#ff0000] mt-2 animate-pulse tracking-[0.5em]">
           SCANNING_DATABASE... 100% COMPLETE
+        </div>
+        <div class="mt-3 flex flex-wrap gap-2">
+          <Tag tone="acid">LIVE_ARCHIVE</Tag>
+          <Tag tone="alert">{{ cases.length }} RECORDS</Tag>
+          <Tag tone="muted">v0.3_beta</Tag>
         </div>
       </div>
 
@@ -55,7 +54,6 @@
       </div>
     </div>
 
-
     <Transition name="glitch-fade">
       <CaseDetail 
         v-if="activeCase" 
@@ -71,13 +69,15 @@
 import { defineComponent } from 'vue'
 import CaseItem from '@/components/cases/CaseItem.vue'
 import CaseDetail from '@/components/cases/CaseDetail.vue'
+import Tag from '@/components/ui/Tag.vue'
 
 export default defineComponent({
   name: 'CasesPage',
 
   components: {
     CaseItem,
-    CaseDetail
+    CaseDetail,
+    Tag,
   },
 
   data() {

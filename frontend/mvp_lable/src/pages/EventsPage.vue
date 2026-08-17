@@ -4,9 +4,15 @@
     <div class="max-w-7xl mx-auto relative z-10">
       
       <div class="mb-10 sm:mb-20 flex flex-col md:flex-row items-start md:items-end justify-between border-b-5 border-[#333] p-4 sm:p-6 border-double gap-4">
-        <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-[140px] leading-none scale-y-110 sm:scale-y-125 uppercase tracking-tight text-white drop-shadow-[3px_3px_0_#39FF14] sm:drop-shadow-[5px_5px_0_#39FF14]">
-          EV<span class="text-[#ff0000]">E</span>NTS_
-        </h1>
+        <div>
+          <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-[140px] leading-none scale-y-110 sm:scale-y-125 uppercase tracking-tight text-white drop-shadow-[3px_3px_0_#39FF14] sm:drop-shadow-[5px_5px_0_#39FF14]">
+            EV<span class="text-[#ff0000]">E</span>NTS_
+          </h1>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <Tag tone="alert">CALENDAR</Tag>
+            <Tag tone="acid">{{ events.length }} LIVE</Tag>
+          </div>
+        </div>
         <div class="bg-[#ff0000] text-black px-4 py-2 font-mono text-xs font-bold animate-pulse mt-4 md:mt-0 shadow-[4px_4px_0_#fff] bottom-0">
           STATUS: SELLING_OUT_FAST
         </div>
@@ -107,9 +113,11 @@ section::after {
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import Tag from '@/components/ui/Tag.vue'
 
 export default defineComponent({
   name: 'EventsPage',
+  components: { Tag },
   data() {
     return {
       events: [

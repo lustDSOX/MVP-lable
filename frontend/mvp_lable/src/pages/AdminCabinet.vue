@@ -3,7 +3,6 @@
   <div class="min-h-screen pt-24 px-4 pb-12 font-['Inter',sans-serif] text-white relative">
     <div class="max-w-7xl mx-auto flex flex-col gap-12 relative z-10">
 
-      <!-- СЕКЦИЯ 1: КОМАНДНЫЙ ЦЕНТР -->
       <section class="command-center-grid">
         <div class="welcome-block">
           <h1 class="font-planet h1-metal-textured" :data-text="authStore.artistName || 'ADMIN'">
@@ -27,7 +26,6 @@
         </button>
       </section>
 
-      <!-- СЕКЦИЯ 2: ПАНЕЛЬ ДАННЫХ -->
       <section class="data-panel-container">
         <div class="data-panel-content">
           <div class="stat-item">
@@ -36,7 +34,7 @@
           </div>
           <div class="stat-item">
             <span class="label">Monthly Active</span>
-            <span class="value">0</span> <!-- TODO: Implement logic -->
+            <span class="value">0</span>
           </div>
           <div class="stat-item">
             <span class="label">Blocked Users</span>
@@ -45,9 +43,33 @@
         </div>
       </section>
 
-      <!-- СЕКЦИЯ 3: ТАБЛИЦА ПОЛЬЗОВАТЕЛЕЙ -->
       <section class="bg-black border border-[#333]">
-        <div class="overflow-x-auto">
+        <!-- Mobile user cards -->
+        <div class="md:hidden space-y-3 p-3">
+          <article
+            v-for="user in filteredUsers"
+            :key="'m-' + user.id"
+            class="border-2 border-[#333] bg-[#0a0a0a] p-4 flex flex-col gap-3"
+          >
+            <div class="flex justify-between gap-2 items-start">
+              <div class="min-w-0">
+                <h3 class="font-bold text-white uppercase text-sm leading-tight">{{ user.name }}</h3>
+                <p class="text-xs text-gray-500 font-mono truncate mt-1">{{ user.email }}</p>
+              </div>
+              <span class="text-[10px] font-mono uppercase shrink-0 border border-[#444] px-2 py-0.5">{{ user.status }}</span>
+            </div>
+            <p class="text-xs text-gray-600 font-mono">Reg: {{ user.registered_at ? new Date(user.registered_at).toLocaleDateString() : '—' }}</p>
+            <div class="flex gap-2">
+              <button type="button" v-if="user.status !== 'blocked'" @click="blockUser(user.id)" class="flex-1 min-h-[44px] border-2 border-[#333] text-xs font-mono uppercase">Block</button>
+              <button type="button" v-else @click="unblockUser(user.id)" class="flex-1 min-h-[44px] border-2 border-[#39FF14] text-[#39FF14] text-xs font-mono uppercase">Unblock</button>
+              <button type="button" @click="deleteUser(user.id)" class="flex-1 min-h-[44px] border-2 border-[#ff0000] text-[#ff0000] text-xs font-mono uppercase">Delete</button>
+            </div>
+          </article>
+          <p v-if="!filteredUsers.length && !isLoading" class="text-center text-gray-600 py-8 font-mono text-sm">NO_USERS</p>
+          <p v-if="isLoading" class="text-center text-[#ff0000] py-8 font-mono text-sm animate-pulse">LOADING...</p>
+        </div>
+
+        <div class="overflow-x-auto hidden md:block">
           <table class="w-full text-left min-w-[800px]">
             <thead class="table-header">
               <tr>
@@ -78,18 +100,10 @@
                 </td>
                 <td class="p-4">
                   <div class="flex items-center justify-center gap-2">
-                     <button @click="editUser(user.id)" class="action-button" title="Edit User Data">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
-                     </button>
-                     <button v-if="user.status === 'active'" @click="blockUser(user.id)" class="action-button" title="Block User">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M13.477 14.89A6 6 0 015.11 6.524l8.367 8.367zm1.414-1.414L6.524 5.11A6 6 0 0114.89 13.477zM18 10a8 8 0 11-16 0 8 8 0 0116 0z" clip-rule="evenodd" /></svg>
-                     </button>
-                      <button v-else @click="unblockUser(user.id)" class="action-button" title="Unblock User">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" /></svg>
-                     </button>
-                     <button @click="deleteUser(user.id)" class="action-button delete-button" title="Delete User">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M9 2a1 1 0 00-.894.553L7.382 4H4a1 1 0 000 2v10a2 2 0 002 2h8a2 2 0 002-2V6a1 1 0 100-2h-3.382l-.724-1.447A1 1 0 0011 2H9zM7 8a1 1 0 012 0v6a1 1 0 11-2 0V8zm5-1a1 1 0 00-1 1v6a1 1 0 102 0V8a1 1 0 00-1-1z" clip-rule="evenodd" /></svg>
-                     </button>
+                     <button @click="editUser(user.id)" class="action-button" title="Edit User Data">Edit</button>
+                     <button v-if="user.status === 'active'" @click="blockUser(user.id)" class="action-button" title="Block User">Block</button>
+                     <button v-else @click="unblockUser(user.id)" class="action-button" title="Unblock User">Unblock</button>
+                     <button @click="deleteUser(user.id)" class="action-button delete-button" title="Delete User">Del</button>
                   </div>
                 </td>
               </tr>
@@ -98,25 +112,115 @@
         </div>
       </section>
     </div>
-    <!-- TODO: Модальное окно для регистрации, редактирования и подтверждения удаления -->
   </div>
 </template>
 
 <style scoped>
-/* Все стили из ArtistCabinet.vue копируются сюда */
-/* ... (скопируйте все содержимое тега <style> из вашего файла) ... */
-
-/* Дополнительные стили */
 .action-button.delete-button:hover {
     background-color: #ff0000;
     color: white;
+}
+.command-center-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1.5rem;
+}
+@media (min-width: 1024px) {
+  .command-center-grid {
+    grid-template-columns: 1fr 380px;
+    align-items: end;
+  }
+  .welcome-block { grid-column: 1 / -1; }
+}
+.welcome-subtitle {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 10px;
+  color: #6b7280;
+  text-transform: uppercase;
+  letter-spacing: 0.4em;
+  margin-top: 0.5rem;
+  display: block;
+}
+.search-input {
+  width: 100%;
+  background-color: black;
+  border: 2px solid #333;
+  padding: 1rem;
+  font-family: 'JetBrains Mono', monospace;
+  color: white;
+  text-transform: uppercase;
+}
+.upload-button {
+  width: 100%;
+  padding: 1rem;
+  background-color: white;
+  color: black;
+  border: 4px solid black;
+  text-transform: uppercase;
+  box-shadow: 4px 4px 0 #ff0000;
+  font-family: 'Archivo Black', sans-serif;
+  position: relative;
+  overflow: hidden;
+}
+.data-panel-container { border: 2px solid #333; background: black; }
+.data-panel-content {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 1px;
+  background: #333;
+}
+@media (min-width: 768px) {
+  .data-panel-content { grid-template-columns: repeat(3, 1fr); }
+}
+.stat-item { background: black; padding: 1.5rem; }
+.stat-item .label {
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  color: #6b7280;
+  text-transform: uppercase;
+}
+.stat-item .value {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 2rem;
+}
+.table-header { border-bottom: 2px solid #333; }
+.table-th {
+  padding: 1rem;
+  text-transform: uppercase;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 0.875rem;
+  color: #6b7280;
+}
+.table-row { border-bottom: 1px solid #222; }
+.track-title {
+  font-family: 'Archivo Black', sans-serif;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+.status-badge {
+  font-family: 'JetBrains Mono', monospace;
+  font-weight: 700;
+  font-size: 0.75rem;
+  padding: 0.25rem 0.5rem;
+  text-transform: uppercase;
+}
+.status-online { background-color: #39FF14; color: black; }
+.status-error { background-color: #ff0000; color: white; }
+.action-button {
+  background-color: #222;
+  color: #9ca3af;
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  text-transform: uppercase;
+}
+.crt-noise {
+  background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="n"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23n)"/%3E%3C/svg%3E');
 }
 </style>
 
 <script lang="ts">
 import { defineComponent } from 'vue';
 import { useAuthStore } from '@/stores/auth';
-// Рекомендуется создать такой стор для логики администрирования
 import { useAdminStore, type User } from '@/stores/admin';
 
 export default defineComponent({
@@ -138,7 +242,7 @@ export default defineComponent({
 
   computed: {
     users(): User[] {
-      return this.adminStore.users; // Геттер из стора
+      return this.adminStore.users;
     },
     isLoading(): boolean {
       return this.adminStore.isLoading;
@@ -158,24 +262,23 @@ export default defineComponent({
   methods: {
     editUser(userId: number) {
       console.log('Editing user:', userId);
-      // Логика открытия модального окна для редактирования
     },
 
     blockUser(userId: number) {
       if (confirm(`Are you sure you want to block user ID: ${userId}?`)) {
-        this.adminStore.blockUser(userId); // Метод стора
+        this.adminStore.blockUser(userId);
       }
     },
 
     unblockUser(userId: number) {
       if (confirm(`Are you sure you want to unblock user ID: ${userId}?`)) {
-        this.adminStore.unblockUser(userId); // Метод стора
+        this.adminStore.unblockUser(userId);
       }
     },
 
     deleteUser(userId: number) {
       if (confirm(`DANGER: Are you sure you want to permanently delete user ID: ${userId}?`)) {
-        this.adminStore.deleteUser(userId); // Метод стора
+        this.adminStore.deleteUser(userId);
       }
     },
   },

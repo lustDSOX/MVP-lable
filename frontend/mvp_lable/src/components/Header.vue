@@ -1,60 +1,27 @@
 <template>
-  <!-- Хедер: Жесткий карбоновый фон, толстая кроваво-красная граница снизу -->
-  <header class="z-30 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] bg-[#050505] font-['Impact','Arial_Black',sans-serif]">
+  <header class="z-30 bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] bg-[#050505] font-['Impact','Arial_Black',sans-serif] relative">
     
-
-    <nav class="max-w-7xl mx-auto px-4 lg:px-6">
-      <div class="flex items-stretch justify-between h-20">
+    <nav class="max-w-7xl mx-auto px-3 sm:px-4 lg:px-6">
+      <div class="flex items-stretch justify-between h-14 sm:h-16 md:h-20">
         
-        <!-- Логотип: Лейбл-стикер с жесткой тенью и глитч-ховером -->
+        <!-- Логотип -->
         <div class="flex items-center">
-          <router-link to="/" class="group relative flex items-center gap-2 bg-[#ff0000] text-black px-4 py-2 border-2 border-black hover:bg-black hover:text-[#ff0000] hover:border-[#ff0000] transition-none active:shadow-none active:translate-y-1 active:translate-x-1">
-            <span class="text-4xl font-black uppercase tracking-tighter scale-y-125 inline-block mt-1">
+          <router-link to="/" class="group relative flex items-center gap-1 sm:gap-2 bg-[#ff0000] text-black px-2 sm:px-3 md:px-4 py-1.5 sm:py-2 border-2 border-black hover:bg-black hover:text-[#ff0000] hover:border-[#ff0000] transition-none active:shadow-none active:translate-y-1 active:translate-x-1">
+            <span class="text-2xl sm:text-3xl md:text-4xl font-black uppercase tracking-tighter scale-y-125 inline-block mt-0.5 sm:mt-1">
               .SOX
             </span>
-            <!-- Индикатор записи -->
-            <div class="hidden sm:flex flex-col ml-2 border-l-2 border-black group-hover:border-[#ff0000] pl-2">
-              <span class="text-[10px] font-mono leading-none font-bold">REC</span>
-              <span class="text-[10px] font-mono leading-none animate-pulse">● 00:00</span>
+            <div class="hidden sm:flex flex-col ml-1 sm:ml-2 border-l-2 border-black group-hover:border-[#ff0000] pl-1.5 sm:pl-2">
+              <span class="text-[8px] sm:text-[10px] font-mono leading-none font-bold">REC</span>
+              <span class="text-[8px] sm:text-[10px] font-mono leading-none animate-pulse">● 00:00</span>
             </div>
           </router-link>
         </div>
         
-        <!-- Навигация: Микшерный пульт. Пункты вдавлены в панель -->
+        <!-- Desktop nav -->
         <ul class="hidden lg:flex items-stretch border-l-4 border-[#222] ml-8">
-          <li class="flex items-stretch">
-            <router-link to="/" class="flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative">
-              <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">ГЛАВНАЯ</span>
-              <span class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14] hidden group-hover:block"></span>
-            </router-link>
-          </li>
-          <li class="flex items-stretch">
-            <router-link to="/about" class="flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative">
-              <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">О_НАС</span>
-              <span class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14] hidden group-hover:block"></span>
-            </router-link>
-          </li>
-          <li class="flex items-stretch">
-            <router-link to="/cases" class="flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative">
-              <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">КЕЙСЫ</span>
-              <span class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14] hidden group-hover:block"></span>
-            </router-link>
-          </li>
-          <li class="flex items-stretch">
-            <router-link to="/news" class="flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative">
-              <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">НОВОСТИ</span>
-              <span class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14] hidden group-hover:block"></span>
-            </router-link>
-          </li>
-          <li class="flex items-stretch">
-            <router-link to="/events" class="flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative">
-              <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">МЕРОПРИЯТИЯ</span>
-              <span class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14] hidden group-hover:block"></span>
-            </router-link>
-          </li>
-          <li class="flex items-stretch">
-            <router-link to="/guides" class="flex items-center px-5 border-r-4 border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative">
-              <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">ДЛЯ_АРТИСТОВ</span>
+          <li class="flex items-stretch" v-for="link in navLinks" :key="link.to">
+            <router-link :to="link.to" class="flex items-center px-5 border-r border-[#222] text-gray-500 font-mono text-sm tracking-widest hover:bg-white hover:text-black transition-none shadow-[inset_0_0_15px_rgba(0,0,0,1)] hover:shadow-none group relative">
+              <span class="group-hover:font-black group-hover:scale-x-110 inline-block transition-none">{{ link.label }}</span>
               <span class="absolute bottom-0 left-0 w-full h-1 bg-[#39FF14] hidden group-hover:block"></span>
             </router-link>
           </li>
@@ -79,29 +46,78 @@
           </li>
         </ul>
         
-        <!-- Мобильный гамбургер: Строгий тумблер -->
+        <!-- Mobile hamburger -->
         <div class="flex items-center lg:hidden">
-          <button class="bg-[#111] border-2 border-[#444] p-2 text-[#39FF14] shadow-[4px_4px_0_#ff0000] hover:bg-[#39FF14] hover:text-black hover:border-black active:shadow-none active:translate-x-1 active:translate-y-1 transition-none">
-            <!-- Хардкорные линии вместо мягкого SVG -->
-            <div class="w-6 h-0.75 bg-current mb-1"></div>
-            <div class="w-6 h-0.75 bg-current mb-1"></div>
-            <div class="w-6 h-0.75 bg-current"></div>
+          <button 
+            @click="menuOpen = !menuOpen"
+            class="bg-[#111] border-2 border-[#444] p-2 text-[#39FF14] shadow-[3px_3px_0_#ff0000] sm:shadow-[4px_4px_0_#ff0000] hover:bg-[#39FF14] hover:text-black hover:border-black active:shadow-none active:translate-x-1 active:translate-y-1 transition-none"
+            aria-label="Toggle menu"
+          >
+            <div class="w-5 sm:w-6 h-0.5 sm:h-0.75 bg-current mb-1"></div>
+            <div class="w-5 sm:w-6 h-0.5 sm:h-0.75 bg-current mb-1"></div>
+            <div class="w-5 sm:w-6 h-0.5 sm:h-0.75 bg-current"></div>
           </button>
         </div>
         
       </div>
     </nav>
+
+    <!-- Mobile menu panel -->
+    <div 
+      v-show="menuOpen" 
+      class="lg:hidden absolute left-0 right-0 top-full z-50 bg-[#0a0a0a] border-b-4 border-[#39FF14] shadow-[0_12px_0_#111]"
+    >
+      <ul class="flex flex-col">
+        <li v-for="link in navLinks" :key="link.to">
+          <router-link 
+            :to="link.to" 
+            @click="menuOpen = false"
+            class="block px-4 py-3 border-b border-[#222] text-gray-400 font-mono text-sm tracking-widest hover:bg-white hover:text-black"
+          >
+            {{ link.label }}
+          </router-link>
+        </li>
+        <li class="p-4">
+          <router-link 
+            v-if="!authed.isAuthenticated"
+            to="/login" 
+            @click="menuOpen = false"
+            class="block w-full bg-[#39FF14] text-black uppercase text-lg text-center py-3 border-2 border-black font-black"
+          >
+            [ ВХОД ]
+          </router-link>
+          <router-link 
+            v-else
+            :to="cabinetPath" 
+            @click="menuOpen = false"
+            class="block w-full bg-[#39FF14] text-black uppercase text-lg text-center py-3 border-2 border-black font-black"
+          >
+            [ КАБИНЕТ ]
+          </router-link>
+        </li>
+      </ul>
+    </div>
   </header>
 </template>
 
 <script lang="ts">
-import { useAuthStore } from '@/stores/auth';
-import { defineComponent, computed } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import { defineComponent, computed, ref } from 'vue'
 
 export default defineComponent({
   name: 'Header',
   setup(){
     const authed = useAuthStore()
+    const menuOpen = ref(false)
+
+    const navLinks = [
+      { to: '/', label: 'ГЛАВНАЯ' },
+      { to: '/about', label: 'О_НАС' },
+      { to: '/cases', label: 'КЕЙСЫ' },
+      { to: '/news', label: 'НОВОСТИ' },
+      { to: '/events', label: 'МЕРОПРИЯТИЯ' },
+      { to: '/guides', label: 'ДЛЯ_АРТИСТОВ' },
+    ]
 
     const cabinetPath = computed(() => {
       switch (authed.role) {
@@ -118,6 +134,8 @@ export default defineComponent({
     return {
       authed,
       cabinetPath,
+      menuOpen,
+      navLinks,
     }
   }
 })

@@ -41,7 +41,7 @@
         <div class="relative z-10 flex flex-col gap-1">
           <div class="flex justify-between text-[10px] font-mono text-gray-400 gap-2">
             <span>©{{ currentYear }} .SOX_CORE</span>
-            <span class="text-[#ff0000] motion-safe:animate-pulse">● LIVE</span>
+            <span class="text-[#ff0000] animate-pulse">● LIVE</span>
           </div>
           <div class="h-5 w-full bg-[#222] border border-[#333] flex items-center justify-center">
             <span class="font-mono text-[8px] text-gray-500 tracking-widest">||||||||||||||||||||||||</span>
@@ -53,7 +53,7 @@
 
     <div class="bg-black border-t border-[#222] py-1 flex items-center overflow-hidden whitespace-nowrap relative">
       <div class="flex-1 overflow-hidden relative">
-        <div class="flex motion-safe:animate-marquee text-[9px] font-mono text-[#333] uppercase">
+        <div class="flex animate-marquee text-[9px] font-mono text-[#333] uppercase">
           <div class="flex gap-4 px-2">
             <span v-for="i in 8" :key="'a' + i">System.Initialize... OK // CLASS_TICKETS // .SOX_OS //</span>
           </div>

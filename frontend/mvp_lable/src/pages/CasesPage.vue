@@ -3,10 +3,11 @@
 
     <div class="absolute inset-0 z-100 pointer-events-none select-none overflow-hidden">
 
-      <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20 mix-blend-screen animate-noise transform-gpu"></div>
-      <div class="absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.4)_80%,rgba(0,0,0,0.9)_90%,#000_100%)] z-10 transform-gpu"></div>
-      <div class="absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(57,255,20,0.02)_100%)] bg-size-[100%_8px] animate-[scan-roll_20s_linear_infinite] transform-gpu"></div>
-      <div class="fixed inset-0 z-40 pointer-events-none bg-[radial-gradient(circle,transparent_50%,rgba(0,0,0,0.5)_80%,rgba(0,0,0,1)_100%)] transform-gpu"></div>
+      <!-- Light texture always; heavy vignette / scan / tracking only desktop -->
+      <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-10 md:opacity-20 mix-blend-screen md:animate-noise transform-gpu"></div>
+      <div class="hidden md:block absolute inset-0 bg-[radial-gradient(circle_at_center,transparent_10%,rgba(0,0,0,0.4)_80%,rgba(0,0,0,0.9)_90%,#000_100%)] z-10 transform-gpu"></div>
+      <div class="hidden md:block absolute inset-0 bg-[linear-gradient(rgba(18,16,16,0)_50%,rgba(57,255,20,0.02)_100%)] bg-size-[100%_8px] animate-[scan-roll_20s_linear_infinite] transform-gpu"></div>
+      <div class="hidden md:block fixed inset-0 z-40 pointer-events-none bg-[radial-gradient(circle,transparent_50%,rgba(0,0,0,0.5)_80%,rgba(0,0,0,1)_100%)] transform-gpu"></div>
 
       <div class="absolute top-10 sm:top-20 right-4 sm:right-30 font-mono text-[#39FF14] text-[10px] sm:text-xs opacity-70 pointer-events-none select-none hidden sm:block">
         <div class="flex items-center gap-2">
@@ -16,7 +17,8 @@
         <div class="text-right">SP</div>
       </div>
 
-      <div class="absolute inset-0 pointer-events-none z-40 overflow-hidden">
+      <!-- Running dark/light tracking strip — desktop only -->
+      <div class="hidden md:block absolute inset-0 pointer-events-none z-40 overflow-hidden">
         <div class="absolute w-full h-32 bg-white/5 blur-3xl animate-[tracking-line_12s_linear_infinite]"></div>
       </div>
 
@@ -26,7 +28,8 @@
 
     </div>
 
-<div class="fixed inset-0 pointer-events-none z-50 shadow-[inset_0_0_150px_rgba(0,0,0,0.8)]"></div>
+<!-- Inset vignette — desktop only (was darkening whole mobile screen) -->
+<div class="hidden md:block fixed inset-0 pointer-events-none z-50 shadow-[inset_0_0_150px_rgba(0,0,0,0.8)]"></div>
 
     <div class="max-w-7xl mx-auto relative z-10 sm:transform sm:scale-y-[1.02] sm:scale-x-[0.98] sm:rounded-[100px/40px]">
       

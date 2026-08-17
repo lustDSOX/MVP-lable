@@ -1,107 +1,97 @@
 <template>
-  <section
-    class="min-h-screen bg-linear-to-br from-black via-gray-900 to-gray-950 px-6 pt-24 pb-12"
-    :class="{ 'no-select': !isDebug }"
-  >
-    <div class="max-w-4xl mx-auto">
+  <section class="min-h-screen px-4 sm:px-6 pb-16 pt-20 sm:pt-24 font-['Impact','Arial_Black',sans-serif] text-white relative overflow-x-hidden">
+    <div class="max-w-3xl mx-auto relative z-10">
+      <!-- Back -->
       <router-link
         to="/guides"
-        class="inline-flex items-center text-[#39FF14] hover:text-[#00CC00] text-lg font-bold mb-6"
+        class="inline-flex items-center gap-2 min-h-[44px] px-3 py-2 mb-6 border-2 border-[#39FF14] bg-black text-[#39FF14] text-sm sm:text-base font-black uppercase hover:bg-[#39FF14] hover:text-black active:translate-x-0.5 active:translate-y-0.5"
       >
-        &larr; Back to guides
+        ← BACK_TO_GUIDES
       </router-link>
 
-      <article
-        ref="articleRef"
-        class="bg-gray-900/70 border border-gray-700 rounded-2xl p-8"
-        @contextmenu="preventContextMenu"
-        @selectstart="preventSelect"
-      >
-        <h2 class="text-4xl font-black uppercase text-white mb-4">
-          {{ currentGuide?.title }}
-        </h2>
-
-        <div class="text-gray-300 prose prose-invert max-w-none text-lg leading-relaxed">
-          {{ currentGuide?.content }}
+      <template v-if="guide">
+        <!-- Meta bar -->
+        <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] sm:text-xs tracking-wider">
+          <span class="bg-[#39FF14] text-black px-2 py-1 font-bold">ID_{{ String(guide.id).padStart(2, '0') }}</span>
+          <span v-if="guide.level" class="border border-[#333] text-gray-400 px-2 py-1">{{ guide.level }}</span>
+          <span v-if="guide.duration" class="border border-[#333] text-gray-400 px-2 py-1">{{ guide.duration }}</span>
+          <span
+            v-for="tag in guide.tags || []"
+            :key="tag"
+            class="border border-[#222] text-[#39FF14]/80 px-2 py-1"
+          >#{{ tag }}</span>
         </div>
 
-        <div class="mt-8 p-6 bg-gray-800/30 border border-gray-700 rounded-xl">
-          <h3 class="text-xl font-bold text-white mb-3">Watermark (пример)</h3>
-          <p class="text-gray-400 text-sm">
-            Все материалы лейбла CLASS TICKETS защищены условием авторского соглашения артиста.
+        <!-- Title -->
+        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black uppercase italic leading-[1.05] mb-6 text-white drop-shadow-[3px_3px_0_#39FF14]">
+          {{ guide.title }}
+        </h1>
+
+        <div class="h-1 w-full bg-[#39FF14] mb-8 shadow-[0_0_12px_#39FF14]"></div>
+
+        <!-- Body panel -->
+        <article class="border-4 border-black bg-[#0a0a0a] shadow-[8px_8px_0_#222] p-4 sm:p-8 relative">
+          <div class="absolute top-0 right-0 bg-[#ff0000] text-black text-[10px] font-mono px-2 py-0.5 font-bold">
+            CLASSIFIED_GUIDE
+          </div>
+          <p class="font-mono text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-line">
+            {{ guide.content }}
           </p>
-          <img
-            src="/src/assets/watermark-class-tickets.png"
-            alt="Watermark CLASS TICKETS"
-            class="w-40 h-10 mt-4 opacity-10"
-          />
+        </article>
+
+        <!-- Steps hint -->
+        <div class="mt-8 border-2 border-[#333] bg-[#111] p-4 sm:p-6">
+          <h2 class="text-lg sm:text-xl font-black text-[#39FF14] uppercase mb-3">NEXT_ACTIONS</h2>
+          <ol class="font-mono text-xs sm:text-sm text-gray-400 space-y-2 list-decimal list-inside">
+            <li>Прочитай материал до конца</li>
+            <li>Примени 1 пункт на ближайшей сессии</li>
+            <li>Залей черновик через кабинет артиста</li>
+          </ol>
         </div>
-      </article>
+
+        <!-- CTA -->
+        <div class="mt-8 flex flex-col sm:flex-row gap-3">
+          <router-link
+            to="/login"
+            class="flex-1 text-center min-h-[48px] flex items-center justify-center bg-[#39FF14] text-black border-4 border-black font-black text-lg uppercase shadow-[4px_4px_0_#ff0000] hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14]"
+          >
+            OPEN_CABINET
+          </router-link>
+          <router-link
+            to="/guides"
+            class="flex-1 text-center min-h-[48px] flex items-center justify-center bg-black text-[#39FF14] border-4 border-[#39FF14] font-black text-lg uppercase hover:bg-[#39FF14] hover:text-black"
+          >
+            ALL_GUIDES
+          </router-link>
+        </div>
+
+        <p class="mt-8 font-mono text-[9px] text-gray-600 text-center uppercase tracking-widest">
+          CLASS TICKETS · materials under artist agreement
+        </p>
+      </template>
+
+      <div v-else class="border-4 border-[#ff0000] bg-[#111] p-8 text-center shadow-[8px_8px_0_#000]">
+        <h2 class="text-2xl sm:text-3xl font-black text-[#ff0000] uppercase italic mb-3">GUIDE_NOT_FOUND</h2>
+        <p class="font-mono text-gray-500 text-sm mb-6">Packet missing or id invalid.</p>
+        <router-link to="/guides" class="text-[#39FF14] font-bold underline">← guides index</router-link>
+      </div>
     </div>
   </section>
 </template>
 
 <script lang="ts">
 import { defineComponent } from 'vue'
+import { getGuideById, type GuideItem } from '@/data/guides'
 
 export default defineComponent({
   name: 'GuideDetail',
   props: {
-    id: {
-      type: String,
-      required: true,
-    },
-  },
-  data() {
-    return {
-      guides: [
-        {
-          id: 1,
-          title: 'Как начать записывать свои треки дома',
-          content:
-            'Начни с базовой установки микрофона и простого аудиоинтерфейса. Важно, чтобы ты не сидел в окружении громких звуков и эхо, поэтому идеально — спальня с подручной изоляцией. Первые треки лучше записывать без лишней обработки: компресс, эквалайзер, реверберация — всё это ты будешь добавлять постепенно. Главное — экспериментируй, не бойся плохих записей, потому что именно из них приходит лучший результат.',
-        },
-        {
-          id: 2,
-          title: 'Как писать текст, чтобы его слышали',
-          content:
-            'Текст должен быть живым, а не похожим на школьное сочинение. Вспоминай истории, которые тебя реально задевали, и перекладывай их в рифму. Слушай себя вслух, ходи по комнате, проговаривай фразы, как будто рассказываешь кому‑то в реальной жизни. Не старайся писать слишком умно, лучше честно и просто. Смысл — важнее слова, а мелодия — чаще всего сама подскажет, какие строки оставить.',
-        },
-        {
-          id: 3,
-          title: 'Личный кабинет артиста: как работать с отчётами',
-          content:
-            'В кабинете доступны статистика прослушиваний, билеты, отчёты по релизам. Каждый цифровой трек — это отдельный «билет» со своей статистикой. Следи, откуда идёт трафик, как меняется аудитория, чтобы лучше понимать, куда развивать своё звучание и визуальный стиль.',
-        },
-      ] satisfies GuideItemData[],
-      isDebug: false, // true — если хочешь включить выделение текста для тестов
-    }
+    id: { type: String, required: true },
   },
   computed: {
-    currentGuide(this: any): typeof this.guides[0] | undefined {
-      const numId = Number(this.id)
-      return this.guides.find((g: any) => g.id === numId)
-    },
-  },
-  mounted() {
-    const el = this.$refs.articleRef as HTMLElement | null
-    if (el) {
-      el.style.userSelect = 'none'
-    }
-  },
-  methods: {
-    preventContextMenu(e: Event) {
-      e.preventDefault()
-    },
-    preventSelect(e: Event) {
-      e.preventDefault()
+    guide(): GuideItem | undefined {
+      return getGuideById(this.id)
     },
   },
 })
-
-interface GuideItemData {
-  id: number
-  title: string
-  content: string
-}
 </script>

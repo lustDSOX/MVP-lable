@@ -1,11 +1,22 @@
 @layer base {
     img{
-        @apply pointer-events-none select-none;
+        @apply pointer-events-none select-none max-w-full h-auto;
+    }
+
+    /* Responsive decorative images */
+    .img-cover {
+        @apply w-full h-full object-cover object-center;
+    }
+    .img-contain {
+        @apply w-full h-full object-contain object-center;
+    }
+    .decor-hide-mobile {
+        @apply hidden sm:block;
     }
 
 
     h1 {
-        @apply text-6xl lg:text-8xl uppercase tracking-tight py-8 scale-y-150 block;
+        @apply text-4xl sm:text-5xl md:text-6xl lg:text-8xl uppercase tracking-tight py-4 sm:py-6 md:py-8 scale-y-125 sm:scale-y-150 block;
 
     }
 
@@ -30,15 +41,11 @@
         padding-right: 2vw;
         letter-spacing: normal;
         filter: 
-            /* Белый блик на самом верху (создает эффект влажного ребра) */
             drop-shadow(0 -1px 1px rgba(255,255,255,0.9))
-            /* Темная фаска (bevel) */
             drop-shadow(0 1px 0px #444)
-            /* Стэк теней для 3D объема (выплавка) */
             drop-shadow(0 1.6px 0px #333)
             drop-shadow(0 2.0px 0px #222)
             drop-shadow(0 2.4px 0px #111)
-            /* Мягкая тень под буквами для отделения от экрана */
             drop-shadow(0 10px 15px rgba(0,0,0,0.8))
             blur(0.3px);
         
@@ -63,7 +70,6 @@
     h1.variant-vhs {
         position: relative;
         color: rgba(255, 255, 255, 0.9);
-        /* 1. Вертикальные полоски субпикселей (как на фото) */
         background: linear-gradient(
             90deg,
             rgba(255, 0, 0, 0.1),
@@ -78,7 +84,6 @@
         animation: vhs-jitter 0.5s infinite;
     }
 
-    /* Красный слой (смещение влево) */
     h1.variant-vhs::before {
         content: attr(data-text);
         position: absolute;
@@ -92,7 +97,6 @@
         animation: vhs-shift-red 0.3s infinite;
     }
 
-    /* Синий слой (смещение вправо) */
     h1.variant-vhs::after {
         content: attr(data-text);
         position: absolute;
@@ -114,7 +118,6 @@
         line-height: 0.85;
         letter-spacing: -0.06em;
         transform: scaleY(1.1) skewX(-2deg);
-        /* Жесткий монолитный сдвиг (черная прослойка + массивный красный блок) */
         text-shadow: 
             4px 4px 0 #000000,
             8px 8px 0 #ff0000;
@@ -125,7 +128,6 @@
         content: attr(data-text);
         @apply absolute left-0 top-4 pointer-events-none z-20;
         color: transparent;
-        /* Y2K CRT-строки (scanlines), въевшиеся в белый текст */
         background-image: repeating-linear-gradient(
             to bottom,
             transparent,
@@ -142,7 +144,6 @@
         @apply absolute -left-2 top-6 pointer-events-none -z-10;
         color: transparent;
         -webkit-text-stroke: 2px #333333;
-        /* Эффект бага/фантомного контура старой системы */
         clip-path: polygon(0 50%, 100% 50%, 100% 100%, 0 100%);
         filter: drop-shadow(4px 0 0 rgba(57, 255, 20, 0.3));
     }
@@ -200,29 +201,21 @@
 
 .y2k-panel {
     @apply relative bg-[#151515] border-2 border-white/20;
-    /* Жесткая 3D тень, имитирующая толщину (как на твоем заголовке) */
     box-shadow: 8px 8px 0px rgba(0, 0, 0, 0.8);
 }
 
 .chrome-decoration {
     @apply absolute w-52 h-52 z-20 pointer-events-none;
-    /* Добавляем хромированный отсвет на сами элементы декора */
     filter: drop-shadow(0 0 10px rgba(255,255,255,0.2)) contrast(1.2) brightness(1.1);
 }
 
 
 .y2k-metal {
     @apply relative rounded-xl transition-all duration-500;
-    /* Убираем рамку, фрезерованный кусок металла не имеет тонких рамок */
     
-    /* Сохраняем физическую толщину блока (брутализм) */
     box-shadow: 
       inset 2px 2px 4px rgba(255, 255, 255, 0.3),
-      inset -3px -3px 6px rgba(0, 0, 0, 0.8),
-
-/* 
-      15px 15px 25px rgba(0, 0, 0, 0.9),
-      -15px -15px 25px rgba(0, 0, 0, 0.9); */
+      inset -3px -3px 6px rgba(0, 0, 0, 0.8);
   }
 
   .y2k-metal::before {
@@ -234,12 +227,12 @@
     background-position: center;
     
     filter: contrast(0.9) brightness(0.8) saturate(0.8);
-    box-shadow: inset 0 0 60px rgba(0,0,0,0.8); /* Глубокая виньетка */
+    box-shadow: inset 0 0 60px rgba(0,0,0,0.8);
   }
 
 
     .text-engraved {
-        color: rgba(10, 10, 10, 0.85); /* Сделали почти черным */
+        color: rgba(10, 10, 10, 0.85);
         text-shadow: 
             -2px -2px 2px rgba(0, 0, 0, 1);
         transition: all 0.5s ease;
@@ -257,7 +250,7 @@
   }
 
   .group:hover .text-engraved-light{
-    color: #e4e4e7; /* Светло-серый (zinc-200) */
+    color: #e4e4e7;
   }
 
   .group:hover .y2k-metal {
@@ -270,25 +263,10 @@
       -20px -20px 25px rgba(22, 22, 22, 0.95);
   }
 
-  /* Текстура слегка вспыхивает */
   .group:hover .y2k-metal::before {
     filter: contrast(1.1) brightness(0.8) saturate(0.4);
   }
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-  
 
 ::-webkit-scrollbar {
   width: 16px;

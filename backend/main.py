@@ -12,6 +12,9 @@ from routers.users_router import protect_router as user_protect
 from routers.users_router import admin_router as user_admin
 from routers.releases_router import router as release_public
 from routers.releases_router import protect_router as release_protect
+from routers.tracks_router import router as tracks_router
+from routers.moderation_router import router as moderation_router
+from routers.links_router import router as links_router
 
 load_dotenv()
 
@@ -32,7 +35,7 @@ async def lifespan(app: FastAPI):
 app = FastAPI(
     title="Label Management API",
     description="MVP сервиса для музыкального лейбла",
-    version="0.0.2",
+    version="0.0.3",
     lifespan=lifespan,
     docs_url="/docs",
     redoc_url="/redoc",
@@ -57,11 +60,14 @@ app.include_router(user_protect)
 app.include_router(user_admin)
 app.include_router(release_public)
 app.include_router(release_protect)
+app.include_router(tracks_router)
+app.include_router(moderation_router)
+app.include_router(links_router)
 
 
 @app.get("/health", tags=["System"])
 async def health():
-    return {"status": "OK", "service": "Label Management API MVP", "version": "0.0.2"}
+    return {"status": "OK", "service": "Label Management API MVP", "version": "0.0.3"}
 
 
 if __name__ == "__main__":

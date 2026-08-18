@@ -1,27 +1,24 @@
 import enum
 
 from sqlalchemy import Column, Enum, ForeignKey, Integer, String
-from database import Base
+from db.database import Base
 from sqlalchemy.orm import relationship
 
 class ContributorRole(str, enum.Enum):
     MAIN_ARTIST = "main_artist"
-    FEATURE = "feature"
+    FEATURED = "featured"
     PRODUCER = "producer"
-    WRITER = "writer"
-    MIXING = "mixing"
+    SONGWRITER = "songwriter"
+    OTHER = "other"
 
 class TrackContributor(Base):
-    # Кто и что делал на конкретном треке
     __tablename__ = "track_contributors"
 
     id = Column(Integer, primary_key=True, index=True)
     track_id = Column(Integer, ForeignKey("tracks.id", ondelete="CASCADE"), nullable=False)
-    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=True) # только зарегистированные
-    external_name = Column(String, nullable=True) # если не зарегистрирован, нет на сайте
+    user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
     role = Column(Enum(ContributorRole), nullable=False)
+    credit_name = Column(String, nullable=True)
 
     track = relationship("Track", back_populates="contributors")
     user = relationship("User", back_populates="contributions")
-    
-

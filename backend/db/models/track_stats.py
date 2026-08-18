@@ -1,8 +1,8 @@
-from sqlalchemy import  Column, Date, Enum, Integer, ForeignKey
-from database import Base
+from sqlalchemy import Column, Date, Enum, Integer, ForeignKey
+from db.database import Base
 from sqlalchemy.orm import relationship
 
-from models.release_links import Platform
+from db.models.release_links import Platform
 
 
 class TrackStat(Base):
@@ -11,7 +11,7 @@ class TrackStat(Base):
     id = Column(Integer, primary_key=True, index=True)
     track_id = Column(Integer, ForeignKey('tracks.id', ondelete='CASCADE'), nullable=False)
     platform = Column(Enum(Platform), nullable=False)
-    date = Column(Date, nullable=False) #за какую дату собрана стата
+    date = Column(Date, nullable=False)
     stream_count = Column(Integer, nullable=False)
 
     track = relationship('Track', back_populates='stats')

@@ -2,25 +2,27 @@ from typing import Sequence
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models.moderation_logs import ModerationLog 
+from db.models.moderation_logs import ModerationLog
+
 
 class ModerationLogManager:
     def __init__(self, session: AsyncSession):
         self.session = session
 
     async def create_log(
-        self, 
-        release_id: int, 
-        moderator_id: int, 
-        comment: str,
-        commit:bool = True
+        self,
+        release_id: int,
+        moderator_id: int | None,
+        action: str,
+        comment: str | None = None,
+        commit: bool = True,
     ) -> ModerationLog:
         new_log = ModerationLog(
             release_id=release_id,
             moderator_id=moderator_id,
-            comment=comment
+            action=action,
+            comment=comment,
         )
-        
         self.session.add(new_log)
         if commit:
             await self.session.commit()

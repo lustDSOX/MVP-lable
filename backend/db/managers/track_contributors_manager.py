@@ -4,30 +4,29 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from db.models.track_contributors import TrackContributor, ContributorRole
 
+
 class TrackContributorManager:
     def __init__(self, session: AsyncSession):
         self.session = session
 
     async def add_contributor(
-        self, 
-        track_id: int, 
-        role: ContributorRole, 
-        user_id: int | None = None, 
-        external_name: str | None = None
+        self,
+        track_id: int,
+        role: ContributorRole,
+        user_id: int | None = None,
+        credit_name: str | None = None,
     ) -> TrackContributor:
-
-        if not user_id and not external_name:
-            raise ValueError("You must specify either the user_id or the external_name.")
-        if user_id and external_name:
-            external_name = None
+        if not user_id and not credit_name:
+            raise ValueError("Specify user_id or credit_name")
+        if user_id and credit_name:
+            credit_name = None
 
         new_contributor = TrackContributor(
             track_id=track_id,
             user_id=user_id,
-            external_name=external_name,
-            role=role
+            credit_name=credit_name,
+            role=role,
         )
-        
         self.session.add(new_contributor)
         await self.session.commit()
         await self.session.refresh(new_contributor)

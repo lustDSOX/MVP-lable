@@ -52,6 +52,31 @@ protect_router = APIRouter(
 )
 
 
+@router.get("/", response_model=list[ReleaseResponse])
+async def list_published_releases(
+    manager: Manager_Dep,
+    limit: int = 20,
+    offset: int = 0,
+):
+    if hasattr(manager, "list_published"):
+        return await manager.list_published(limit=limit, offset=offset)
+    return await manager.get_releases_by_status(
+        status=ReleaseStatus.PUBLISHED, limit=limit, offset=offset
+    )
+
+
+@router.get("/search", response_model=list[ReleaseResponse])
+async def search_releases(
+    manager: Manager_Dep,
+    query: str = Query(..., min_length=3),
+    limit: int = 20,
+    offset: int = 0,
+):
+    if hasattr(manager, "search_releases_by_title"):
+        return await manager.search_releases_by_title(query, limit, offset)
+    return await manager.get_release_by_search(query, limit, offset)
+
+
 @router.get("/{release_id}", response_model=ReleaseResponse)
 async def get_release(release_id: int, manager: Manager_Dep):
     release = await manager.get_release_by_id(release_id)
@@ -65,18 +90,6 @@ async def get_release(release_id: int, manager: Manager_Dep):
         )
 
     return release
-
-
-@router.get("/search", response_model=list[ReleaseResponse])
-async def search_releases(
-    manager: Manager_Dep,
-    query: str = Query(..., min_length=3),
-    limit: int = 20,
-    offset: int = 0,
-):
-    if hasattr(manager, "search_releases_by_title"):
-        return await manager.search_releases_by_title(query, limit, offset)
-    return await manager.get_release_by_search(query, limit, offset)
 
 
 @protect_router.post("/", response_model=ReleaseResponse, status_code=status.HTTP_201_CREATED)

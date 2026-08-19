@@ -49,42 +49,16 @@
 
         <div class="space-y-8">
           <div v-if="mode === 'register'" class="relative">
-            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">
-              Artist_Name
-            </label>
-            <input
-              v-model="artistName"
-              type="text"
-              class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]"
-              placeholder="DJ Neon"
-            />
+            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">Artist_Name</label>
+            <input v-model="artistName" type="text" class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]" placeholder="DJ Neon" />
           </div>
-
           <div class="relative">
-            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">
-              User_ID
-            </label>
-            <input
-              v-model="email"
-              type="email"
-              required
-              class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]"
-              placeholder="demo@label.ru"
-            />
+            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">User_ID</label>
+            <input v-model="email" type="email" required class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]" placeholder="demo@label.ru" />
           </div>
-
           <div class="relative">
-            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">
-              Access_Key
-            </label>
-            <input
-              v-model="password"
-              type="password"
-              required
-              minlength="6"
-              class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]"
-              placeholder="••••••••"
-            />
+            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">Access_Key</label>
+            <input v-model="password" type="password" required minlength="6" class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]" placeholder="••••••••" />
           </div>
         </div>
 
@@ -99,10 +73,12 @@
         </button>
 
         <div class="mt-6 font-mono text-[10px] text-gray-600 uppercase space-y-1 leading-relaxed">
-          <p>Demo: demo@label.ru / demo123 (artist)</p>
-          <p>Demo: moderator@label.ru / mod123</p>
-          <p>Demo: admin@label.ru / admin123</p>
-          <p class="text-[#39FF14]/70">Mock auth — session in localStorage</p>
+          <p>demo@label.ru / demo123 — artist</p>
+          <p>moderator@label.ru / mod123 — only releases</p>
+          <p>news@label.ru / news123 — only news CMS</p>
+          <p>events@label.ru / events123 — only events CMS</p>
+          <p>staff@label.ru / staff123 — releases+news+events</p>
+          <p>admin@label.ru / admin123 — matrix + all</p>
         </div>
       </div>
     </form>
@@ -132,8 +108,7 @@ async function handleSubmit() {
       await authStore.login(email.value, password.value)
     }
     const role = authStore.role
-    if (role === 'admin') router.push('/admin')
-    else if (role === 'moderator') router.push('/moderator')
+    if (role === 'admin' || role === 'moderator') router.push('/staff')
     else router.push('/dashboard')
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : 'Auth failed'

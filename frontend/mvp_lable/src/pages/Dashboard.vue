@@ -115,15 +115,8 @@
                     <button @click="continueDraft(track.id)" class="action-button draft-button">[CONTINUE]</button>
                   </div>
                   <div v-else class="flex items-center justify-center gap-2">
-                    <button class="action-button" title="Edit Release">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M17.414 2.586a2 2 0 00-2.828 0L7 10.172V13h2.828l7.586-7.586a2 2 0 000-2.828z" /><path fill-rule="evenodd" d="M2 6a2 2 0 012-2h4a1 1 0 010 2H4v10h10v-4a1 1 0 112 0v4a2 2 0 01-2 2H4a2 2 0 01-2-2V6z" clip-rule="evenodd" /></svg>
-                    </button>
-                    <button class="action-button" title="View Detailed Stats">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path d="M2 10a8 8 0 018-8v8h8a8 8 0 11-16 0z" /><path d="M12 2.252A8.014 8.014 0 0117.748 8H12V2.252z" /></svg>
-                    </button>
-                    <button class="action-button" title="Copy Links">
-                      <svg xmlns="http://www.w3.org/2000/svg" class="w-5 h-5" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.586 4.586a2 2 0 112.828 2.828l-3 3a2 2 0 01-2.828 0 1 1 0 00-1.414 1.414 4 4 0 005.656 0l3-3a4 4 0 00-5.656-5.656l-1.5 1.5a1 1 0 101.414 1.414l1.5-1.5zm-5 5a2 2 0 012.828 0 1 1 0 101.414-1.414 4 4 0 00-5.656 0l-3 3a4 4 0 105.656 5.656l1.5-1.5a1 1 0 10-1.414-1.414l-1.5 1.5a2 2 0 11-2.828-2.828l3-3z" clip-rule="evenodd" /></svg>
-                    </button>
+                    <button class="action-button" title="Edit Release">✎</button>
+                    <button class="action-button" title="Stats">◉</button>
                   </div>
                 </td>
               </tr>
@@ -160,10 +153,7 @@
   align-self: start;
   margin-bottom: 1rem;
 }
-.search-wrapper {
-  position: relative;
-  width: 100%;
-}
+.search-wrapper { position: relative; width: 100%; }
 .upload-button {
   width: 100%;
   padding: 1rem;
@@ -178,22 +168,11 @@
   overflow: hidden;
   height: fit-content; 
 }
-.upload-button:hover{
-  box-shadow: none;
-  transform: translate(2px, 2px);
-}
+.upload-button:hover{ box-shadow: none; transform: translate(2px, 2px); }
 @media (max-width: 1024px) {
-  .command-center-grid {
-    grid-template-columns: 1fr;
-    gap: 1.5rem;
-  }
-  .welcome-block {
-    margin-bottom: 0;
-  }
-  .upload-button {
-    width: 100%;
-    order: 3;
-  }
+  .command-center-grid { grid-template-columns: 1fr; gap: 1.5rem; }
+  .welcome-block { margin-bottom: 0; }
+  .upload-button { width: 100%; order: 3; }
 }
 .welcome-subtitle {
   font-family: 'JetBrains Mono', monospace;
@@ -214,19 +193,9 @@
   color: white;
   text-transform: uppercase;
 }
-.search-input:focus {
-  outline: none;
-  border-color: #ff0000;
-}
-.data-panel-container {
-  border: 2px solid #333;
-  background-color: black;
-}
-.platform-tabs {
-  display: flex;
-  border-bottom: 2px solid #333;
-  overflow-x: auto;
-}
+.search-input:focus { outline: none; border-color: #ff0000; }
+.data-panel-container { border: 2px solid #333; background-color: black; }
+.platform-tabs { display: flex; border-bottom: 2px solid #333; overflow-x: auto; }
 .platform-tab {
   padding: 0.75rem 1.5rem;
   font-family: 'JetBrains Mono', monospace;
@@ -238,10 +207,7 @@
   white-space: nowrap;
 }
 .platform-tab:last-child { border-right: none; }
-.platform-tab.active {
-  background-color: #ff0000;
-  color: white;
-}
+.platform-tab.active { background-color: #ff0000; color: white; }
 .data-panel-content {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
@@ -277,17 +243,12 @@
   font-size: 0.875rem;
   color: #6b7280;
 }
-.table-row {
-  border-bottom: 1px solid #222;
-  transition: background-color 0.1s;
-}
-.table-row:last-child { border-bottom: none; }
+.table-row { border-bottom: 1px solid #222; }
 .table-row:hover { background-color: #0a0a0a; }
 .track-title {
   font-family: 'Archivo Black', sans-serif;
   font-size: 1.25rem;
   text-transform: uppercase;
-  letter-spacing: -0.025em;
 }
 .rejection-reason {
   margin-top: 0.5rem;
@@ -313,25 +274,14 @@
   background-color: #222;
   color: #9ca3af;
   padding: 0.5rem;
-  transition: background-color 0.2s, color 0.2s;
 }
-.action-button:hover {
-  background-color: #ff0000;
-  color: black;
-}
+.action-button:hover { background-color: #ff0000; color: black; }
 .action-button.draft-button {
   background-color: #39FF14;
   color: black;
   font-family: 'JetBrains Mono', monospace;
   font-size: 0.75rem;
   padding: 0.5rem 0.75rem;
-}
-.action-button.draft-button:hover { background-color: white; }
-@media (max-width: 1024px) {
-  .command-center-grid {
-    grid-template-columns: 1fr;
-    grid-template-areas: "welcome" "search" "upload";
-  }
 }
 @media (max-width: 768px) {
   .data-panel-content { grid-template-columns: 1fr; }
@@ -345,7 +295,7 @@
 <script lang="ts" setup>
 import { ref, computed, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
-import { useTracksStore, type Track } from '@/stores/tracks'
+import { useTracksStore } from '@/stores/tracks'
 
 import ContractModal from '@/components/track/ContractModal.vue'
 import TrackUploadForm from '@/components/track/TrackUploadForm.vue'
@@ -381,15 +331,18 @@ const platformShare = computed(() => {
 const filteredTracks = computed(() => {
   if (!searchQuery.value.trim()) return tracksStore.tracks
   const query = searchQuery.value.toLowerCase()
-  return tracksStore.tracks.filter(track => 
-    track.title.toLowerCase().includes(query)
-  )
+  return tracksStore.tracks.filter(track => track.title.toLowerCase().includes(query))
 })
 
-const handleContractSuccess = (contractData: { trackTitle: string }) => {
+const handleContractSuccess = (payload: { release?: { title: string; type?: string; tracks?: unknown[] }; trackTitle?: string }) => {
   isContractModalOpen.value = false
-  const title = contractData.trackTitle || 'Новый релиз'
-  const newTrackId = tracksStore.createDraftContract(title)
+  const rel = payload?.release
+  const title = rel?.title || payload?.trackTitle || 'Новый релиз'
+  const newTrackId = tracksStore.createFromRelease({
+    title,
+    type: rel?.type,
+    trackCount: rel?.tracks?.length ?? 1,
+  })
   activeDraftId.value = newTrackId
 }
 const continueDraft = (trackId: string) => { activeDraftId.value = trackId }

@@ -1,108 +1,172 @@
-import { defineStore } from 'pinia';
+import { defineStore } from 'pinia'
 
-// Тип для пользователя
-export interface User {
-  id: number;
-  name: string;
-  email: string;
-  status: 'active' | 'blocked';
-  registered_at: string;
-  // Добавьте другие поля пользователя, если они есть
+export type AccountStatus = 'active' | 'blocked' | 'pending'
+
+export interface Account {
+  id: string
+  name: string
+  email: string
+  role: 'artist' | 'moderator' | 'admin'
+  status: AccountStatus
+  registeredAt: string
 }
 
-interface AdminState {
-  users: User[];
-  isLoading: boolean;
-  error: string | null;
+export interface RegistrationRequest {
+  id: string
+  name: string
+  email: string
+  artistName: string
+  createdAt: string
+  note?: string
+}
+
+const USERS_KEY = 'mvp_lable_admin_users'
+const REQS_KEY = 'mvp_lable_admin_reqs'
+
+function seedUsers(): Account[] {
+  return [
+    {
+      id: 'a1',
+      name: 'DJ Neon',
+      email: 'demo@label.ru',
+      role: 'artist',
+      status: 'active',
+      registeredAt: '2026-01-10',
+    },
+    {
+      id: 'a2',
+      name: 'Chief Editor',
+      email: 'moderator@label.ru',
+      role: 'moderator',
+      status: 'active',
+      registeredAt: '2025-11-01',
+    },
+    {
+      id: 'a3',
+      name: 'SynthRider',
+      email: 'synth@label.db',
+      role: 'artist',
+      status: 'active',
+      registeredAt: '2025-10-15',
+    },
+    {
+      id: 'a4',
+      name: 'VoidStalker',
+      email: 'void@label.db',
+      role: 'artist',
+      status: 'blocked',
+      registeredAt: '2026-01-05',
+    },
+  ]
+}
+
+function seedReqs(): RegistrationRequest[] {
+  return [
+    {
+      id: 'r1',
+      name: 'Alex Grid',
+      email: 'alex.grid@mail.ru',
+      artistName: 'GridKid',
+      createdAt: '2026-03-18',
+      note: 'Хочет релиз EP',
+    },
+    {
+      id: 'r2',
+      name: 'Mira Bass',
+      email: 'mira@bass.lab',
+      artistName: 'MIRA',
+      createdAt: '2026-03-19',
+    },
+  ]
 }
 
 export const useAdminStore = defineStore('admin', {
-  // 1. СОСТОЯНИЕ (State)
-  state: (): AdminState => ({
-    users: [],
+  state: () => ({
+    users: seedUsers() as Account[],
+    requests: seedReqs() as RegistrationRequest[],
     isLoading: false,
-    error: null,
+    error: null as string | null,
   }),
-
-  // 2. ГЕТТЕРЫ (Getters)
   getters: {
-    totalUsers(state): number {
-      return state.users.length;
-    },
-    blockedUsersCount(state): number {
-      return state.users.filter(u => u.status === 'blocked').length;
-    },
+    totalUsers: (s) => s.users.length,
+    blockedUsersCount: (s) => s.users.filter((u) => u.status === 'blocked').length,
+    pendingRequests: (s) => s.requests,
   },
-
-  // 3. ДЕЙСТВИЯ (Actions)
   actions: {
-    // Загрузка всех пользователей
+    hydrate() {
+      try {
+        const u = localStorage.getItem(USERS_KEY)
+        const r = localStorage.getItem(REQS_KEY)
+        if (u) this.users = JSON.parse(u)
+        if (r) this.requests = JSON.parse(r)
+      } catch {
+        /* seed */
+      }
+    },
+    persist() {
+      localStorage.setItem(USERS_KEY, JSON.stringify(this.users))
+      localStorage.setItem(REQS_KEY, JSON.stringify(this.requests))
+    },
     async fetchUsers() {
-      this.isLoading = true;
-      this.error = null;
-      try {
-        // TODO: Замените на ваш реальный API-запрос
-        // const response = await api.get('/admin/users');
-        // this.users = response.data;
-        
-        // --- Mock-данные для симуляции ---
-        await new Promise(res => setTimeout(res, 1000));
-        this.users = [
-            { id: 10, name: 'SynthRider', email: 'synth@label.db', status: 'active', registered_at: '2025-10-15T10:00:00Z' },
-            { id: 12, name: 'GridRunner', email: 'grid@label.db', status: 'active', registered_at: '2025-11-20T11:00:00Z' },
-            { id: 15, name: 'VoidStalker', email: 'void@label.db', status: 'blocked', registered_at: '2026-01-05T12:00:00Z' },
-        ];
-        // --- Конец Mock-данных ---
-
-      } catch (e: any) {
-        this.error = 'Failed to load users.';
-        console.error(e);
-      } finally {
-        this.isLoading = false;
+      this.isLoading = true
+      this.hydrate()
+      await new Promise((r) => setTimeout(r, 200))
+      this.isLoading = false
+    },
+    upsertUser(partial: Partial<Account> & { email: string; name: string }) {
+      if (partial.id) {
+        const i = this.users.findIndex((u) => u.id === partial.id)
+        if (i >= 0) {
+          this.users[i] = { ...this.users[i], ...partial } as Account
+          this.persist()
+          return partial.id
+        }
+      }
+      const id = `a-${Date.now()}`
+      this.users.push({
+        id,
+        name: partial.name,
+        email: partial.email.toLowerCase(),
+        role: partial.role || 'artist',
+        status: partial.status || 'active',
+        registeredAt: new Date().toISOString().slice(0, 10),
+      })
+      this.persist()
+      return id
+    },
+    blockUser(id: string) {
+      const u = this.users.find((x) => x.id === id)
+      if (u) {
+        u.status = 'blocked'
+        this.persist()
       }
     },
-
-    // Блокировка пользователя
-    async blockUser(userId: number) {
-      try {
-        // TODO: Замените на ваш реальный API-запрос
-        // await api.post(`/admin/users/${userId}/block`);
-
-        // Обновляем статус пользователя в нашем локальном состоянии
-        const user = this.users.find(u => u.id === userId);
-        if (user) {
-          user.status = 'blocked';
-        }
-      } catch (e) {
-        console.error(`Failed to block user ${userId}`, e);
+    unblockUser(id: string) {
+      const u = this.users.find((x) => x.id === id)
+      if (u) {
+        u.status = 'active'
+        this.persist()
       }
     },
-
-    // Разблокировка пользователя
-    async unblockUser(userId: number) {
-      try {
-        // TODO: Замените на ваш реальный API-запрос
-        // await api.post(`/admin/users/${userId}/unblock`);
-
-        const user = this.users.find(u => u.id === userId);
-        if (user) {
-          user.status = 'active';
-        }
-      } catch (e) {
-        console.error(`Failed to unblock user ${userId}`, e);
-      }
+    deleteUser(id: string) {
+      this.users = this.users.filter((u) => u.id !== id)
+      this.persist()
     },
-
-     // Удаление пользователя
-     async deleteUser(userId: number) {
-        try {
-            // TODO: Замените на ваш реальный API-запрос
-            // await api.delete(`/admin/users/${userId}`);
-
-            this.users = this.users.filter(u => u.id !== userId);
-        } catch (e) {
-            console.error(`Failed to delete user ${userId}`, e);
-        }
-     }
+    approveRequest(reqId: string) {
+      const req = this.requests.find((r) => r.id === reqId)
+      if (!req) return
+      this.upsertUser({
+        name: req.artistName || req.name,
+        email: req.email,
+        role: 'artist',
+        status: 'active',
+      })
+      this.requests = this.requests.filter((r) => r.id !== reqId)
+      this.persist()
+    },
+    rejectRequest(reqId: string) {
+      this.requests = this.requests.filter((r) => r.id !== reqId)
+      this.persist()
+    },
   },
-});
+})

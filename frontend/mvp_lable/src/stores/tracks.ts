@@ -1,4 +1,5 @@
 import { defineStore } from 'pinia'
+import type { ReleaseType, ContributorInput } from '@/types/release'
 
 export type TrackStatus = 'draft' | 'pending' | 'approved' | 'published' | 'rejected'
 
@@ -7,6 +8,25 @@ export interface PlatformStats {
   apple: number
   yandex: number
   vk: number
+}
+
+export interface ReleaseTrackDetail {
+  localId: string
+  title: string
+  order: number
+  isExplicit: boolean
+  lyrics: string
+  masterFile?: string
+  previewFile?: string
+  contributors: ContributorInput[]
+}
+
+export interface ContractInfo {
+  signed: boolean
+  signedAt?: string
+  version: string
+  artistFullName: string
+  status: 'unsigned' | 'signed' | 'void'
 }
 
 export interface Track {
@@ -19,6 +39,18 @@ export interface Track {
   contractSigned: boolean
   platforms: PlatformStats
   createdAt: string
+  type?: ReleaseType
+  genre?: string
+  releaseDate?: string
+  artistName?: string
+  artistEmail?: string
+  artistPhone?: string
+  artistCity?: string
+  socialNetworks?: string
+  coverNote?: string
+  tracksDetail?: ReleaseTrackDetail[]
+  contract?: ContractInfo
+  moderationLog?: { at: string; action: string; by: string; note?: string }[]
 }
 
 export const useTracksStore = defineStore('tracks', {
@@ -37,7 +69,7 @@ export const useTracksStore = defineStore('tracks', {
   actions: {
     async fetchTracks() {
       this.isLoading = true
-      await new Promise((r) => setTimeout(r, 600))
+      await new Promise((r) => setTimeout(r, 400))
       this.tracks = [
         {
           id: '1',
@@ -48,6 +80,39 @@ export const useTracksStore = defineStore('tracks', {
           contractSigned: true,
           platforms: { spotify: 5200, apple: 3100, yandex: 2800, vk: 1400 },
           createdAt: '2026-01-10',
+          type: 'single',
+          genre: 'electronic',
+          releaseDate: '2026-01-15',
+          artistName: 'DJ Neon',
+          artistEmail: 'demo@label.ru',
+          artistPhone: '+7 900 000-00-00',
+          artistCity: 'Moscow',
+          socialNetworks: '@djneon',
+          coverNote: '3000×3000 RGB',
+          tracksDetail: [
+            {
+              localId: 't1',
+              title: 'Cyber City',
+              order: 1,
+              isExplicit: false,
+              lyrics: 'Neon veins under glass rain...\nGrid runner, midnight lane.',
+              masterFile: 'cyber_city_master.wav',
+              contributors: [
+                { role: 'main_artist', creditName: 'DJ Neon' },
+                { role: 'producer', creditName: 'Void Lab' },
+              ],
+            },
+          ],
+          contract: {
+            signed: true,
+            signedAt: '2026-01-09T18:00:00Z',
+            version: 'v0.3',
+            artistFullName: 'Ivan Ivanov',
+            status: 'signed',
+          },
+          moderationLog: [
+            { at: '2026-01-10T10:00:00Z', action: 'approved', by: 'moderator@label.ru' },
+          ],
         },
         {
           id: '2',
@@ -59,6 +124,41 @@ export const useTracksStore = defineStore('tracks', {
           contractSigned: true,
           platforms: { spotify: 0, apple: 0, yandex: 0, vk: 0 },
           createdAt: '2026-02-01',
+          type: 'single',
+          genre: 'synthwave',
+          releaseDate: '2026-02-20',
+          artistName: 'DJ Neon',
+          artistEmail: 'demo@label.ru',
+          artistPhone: '+7 900 000-00-00',
+          artistCity: 'Moscow',
+          socialNetworks: '@djneon',
+          coverNote: '1500×1500 (INVALID)',
+          tracksDetail: [
+            {
+              localId: 't1',
+              title: 'Neon Lights',
+              order: 1,
+              isExplicit: true,
+              lyrics: '[explicit verse]\nLights cut through the fog...',
+              masterFile: 'neon_lights.wav',
+              contributors: [{ role: 'main_artist', creditName: 'DJ Neon' }],
+            },
+          ],
+          contract: {
+            signed: true,
+            signedAt: '2026-01-28T12:00:00Z',
+            version: 'v0.3',
+            artistFullName: 'Ivan Ivanov',
+            status: 'signed',
+          },
+          moderationLog: [
+            {
+              at: '2026-02-02T09:00:00Z',
+              action: 'rejected',
+              by: 'moderator@label.ru',
+              note: 'Обложка не 3000×3000',
+            },
+          ],
         },
         {
           id: '3',
@@ -69,13 +169,63 @@ export const useTracksStore = defineStore('tracks', {
           contractSigned: true,
           platforms: { spotify: 0, apple: 0, yandex: 0, vk: 0 },
           createdAt: '2026-03-15',
+          type: 'ep',
+          genre: 'bass / experimental',
+          releaseDate: '2026-04-01',
+          artistName: 'DJ Neon',
+          artistEmail: 'demo@label.ru',
+          artistPhone: '+7 900 000-00-00',
+          artistCity: 'Moscow',
+          socialNetworks: '@djneon',
+          coverNote: '3000×3000 OK',
+          tracksDetail: [
+            {
+              localId: 't1',
+              title: 'Grid Runner',
+              order: 1,
+              isExplicit: false,
+              lyrics: 'Run the grid, break the wall...',
+              masterFile: 'grid_runner.wav',
+              contributors: [
+                { role: 'main_artist', creditName: 'DJ Neon' },
+                { role: 'featured', creditName: 'Kai' },
+              ],
+            },
+            {
+              localId: 't2',
+              title: 'Sector 7',
+              order: 2,
+              isExplicit: false,
+              lyrics: 'Sector seven, signal lost...',
+              masterFile: 'sector_7.wav',
+              contributors: [
+                { role: 'main_artist', creditName: 'DJ Neon' },
+                { role: 'producer', creditName: 'Lab Unit' },
+              ],
+            },
+            {
+              localId: 't3',
+              title: 'Exit Ramp',
+              order: 3,
+              isExplicit: true,
+              lyrics: '[explicit]\nExit ramp at dawn...',
+              masterFile: 'exit_ramp.wav',
+              contributors: [{ role: 'main_artist', creditName: 'DJ Neon' }],
+            },
+          ],
+          contract: {
+            signed: true,
+            signedAt: '2026-03-14T20:00:00Z',
+            version: 'v0.3',
+            artistFullName: 'Ivan Ivanov',
+            status: 'signed',
+          },
+          moderationLog: [
+            { at: '2026-03-15T08:00:00Z', action: 'submitted', by: 'demo@label.ru' },
+          ],
         },
       ]
       this.isLoading = false
-    },
-
-    createDraftContract(title: string) {
-      return this.createFromRelease({ title, trackCount: 1 })
     },
 
     createFromRelease(meta: { title: string; trackCount?: number; type?: string }) {
@@ -88,14 +238,23 @@ export const useTracksStore = defineStore('tracks', {
         contractSigned: true,
         platforms: { spotify: 0, apple: 0, yandex: 0, vk: 0 },
         createdAt: new Date().toISOString().slice(0, 10),
+        type: (meta.type as ReleaseType) || 'single',
+        tracksDetail: [],
+        contract: {
+          signed: true,
+          signedAt: new Date().toISOString(),
+          version: 'v0.3',
+          artistFullName: '—',
+          status: 'signed',
+        },
+        moderationLog: [],
       }
       this.tracks.unshift(newTrack)
-      try {
-        sessionStorage.setItem(`release_draft_${newTrack.id}`, JSON.stringify(meta))
-      } catch {
-        /* ignore */
-      }
       return newTrack.id
+    },
+
+    createDraftContract(title: string) {
+      return this.createFromRelease({ title, trackCount: 1 })
     },
 
     completeTrackUpload(id: string) {
@@ -103,15 +262,32 @@ export const useTracksStore = defineStore('tracks', {
       if (track) {
         track.status = 'pending'
         track.rejectReason = undefined
+        track.moderationLog = track.moderationLog || []
+        track.moderationLog.push({
+          at: new Date().toISOString(),
+          action: 'submitted',
+          by: 'artist',
+        })
       }
     },
 
-    setStatus(id: string, status: TrackStatus, reason?: string) {
+    setStatus(id: string, status: TrackStatus, reason?: string, by = 'moderator') {
       const track = this.tracks.find((t) => t.id === id)
       if (!track) return
       track.status = status
       if (status === 'rejected') track.rejectReason = reason || 'Rejected'
       else track.rejectReason = undefined
+      track.moderationLog = track.moderationLog || []
+      track.moderationLog.push({
+        at: new Date().toISOString(),
+        action: status,
+        by,
+        note: reason,
+      })
+    },
+
+    requeue(id: string, by = 'moderator') {
+      this.setStatus(id, 'pending', undefined, by)
     },
   },
 })

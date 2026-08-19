@@ -75,9 +75,13 @@ export const useTracksStore = defineStore('tracks', {
     },
 
     createDraftContract(title: string) {
+      return this.createFromRelease({ title, trackCount: 1 })
+    },
+
+    createFromRelease(meta: { title: string; trackCount?: number; type?: string }) {
       const newTrack: Track = {
         id: Date.now().toString(),
-        title: title || 'Новый релиз',
+        title: meta.title || 'Новый релиз',
         status: 'draft',
         plays: 0,
         royalties: 0,
@@ -86,6 +90,11 @@ export const useTracksStore = defineStore('tracks', {
         createdAt: new Date().toISOString().slice(0, 10),
       }
       this.tracks.unshift(newTrack)
+      try {
+        sessionStorage.setItem(`release_draft_${newTrack.id}`, JSON.stringify(meta))
+      } catch {
+        /* ignore */
+      }
       return newTrack.id
     },
 

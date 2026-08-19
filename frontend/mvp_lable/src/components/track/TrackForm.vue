@@ -1,311 +1,218 @@
 <template>
   <form @submit.prevent="onSubmit" class="contract-form font-['Inter',sans-serif]">
-    
-    <!-- Секция 1: Личные данные -->
     <div class="form-section">
       <div class="section-header">
-        <h4 class="section-title">01 // SUBJECT_INFO</h4>
+        <h4 class="section-title">01 // ARTIST_PROFILE</h4>
         <div class="section-line"></div>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-6">
+      <p class="hint">Данные из аккаунта. Правка — в профиле.</p>
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
         <div class="input-group">
-          <label class="input-label">
-            <span>FULL_LEGAL_NAME</span>
-            <span class="required-mark">*REQ</span>
-          </label>
-          <input v-model="form.fullName" type="text" required placeholder="IVANOV IVAN" class="form-input" />
+          <label class="input-label"><span>FULL_LEGAL_NAME</span></label>
+          <input :value="profile.fullName" type="text" readonly class="form-input readonly" />
         </div>
-
         <div class="input-group">
-          <label class="input-label">
-            <span>UPLINK_MAIL</span>
-            <span class="required-mark">*REQ</span>
-          </label>
-          <input v-model="form.email" type="email" required placeholder="USER@SOX.NET" class="form-input" />
+          <label class="input-label"><span>UPLINK_MAIL</span></label>
+          <input :value="profile.email" type="email" readonly class="form-input readonly" />
         </div>
-
         <div class="input-group">
-          <label class="input-label">
-            <span>COMM_PHONE</span>
-            <span class="required-mark">*REQ</span>
-          </label>
-          <input v-model="form.phone" type="tel" required placeholder="+7 (___) ___-__-__" class="form-input" />
+          <label class="input-label"><span>ARTIST_ALIAS</span></label>
+          <input :value="profile.artistName" type="text" readonly class="form-input readonly" />
         </div>
-
         <div class="input-group">
-          <label class="input-label">
-            <span>ARTIST_ALIAS</span>
-            <span class="required-mark">*REQ</span>
-          </label>
-          <input v-model="form.nicknames" type="text" required placeholder="DJ_NEON" class="form-input" />
+          <label class="input-label"><span>COMM_PHONE</span></label>
+          <input v-model="profile.phone" type="tel" placeholder="+7…" class="form-input" />
         </div>
-
         <div class="input-group md:col-span-2">
-          <label class="input-label">
-            <span>NETWORK_CREDENTIALS</span>
-            <span class="required-mark">*REQ</span>
-          </label>
-          <input v-model="form.socialNetworks" type="text" required placeholder="VK.COM/ARTIST // TG/ALIAS" class="form-input" />
+          <label class="input-label"><span>NETWORK_CREDENTIALS</span></label>
+          <input v-model="profile.socialNetworks" type="text" placeholder="VK / TG / IG" class="form-input" />
         </div>
-
         <div class="input-group">
-          <label class="input-label"><span>AUDIO_GENRE</span></label>
-          <input v-model="form.genre" type="text" placeholder="INDUSTRIAL / TRAP" class="form-input" />
+          <label class="input-label"><span>SUBJECT_AGE</span></label>
+          <input v-model.number="profile.age" type="number" min="14" max="100" class="form-input" />
         </div>
-
         <div class="input-group">
-          <label class="input-label">
-            <span>SUBJECT_AGE</span>
-            <span class="required-mark">*REQ</span>
-          </label>
-          <input v-model.number="form.age" type="number" required min="14" max="100" placeholder="18" class="form-input" />
-        </div>
-
-        <div class="input-group md:col-span-2">
-          <label class="input-label">
-            <span>LOCATION_ZONE</span>
-            <span class="required-mark">*REQ</span>
-          </label>
-          <input v-model="form.city" type="text" required placeholder="MOSCOW_UNDERGROUND" class="form-input" />
+          <label class="input-label"><span>LOCATION_ZONE</span></label>
+          <input v-model="profile.city" type="text" placeholder="MOSCOW" class="form-input" />
         </div>
       </div>
     </div>
 
-    <!-- Секция 2: Релиз -->
     <div class="form-section">
       <div class="section-header">
-        <h4 class="section-title text-red">02 // RELEASE_DATA</h4>
+        <h4 class="section-title text-red">02 // RELEASE</h4>
         <div class="section-line bg-red"></div>
       </div>
-
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-x-8 gap-y-4">
         <div class="input-group">
-          <label class="input-label">
-            <span class="text-[#ff0000]">PRIMARY_TRACK_TITLE</span>
-            <span class="required-mark">*REQ</span>
-          </label>
-          <input v-model="form.trackTitle" type="text" required placeholder="TRACK_NAME_01" class="form-input border-red" />
+          <label class="input-label"><span>RELEASE_TYPE</span><span class="required-mark">*REQ</span></label>
+          <select v-model="releaseType" class="form-input" required>
+            <option value="single">Single (1 track)</option>
+            <option value="ep">EP (2–6 tracks)</option>
+            <option value="album">Album (7+ tracks)</option>
+          </select>
         </div>
-
         <div class="input-group">
-          <label class="input-label"><span>CO_AUTHORS</span></label>
-          <input v-model="form.coAuthors" type="text" placeholder="FEAT_NAME / EMPTY" class="form-input" />
+          <label class="input-label"><span>RELEASE_TITLE</span><span class="required-mark">*REQ</span></label>
+          <input v-model="releaseTitle" type="text" required placeholder="ALBUM / SINGLE NAME" class="form-input border-red" />
+        </div>
+        <div class="input-group">
+          <label class="input-label"><span>GENRE</span></label>
+          <input v-model="genre" type="text" placeholder="TRAP / INDUSTRIAL" class="form-input" />
+        </div>
+        <div class="input-group">
+          <label class="input-label"><span>RELEASE_DATE</span></label>
+          <input v-model="releaseDate" type="date" class="form-input" />
         </div>
       </div>
+      <p class="hint">Один договор на весь релиз. Треклист — спецификация к договору.</p>
     </div>
 
-    <!-- КНОПКА ОТПРАВКИ -->
-    <button 
-      type="submit" 
-      :disabled="isLoading"
-      class="submit-button group"
-    >
-      <span v-if="!isLoading" class="button-content">
-        >>> GENERATE_CONTRACT
-      </span>
-      <span v-else class="button-content processing">
-        <div class="spinner"></div>
-        PROCESSING_DATA...
-      </span>
+    <div class="form-section">
+      <div class="section-header">
+        <h4 class="section-title">03 // TRACKLIST</h4>
+        <div class="section-line"></div>
+      </div>
+      <p class="hint">Для EP/альбома — каждый трек отдельно. Фиты и роли — на треке.</p>
+
+      <div v-for="(track, idx) in tracks" :key="track.localId" class="track-card">
+        <div class="track-card-head">
+          <span class="font-mono text-xs text-[#39FF14]">TRACK {{ idx + 1 }}</span>
+          <button v-if="tracks.length > 1" type="button" class="text-[#ff0000] font-mono text-[10px] uppercase" @click="removeTrack(idx)">Remove</button>
+        </div>
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+          <div class="input-group md:col-span-2">
+            <label class="input-label"><span>TITLE</span><span class="required-mark">*REQ</span></label>
+            <input v-model="track.title" type="text" required class="form-input" placeholder="TRACK_NAME" />
+          </div>
+          <label class="flex items-center gap-2 font-mono text-xs uppercase text-gray-400">
+            <input v-model="track.isExplicit" type="checkbox" class="accent-[#39FF14]" /> Explicit
+          </label>
+        </div>
+        <div class="mt-3">
+          <p class="input-label mb-2"><span>CONTRIBUTORS</span></p>
+          <div v-for="(c, cIdx) in track.contributors" :key="cIdx" class="flex flex-col sm:flex-row gap-2 mb-2">
+            <select v-model="c.role" class="form-input sm:w-40">
+              <option value="main_artist">Main artist</option>
+              <option value="featured">Featured</option>
+              <option value="producer">Producer</option>
+              <option value="songwriter">Songwriter</option>
+              <option value="other">Other</option>
+            </select>
+            <input v-model="c.creditName" type="text" class="form-input flex-1" placeholder="Name / alias" />
+            <button type="button" class="font-mono text-[10px] text-gray-500 uppercase min-h-[44px] px-2" @click="track.contributors.splice(cIdx, 1)">✕</button>
+          </div>
+          <button type="button" class="add-btn" @click="addContributor(track)">+ contributor</button>
+        </div>
+      </div>
+
+      <button v-if="releaseType !== 'single' || tracks.length < 1" type="button" class="add-btn mt-2" :disabled="releaseType === 'single' && tracks.length >= 1" @click="addTrack">+ add track</button>
+    </div>
+
+    <button type="submit" :disabled="isLoading || !canSubmit" class="submit-button">
+      <span v-if="!isLoading">&gt;&gt;&gt; GENERATE_RELEASE_CONTRACT</span>
+      <span v-else>PROCESSING…</span>
     </button>
   </form>
 </template>
 
-<script lang="ts">
-import { defineComponent } from 'vue'
+<script setup lang="ts">
+import { ref, computed, watch, onMounted } from 'vue'
+import { useAuthStore } from '@/stores/auth'
+import type { ReleaseDraft, ReleaseType, TrackInput, ContributorInput, ArtistProfileSnapshot } from '@/types/release'
 
-export interface ContractFormData {
-  fullName: string;
-  email: string;
-  phone: string;
-  nicknames: string;
-  socialNetworks: string;
-  genre: string;
-  age: number | null;
-  city: string;
-  trackTitle: string;
-  coAuthors: string;
-}
+defineProps<{ isLoading?: boolean }>()
+const emit = defineEmits<{ 'submit-form': [payload: ReleaseDraft] }>()
+const auth = useAuthStore()
 
-export default defineComponent({
-  name: 'TrackForm',
-  props: {
-    isLoading: { type: Boolean, default: false }
-  },
-  emits: {
-    'submit-form': (payload: ContractFormData) => true
-  },
-  data() {
-    return {
-      form: {
-        fullName: '', email: '', phone: '',
-        nicknames: '', socialNetworks: '', genre: '',
-        age: null as number | null, city: '',
-        trackTitle: '', coAuthors: ''
-      } as ContractFormData
-    }
-  },
-  methods: {
-    onSubmit() {
-      this.$emit('submit-form', { ...this.form })
-    }
-  }
+const profile = ref<ArtistProfileSnapshot>({
+  fullName: '', email: '', phone: '', artistName: '', socialNetworks: '', age: null, city: '',
 })
+const releaseType = ref<ReleaseType>('single')
+const releaseTitle = ref('')
+const genre = ref('')
+const releaseDate = ref('')
+const tracks = ref<TrackInput[]>([])
+
+function newTrack(order: number): TrackInput {
+  return {
+    localId: `t-${Date.now()}-${order}`,
+    title: '',
+    order,
+    isExplicit: false,
+    lyrics: '',
+    contributors: [{ role: 'main_artist', creditName: auth.artistName || profile.value.artistName || '' }],
+  }
+}
+function addTrack() {
+  if (releaseType.value === 'single' && tracks.value.length >= 1) return
+  tracks.value.push(newTrack(tracks.value.length + 1))
+}
+function removeTrack(idx: number) {
+  tracks.value.splice(idx, 1)
+  tracks.value.forEach((t, i) => { t.order = i + 1 })
+}
+function addContributor(track: TrackInput) {
+  track.contributors.push({ role: 'featured', creditName: '' } as ContributorInput)
+}
+watch(releaseType, (t) => {
+  if (t === 'single' && tracks.value.length > 1) tracks.value = [tracks.value[0]]
+  if (tracks.value.length === 0) addTrack()
+})
+onMounted(() => {
+  profile.value = {
+    fullName: auth.artistName || '—',
+    email: auth.email || '',
+    phone: '',
+    artistName: auth.artistName || '',
+    socialNetworks: '',
+    age: null,
+    city: '',
+  }
+  if (!tracks.value.length) addTrack()
+})
+const canSubmit = computed(() => {
+  if (!releaseTitle.value.trim() || !tracks.value.length) return false
+  return tracks.value.every((t) => t.title.trim())
+})
+function onSubmit() {
+  if (!canSubmit.value) return
+  emit('submit-form', {
+    type: releaseType.value,
+    title: releaseTitle.value.trim(),
+    genre: genre.value.trim(),
+    releaseDate: releaseDate.value || new Date().toISOString().slice(0, 10),
+    contractRequired: true,
+    profile: { ...profile.value },
+    tracks: tracks.value.map((t, i) => ({
+      ...t,
+      order: i + 1,
+      title: t.title.trim(),
+      contributors: t.contributors.filter((c) => c.creditName.trim()),
+    })),
+  })
+}
 </script>
 
 <style scoped>
-/* Контейнер формы */
-.contract-form {
-  display: flex;
-  flex-direction: column;
-  gap: 2.5rem;
-  position: relative;
-  z-index: 10;
-}
-
-/* Секции и заголовки */
-.form-section {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-.section-header {
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 0.5rem;
-}
-.section-title {
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 1.5rem;
-  color: white;
-  text-transform: uppercase;
-  letter-spacing: -0.025em;
-  margin: 0;
-}
-.section-title.text-red {
-  color: #ff0000;
-}
-.section-line {
-  flex: 1;
-  height: 2px;
-  background-color: #333;
-}
-.section-line.bg-red {
-  background-color: #ff0000;
-  opacity: 0.5;
-}
-
-/* Группы инпутов */
-.input-group {
-  display: flex;
-  flex-direction: column;
-  gap: 0.5rem;
-}
-.input-label {
-  display: flex;
-  justify-content: space-between;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 0.625rem; /* 10px */
-  color: #9ca3af;
-  text-transform: uppercase;
-  letter-spacing: 0.1em;
-}
-.required-mark {
-  color: #ff0000;
-}
-
-/* Сами поля ввода (Брутализм) */
-.form-input {
-  width: 100%;
-  padding: 0.75rem 1rem;
-  background-color: black;
-  border: 2px solid #333;
-  color: white;
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1rem;
-  text-transform: uppercase;
-  transition: border-color 0.2s, background-color 0.2s;
-}
-.form-input::placeholder {
-  color: #333;
-}
-.form-input:focus {
-  outline: none;
-  border-color: #ffffff;
-  background-color: #050505;
-}
-/* Спец-инпут для названия трека */
-.form-input.border-red:focus {
-  border-color: #ff0000;
-}
-
-/* Кнопка отправки */
-.submit-button {
-  width: 100%;
-  padding: 1.5rem;
-  background-color: white;
-  color: black;
-  border: 4px solid black;
-  text-transform: uppercase;
-  font-family: 'Archivo Black', sans-serif;
-  font-size: 1.5rem;
-  box-shadow: 6px 6px 0 #ff0000;
-  transition: all 0.15s;
-  cursor: pointer;
-  margin-top: 1rem;
-}
-.submit-button:hover:not(:disabled) {
-  box-shadow: none;
-  transform: translate(6px, 6px);
-  background-color: #ff0000;
-  color: white;
-}
-.submit-button:active:not(:disabled) {
-  transform: translate(4px, 4px);
-  box-shadow: 2px 2px 0 #000;
-}
-.submit-button:disabled {
-  background-color: #222;
-  color: #555;
-  box-shadow: none;
-  border-color: #111;
-  cursor: not-allowed;
-}
-
-/* Внутренности кнопки */
-.button-content {
-  position: relative;
-  z-index: 10;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 1rem;
-  letter-spacing: -0.025em;
-}
-.processing {
-  font-family: 'JetBrains Mono', monospace;
-  font-size: 1.25rem;
-  font-weight: bold;
-}
-
-/* Спиннер загрузки */
-.spinner {
-  width: 1.5rem;
-  height: 1.5rem;
-  border: 3px solid black;
-  border-top-color: transparent;
-  border-radius: 50%;
-  animation: spin 1s linear infinite;
-}
-.submit-button:disabled .spinner {
-  border-color: #555;
-  border-top-color: transparent;
-}
-
-@keyframes spin {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+.contract-form { display: flex; flex-direction: column; gap: 2.5rem; position: relative; z-index: 10; }
+.hint { font-family: 'JetBrains Mono', monospace; font-size: 0.65rem; color: #6b7280; text-transform: uppercase; margin: 0 0 0.5rem; }
+.form-section { display: flex; flex-direction: column; gap: 1rem; }
+.section-header { display: flex; align-items: center; gap: 1rem; }
+.section-title { font-family: 'Archivo Black', sans-serif; font-size: 1.25rem; color: white; text-transform: uppercase; margin: 0; }
+.section-title.text-red { color: #ff0000; }
+.section-line { flex: 1; height: 2px; background: #333; }
+.section-line.bg-red { background: #ff0000; opacity: 0.5; }
+.input-group { display: flex; flex-direction: column; gap: 0.4rem; }
+.input-label { display: flex; justify-content: space-between; font-family: 'JetBrains Mono', monospace; font-size: 0.625rem; color: #9ca3af; text-transform: uppercase; letter-spacing: 0.1em; }
+.required-mark { color: #ff0000; }
+.form-input { width: 100%; padding: 0.75rem 1rem; background: #000; border: 2px solid #333; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.9rem; text-transform: uppercase; min-height: 44px; }
+.form-input.readonly { opacity: 0.7; border-color: #222; cursor: default; }
+.form-input:focus { outline: none; border-color: #fff; }
+.form-input.border-red:focus { border-color: #ff0000; }
+.track-card { border: 2px solid #333; padding: 1rem; background: #050505; margin-bottom: 0.75rem; }
+.track-card-head { display: flex; justify-content: space-between; margin-bottom: 0.75rem; }
+.add-btn { font-family: 'JetBrains Mono', monospace; font-size: 0.7rem; text-transform: uppercase; color: #39ff14; border: 1px dashed #39ff14; padding: 0.5rem 0.75rem; background: transparent; min-height: 44px; }
+.submit-button { width: 100%; padding: 1.25rem; background: #fff; color: #000; border: 4px solid #000; text-transform: uppercase; font-family: 'Archivo Black', sans-serif; font-size: 1.1rem; box-shadow: 6px 6px 0 #ff0000; min-height: 52px; }
+.submit-button:disabled { opacity: 0.5; cursor: not-allowed; }
 </style>

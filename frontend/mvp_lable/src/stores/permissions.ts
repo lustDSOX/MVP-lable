@@ -55,12 +55,14 @@ function seed(): StaffUser[] {
 export const usePermissionsStore = defineStore('permissions', {
   state: () => ({
     staff: seed() as StaffUser[],
+    matrixDirty: false,
   }),
   actions: {
     hydrate() {
       try {
         const raw = localStorage.getItem(STORAGE)
         if (raw) this.staff = JSON.parse(raw)
+        this.matrixDirty = false
       } catch {
         /* keep seed */
       }
@@ -81,7 +83,15 @@ export const usePermissionsStore = defineStore('permissions', {
       if (!u) return
       if (on && !u.permissions.includes(key)) u.permissions.push(key)
       if (!on) u.permissions = u.permissions.filter((p) => p !== key)
+      this.matrixDirty = true
+    },
+    saveMatrix() {
       this.persist()
+      this.matrixDirty = false
+    },
+    discardMatrix() {
+      this.hydrate()
+      this.matrixDirty = false
     },
     addStaff(email: string, name: string, role: 'moderator' | 'admin') {
       this.staff.push({
@@ -91,7 +101,7 @@ export const usePermissionsStore = defineStore('permissions', {
         role,
         permissions: role === 'admin' ? [...ROLE_DEFAULTS.admin] : [...ROLE_DEFAULTS.moderator],
       })
-      this.persist()
+      this.matrixDirty = true
     },
   },
 })

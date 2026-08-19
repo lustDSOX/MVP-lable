@@ -7,7 +7,6 @@ export type UserRole = 'artist' | 'moderator' | 'admin'
 
 const STORAGE_KEY = 'mvp_lable_auth'
 
-/** Demo accounts: email → credentials (exact password match required) */
 const DEMO_ACCOUNTS: Record<
   string,
   { password: string; role: UserRole; name: string }
@@ -95,30 +94,31 @@ export const useAuthStore = defineStore('auth', () => {
     return role.value
   }
 
+  function effectiveRoles(): string[] {
+    const e = (email.value || '').toLowerCase()
+    if (e === 'staff@label.ru') return ['moderator', 'news_editor', 'events_editor']
+    if (e === 'news@label.ru') return ['news_editor']
+    if (e === 'events@label.ru') return ['events_editor']
+    if (e === 'admin@label.ru') return ['admin']
+    if (e === 'moderator@label.ru' || e === 'manager@label.ru') return ['moderator']
+    const r = effectiveRole()
+    return r ? [r] : []
+  }
+
   function can(permission: Permission): boolean {
     if (!isAuthenticated.value) return false
-    const r = effectiveRole()
-    if (r === 'admin') return true
+    const roles = effectiveRoles()
+    if (roles.includes('admin')) return true
     const perm = usePermissionsStore()
     perm.hydrate()
-    return perm.permissionsFor(email.value || '', r).includes(permission)
+    return perm.permissionsForRoles(roles).includes(permission)
   }
 
   function myPermissions(): Permission[] {
-    const r = effectiveRole()
-    if (r === 'admin') {
-      return [
-        'releases.moderate',
-        'news.manage',
-        'events.manage',
-        'guides.manage',
-        'users.manage',
-        'permissions.manage',
-      ]
-    }
+    const roles = effectiveRoles()
     const perm = usePermissionsStore()
     perm.hydrate()
-    return perm.permissionsFor(email.value || '', r)
+    return perm.permissionsForRoles(roles)
   }
 
   async function login(userEmail: string, password: string): Promise<UserRole> {
@@ -127,16 +127,12 @@ export const useAuthStore = defineStore('auth', () => {
       await new Promise((r) => setTimeout(r, 200))
       const e = userEmail.trim().toLowerCase()
       const pwd = password.trim()
-
       const demo = DEMO_ACCOUNTS[e]
       if (demo) {
-        if (pwd !== demo.password) {
-          throw new Error(`Неверный пароль для ${e}`)
-        }
+        if (pwd !== demo.password) throw new Error(`Неверный пароль для ${e}`)
         setCredentials(`mock-jwt-${demo.role}`, demo.name, demo.role, e)
         return demo.role
       }
-
       if (pwd.length >= 6) {
         const name = e.split('@')[0] || 'Artist'
         setCredentials(`mock-jwt-artist-${Date.now()}`, name, 'artist', e)
@@ -155,15 +151,8 @@ export const useAuthStore = defineStore('auth', () => {
       if (password.length < 6) throw new Error('Пароль минимум 6 символов')
       if (!userEmail.includes('@')) throw new Error('Некорректный email')
       const e = userEmail.trim().toLowerCase()
-      if (DEMO_ACCOUNTS[e]) {
-        throw new Error('Этот email зарезервирован. Войдите с demo-паролем.')
-      }
-      setCredentials(
-        `mock-jwt-${Date.now()}`,
-        name || e.split('@')[0],
-        'artist',
-        e,
-      )
+      if (DEMO_ACCOUNTS[e]) throw new Error('Этот email зарезервирован. Войдите с demo-паролем.')
+      setCredentials(`mock-jwt-${Date.now()}`, name || e.split('@')[0], 'artist', e)
       return 'artist'
     } finally {
       isLoading.value = false
@@ -183,5 +172,6 @@ export const useAuthStore = defineStore('auth', () => {
     can,
     myPermissions,
     effectiveRole,
+    effectiveRoles,
   }
 })

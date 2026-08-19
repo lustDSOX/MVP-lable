@@ -2,7 +2,6 @@
   <div class="min-h-screen pt-24 px-4 pb-12 font-['Inter',sans-serif] text-white relative">
     <div class="max-w-7xl mx-auto flex flex-col gap-12 relative z-10">
       
-      <!-- СЕКЦИЯ 1: КОМАНДНЫЙ ЦЕНТР -->
       <section class="command-center-grid">
         <div class="welcome-block">
           <h1 class="font-planet h1-metal-textured" :data-text="authStore.artistName || 'UNKNOWN'">
@@ -53,8 +52,9 @@
         </div>
       </section>
 
+      <PlatformsPanel />
+
       <section class="bg-black border border-[#333]">
-        <!-- Mobile track cards -->
         <div class="md:hidden space-y-3 p-3 mobile-track-cards">
           <article
             v-for="track in filteredTracks"
@@ -105,7 +105,7 @@
                 </td>
                 <td class="p-4 text-center">
                   <span v-if="track.status === 'published'" class="status-badge status-online">ONLINE</span>
-                  <span v-else-if="track.status === 'moderation'" class="status-badge status-scanning animate-pulse">SCANNING</span>
+                  <span v-else-if="track.status === 'pending'" class="status-badge status-scanning animate-pulse">SCANNING</span>
                   <span v-else-if="track.status === 'rejected'" class="status-badge status-error">ERROR</span>
                   <span v-else-if="track.status === 'draft'" class="status-badge status-draft">DRAFT</span>
                 </td>
@@ -349,6 +349,7 @@ import { useTracksStore, type Track } from '@/stores/tracks'
 
 import ContractModal from '@/components/track/ContractModal.vue'
 import TrackUploadForm from '@/components/track/TrackUploadForm.vue'
+import PlatformsPanel from '@/components/dashboard/PlatformsPanel.vue'
 
 const authStore = useAuthStore()
 const tracksStore = useTracksStore()
@@ -360,11 +361,16 @@ const platforms = ref(['Total', 'ЯМ', 'VK', 'Apple', 'Spotify'])
 const activePlatform = ref('Total')
 
 const displayedPlays = computed(() => {
-  if (activePlatform.value === 'Total') {
-    return tracksStore.totalPlays
+  if (activePlatform.value === 'Total') return tracksStore.totalPlays
+  const map: Record<string, 'spotify' | 'apple' | 'yandex' | 'vk'> = {
+    Spotify: 'spotify',
+    Apple: 'apple',
+    'ЯМ': 'yandex',
+    VK: 'vk',
   }
-  const seed = platforms.value.indexOf(activePlatform.value)
-  return Math.floor(tracksStore.totalPlays * (0.4 + seed * 0.1) + Math.random() * 1000)
+  const key = map[activePlatform.value]
+  if (!key) return tracksStore.totalPlays
+  return tracksStore.tracks.reduce((s, tr) => s + (tr.platforms?.[key] ?? 0), 0)
 })
 
 const platformShare = computed(() => {

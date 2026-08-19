@@ -1,108 +1,95 @@
 <template>
-  <!-- Teleport выносит модалку в корень body, убирая любые лаги z-index -->
   <Teleport to="body">
     <Transition name="crt-popup">
-      <div 
-        v-if="isOpen" 
+      <div
+        v-if="isOpen"
         class="fixed inset-0 z-9999 flex items-center justify-center p-4 sm:p-6 overflow-hidden"
         role="dialog"
         aria-modal="true"
       >
-        <!-- BACKDROP: Клик только по фону закроет окно -->
-        <div 
+        <div
           class="absolute inset-0 bg-black/90 backdrop-blur-md cursor-pointer pointer-events-auto"
           @click.self="close"
-        >
-          <div class="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 pointer-events-none"></div>
-        </div>
+        />
 
-        <!-- MODAL BODY: Стальной корпус -->
-        <div 
-          class="relative w-full max-w-4xl  h-screen bg-[#0a0a0a] border-[6px] border-[#333] shadow-[40px_40px_0_rgba(0,0,0,0.7)] flex flex-col font-['Impact','Arial_Black',sans-serif] selection:bg-[#39FF14] selection:text-black max-h-[95vh] overflow-hidden will-change-transform"
+        <div
+          class="relative w-full max-w-4xl h-screen bg-[#0a0a0a] border-[6px] border-[#333] shadow-[40px_40px_0_rgba(0,0,0,0.7)] flex flex-col font-['Impact','Arial_Black',sans-serif] max-h-[95vh] overflow-hidden"
         >
-          
-          <!-- HEADER -->
           <div class="bg-[#333] p-2 flex justify-between items-center border-b-4 border-black shrink-0 relative z-50">
             <div class="flex items-center gap-3 px-2 text-[10px] font-mono tracking-widest uppercase italic">
-              <div 
+              <div
                 class="w-3 h-3 shadow-[0_0_10px_currentColor] animate-led transition-colors duration-500"
                 :class="{
                   'bg-[#39FF14] text-[#39FF14]': step === 'form',
                   'bg-blue-500 text-blue-500': step === 'preview',
-                  'bg-white text-white': step === 'success'
+                  'bg-white text-white': step === 'success',
                 }"
-              ></div>
-              <span class="text-white">
-                LEGAL_ENGINE_V.03 // STEP: {{ step.toUpperCase() }}
-              </span>
+              />
+              <span class="text-white">LEGAL_ENGINE // {{ step.toUpperCase() }} // 1_CONTRACT_PER_RELEASE</span>
             </div>
-            
-            <!-- Кнопка закрытия: Явно вызываем close() -->
-            <button 
+            <button
               type="button"
-              @click="close" 
-              class="bg-[#ff0000] text-black px-4 py-1 border-2 border-black hover:bg-white hover:text-black transition-none active:translate-y-1 active:translate-x-1 shadow-[2px_2px_0_#000] flex items-center gap-2 cursor-pointer pointer-events-auto"
+              class="bg-[#ff0000] text-black px-4 py-1 border-2 border-black hover:bg-white transition-none shadow-[2px_2px_0_#000] flex items-center gap-2 cursor-pointer"
+              @click="close"
             >
               <span class="text-xs font-black uppercase">ABORT</span>
               <span class="text-xl font-black">✖</span>
             </button>
           </div>
 
-          <!-- CONTENT -->
-          <div class="flex-1 overflow-y-auto bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')] relative custom-scrollbar">
-            <div class="absolute top-10 left-10 text-[120px] font-black text-white opacity-[0.02] pointer-events-none select-none italic uppercase leading-none">
-              SOX_LEGIT
-            </div>
-
+          <div class="flex-1 overflow-y-auto relative custom-scrollbar">
             <div class="p-6 md:p-10 relative z-10">
-              <TrackForm 
-                v-if="step === 'form'" 
-                :is-open="true"
-                :is-loading="isLoading" 
-                @submit-form="generateContract" 
+              <TrackForm
+                v-if="step === 'form'"
+                :is-loading="isLoading"
+                @submit-form="generateContract"
               />
 
-              <ContractPreview 
-                v-else-if="step === 'preview'" 
+              <ContractPreview
+                v-else-if="step === 'preview'"
                 :pdf-url="pdfUrl"
                 :is-loading="isLoading"
                 @upload-signed="uploadSignedContract"
               />
 
-              <div v-else-if="step === 'success'" class="text-center py-12 flex flex-col items-center border-4 border-[#39FF14] bg-black/80 relative overflow-hidden group">
-                <div class="absolute inset-0 bg-[#39FF14] opacity-5 animate-pulse pointer-events-none"></div>
-                <div class="text-[120px] leading-none mb-6 text-[#39FF14] drop-shadow-[0_0_30px_#39FF14] italic animate-bounce-slow">✔</div>
-                <h3 class="text-5xl font-black mb-4 uppercase italic tracking-tighter">MISSION_COMPLETE</h3>
-                <p class="text-gray-400 font-mono text-sm mb-12 uppercase border-l-2 border-[#39FF14] px-4">
-                  Договор подписан и верифицирован. <br>Система готова к приему аудио-файлов.
+              <div
+                v-else-if="step === 'success'"
+                class="text-center py-12 flex flex-col items-center border-4 border-[#39FF14] bg-black/80"
+              >
+                <div class="text-[80px] leading-none mb-4 text-[#39FF14]">✔</div>
+                <h3 class="text-3xl sm:text-5xl font-black mb-4 uppercase italic">MISSION_COMPLETE</h3>
+                <p class="text-gray-400 font-mono text-xs sm:text-sm mb-4 uppercase max-w-md">
+                  Один договор на релиз «{{ releaseDraft?.title }}» ({{ releaseDraft?.type }}).
+                  Треков в спецификации: {{ releaseDraft?.tracks.length || 0 }}.
                 </p>
-                <button 
+                <p class="text-gray-600 font-mono text-[10px] mb-10 uppercase">
+                  Дальше — загрузка обложки и аудио по треклисту
+                </p>
+                <button
+                  type="button"
+                  class="bg-[#39FF14] text-black font-black uppercase text-xl px-10 py-5 border-4 border-black shadow-[10px_10px_0_#fff]"
                   @click="finishAndProceed"
-                  class="bg-[#39FF14] text-black font-black uppercase text-2xl px-12 py-6 border-4 border-black shadow-[10px_10px_0_#fff] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-none"
                 >
-                  >> START_TRACK_UPLINK
+                  &gt;&gt; START_UPLINK
                 </button>
               </div>
 
-              <!-- ОШИБКИ -->
-              <div v-if="errorMessage" class="mt-8 p-6 bg-[#ff0000] text-black border-4 border-black animate-strobe flex items-start gap-4 shadow-[10px_10px_0_#000]">
+              <div
+                v-if="errorMessage"
+                class="mt-8 p-6 bg-[#ff0000] text-black border-4 border-black flex items-start gap-4"
+              >
                 <span class="text-4xl font-black">[!]</span>
-                <div class="flex-1">
-                  <p class="text-lg font-black uppercase italic leading-none mb-1">CRITICAL_SYSTEM_ERROR</p>
-                  <p class="font-mono text-xs uppercase opacity-80">{{ errorMessage }}</p>
+                <div>
+                  <p class="text-lg font-black uppercase italic">ERROR</p>
+                  <p class="font-mono text-xs uppercase">{{ errorMessage }}</p>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- FOOTER -->
-          <div class="bg-black border-t-4 border-[#333] p-2 flex justify-between items-center text-[8px] font-mono text-gray-700 uppercase italic shrink-0">
-            <span>OS: SOX_V3_BOOTLOADER</span>
-            <div class="flex gap-4">
-              <span :class="isLoading ? 'text-[#39FF14] animate-pulse' : ''">UPLINK: {{ isLoading ? 'ACTIVE' : 'IDLE' }}</span>
-              <span class="text-white">ENCRYPTION: AES256</span>
-            </div>
-            <span>© 2003 SOX HEAVY IND.</span>
+          <div class="bg-black border-t-4 border-[#333] p-2 flex justify-between text-[8px] font-mono text-gray-700 uppercase italic shrink-0">
+            <span>CONTRACT_SCOPE: RELEASE</span>
+            <span>UPLINK: {{ isLoading ? 'ACTIVE' : 'IDLE' }}</span>
           </div>
         </div>
       </div>
@@ -112,43 +99,40 @@
 
 <script lang="ts">
 import { defineComponent } from 'vue'
-import { mapState } from 'pinia'
-
 import TrackForm from './TrackForm.vue'
 import ContractPreview from './ContractPreview.vue'
-import { useAuthStore } from '@/stores/auth';
-import type { ContractFormData } from '@/types/contract';
+import type { ReleaseDraft } from '@/types/release'
 
 export default defineComponent({
   name: 'ContractModal',
   components: { TrackForm, ContractPreview },
   props: {
-    isOpen: { type: Boolean, required: true }
+    isOpen: { type: Boolean, required: true },
   },
-  emits: ['close', 'success'],
+  emits: {
+    close: () => true,
+    success: (payload: { release: ReleaseDraft }) => true,
+  },
   data() {
     return {
       step: 'form' as 'form' | 'preview' | 'success',
       isLoading: false,
+      errorMessage: '',
       pdfUrl: '',
-      errorMessage: ''
+      releaseDraft: null as ReleaseDraft | null,
     }
   },
-  computed: {
-    ...mapState(useAuthStore, ['token'])
-  },
   watch: {
-    isOpen(newVal) {
-      if (newVal) {
+    isOpen(val: boolean) {
+      if (val) {
         this.step = 'form'
-        this.pdfUrl = ''
         this.errorMessage = ''
-        // Добавляем слушатель Esc при открытии
+        this.releaseDraft = null
         document.addEventListener('keydown', this.handleEsc)
       } else {
         document.removeEventListener('keydown', this.handleEsc)
       }
-    }
+    },
   },
   beforeUnmount() {
     document.removeEventListener('keydown', this.handleEsc)
@@ -158,50 +142,69 @@ export default defineComponent({
       if (e.key === 'Escape' && this.isOpen) this.close()
     },
     close() {
-      console.log('Closing modal...') // Для дебага
       this.$emit('close')
     },
     finishAndProceed() {
-      this.$emit('success')
-      this.close()         
+      if (this.releaseDraft) {
+        this.$emit('success', { release: this.releaseDraft })
+      }
+      this.close()
     },
-    async generateContract(formData: ContractFormData) {
+    async generateContract(draft: ReleaseDraft) {
       this.isLoading = true
       this.errorMessage = ''
+      this.releaseDraft = draft
       try {
-        await new Promise(res => setTimeout(res, 1500))
-        this.pdfUrl = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf' 
+        await new Promise((r) => setTimeout(r, 800))
+        this.pdfUrl =
+          'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
         this.step = 'preview'
-      } catch (error: any) {
-        this.errorMessage = error.message || 'Произошла ошибка при генерации'
+      } catch (e: unknown) {
+        this.errorMessage = e instanceof Error ? e.message : 'Generate failed'
       } finally {
         this.isLoading = false
       }
     },
-    async uploadSignedContract(file: File) {
+    async uploadSignedContract(_file: File) {
       this.isLoading = true
       this.errorMessage = ''
       try {
-        await new Promise(res => setTimeout(res, 1500))
+        await new Promise((r) => setTimeout(r, 800))
         this.step = 'success'
-      } catch (error: any) {
-        this.errorMessage = error.message || 'Ошибка загрузки файла'
+      } catch (e: unknown) {
+        this.errorMessage = e instanceof Error ? e.message : 'Upload failed'
       } finally {
         this.isLoading = false
       }
-    }
-  }
+    },
+  },
 })
 </script>
 
 <style scoped>
-@reference "tailwindcss";
-
-/* Оптимизация производительности: говорим браузеру, что будет анимация */
-.will-change-transform {
-  will-change: transform, opacity;
+.custom-scrollbar::-webkit-scrollbar {
+  width: 10px;
 }
-
+.custom-scrollbar::-webkit-scrollbar-track {
+  background: #000;
+  border-left: 2px solid #222;
+}
+.custom-scrollbar::-webkit-scrollbar-thumb {
+  background: #333;
+  border: 2px solid #39ff14;
+}
+@keyframes real-port-flicker {
+  0%,
+  100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.1;
+  }
+}
+.animate-led {
+  animation: real-port-flicker 2s infinite steps(1);
+}
 .crt-popup-enter-active,
 .crt-popup-leave-active {
   transition: all 0.3s steps(6);
@@ -209,23 +212,6 @@ export default defineComponent({
 .crt-popup-enter-from,
 .crt-popup-leave-to {
   opacity: 0;
-  transform: scale(0.5, 0.01); /* Эффект схлопывания в линию */
+  transform: scale(0.5, 0.01);
 }
-
-/* Скроллбар */
-.custom-scrollbar::-webkit-scrollbar { width: 10px; }
-.custom-scrollbar::-webkit-scrollbar-track { background: #000; border-left: 2px solid #222; }
-.custom-scrollbar::-webkit-scrollbar-thumb { background: #333; border: 2px solid #39FF14; }
-
-@keyframes real-port-flicker {
-  0%, 100% { opacity: 1; }
-  50% { opacity: 0.1; }
-}
-.animate-led { animation: real-port-flicker 2s infinite steps(1); }
-
-@keyframes strobe {
-  0%, 100% { background-color: #ff0000; color: #000; }
-  50% { background-color: #000; color: #ff0000; }
-}
-.animate-strobe { animation: strobe 0.15s infinite steps(1); }
 </style>

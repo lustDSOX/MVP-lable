@@ -21,13 +21,19 @@
       <p v-if="!filtered.length" class="font-mono text-gray-600 text-sm">Ничего не найдено</p>
     </div>
 
-    <div v-else-if="sel && !trackView" ref="detailEl" class="space-y-6 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505] pb-24">
+    <div v-else-if="sel && !trackView" ref="detailEl" class="space-y-6 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505]">
       <div class="flex flex-wrap gap-2 justify-between items-start">
         <button type="button" class="btn-muted" @click="selectedId = null">← К списку</button>
         <span class="font-mono text-xs uppercase text-[#39FF14]">{{ sel.status }}</span>
       </div>
 
       <h2 class="text-2xl font-black uppercase italic">{{ sel.title }}</h2>
+      <div class="sticky-actions">
+        <button type="button" class="btn-muted" @click="selectedId = null">← Список</button>
+        <button v-if="sel.status === 'pending' || sel.status === 'draft'" type="button" class="btn-green" @click="approve">Одобрить</button>
+        <button v-if="sel.status === 'pending' || sel.status === 'draft'" type="button" class="btn-red" @click="rejectOpen = true">Отклонить</button>
+        <button v-if="sel.status === 'published' || sel.status === 'rejected'" type="button" class="btn-muted" @click="requeue">На модерацию</button>
+      </div>
 
       <div class="grid sm:grid-cols-[180px_1fr] gap-4">
         <div>
@@ -76,27 +82,20 @@
           <span class="font-mono text-[10px] text-gray-500">→</span>
         </button>
       </div>
-
-      <div class="sticky-actions">
-        <button type="button" class="btn-muted" @click="selectedId = null">← Список</button>
-        <button v-if="sel.status === 'pending' || sel.status === 'draft'" type="button" class="btn-green" @click="approve">Одобрить</button>
-        <button v-if="sel.status === 'pending' || sel.status === 'draft'" type="button" class="btn-red" @click="rejectOpen = true">Отклонить</button>
-        <button v-if="sel.status === 'published' || sel.status === 'rejected'" type="button" class="btn-muted" @click="requeue">На модерацию</button>
-      </div>
     </div>
 
-    <div v-else-if="sel && trackView" class="space-y-4 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505] pb-20">
+    <div v-else-if="sel && trackView" class="space-y-4 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505]">
       <button type="button" class="btn-muted" @click="trackViewId = null">← К релизу</button>
       <h2 class="text-3xl font-black uppercase italic">{{ trackView.title }}</h2>
+      <div class="sticky-actions">
+        <button type="button" class="btn-muted" @click="trackViewId = null">← К релизу</button>
+      </div>
       <p class="font-mono text-xs text-gray-400" v-for="(c, i) in trackView.contributors" :key="i">{{ c.role }}: <span class="text-white">{{ c.creditName }}</span></p>
       <div v-if="trackView.audioUrl" class="border border-[#333] p-3">
         <p class="lbl mb-2">Плеер</p>
         <audio :src="trackView.audioUrl" controls class="w-full" />
       </div>
       <pre class="whitespace-pre-wrap font-serif text-lg leading-relaxed text-gray-100 border border-[#333] p-4 bg-black">{{ trackView.lyrics || '(нет текста)' }}</pre>
-      <div class="sticky-actions">
-        <button type="button" class="btn-muted" @click="trackViewId = null">← К релизу</button>
-      </div>
     </div>
 
     <ReasonModal
@@ -178,15 +177,16 @@ function requeue() {
 .chip.on { background: #39ff14; color: #000; border-color: #000; }
 .sticky-actions {
   position: sticky;
-  bottom: 0;
-  z-index: 20;
+  top: 4.5rem;
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.75rem;
-  margin: 0 -1rem -1rem;
-  background: rgba(5, 5, 5, 0.95);
-  border-top: 2px solid #39ff14;
+  margin: 0 -1rem 1rem;
+  background: rgba(5, 5, 5, 0.97);
+  border-bottom: 2px solid #39ff14;
   backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 </style>

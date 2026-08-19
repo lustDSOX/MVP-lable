@@ -1,5 +1,7 @@
 import { ref, computed } from 'vue'
 import { defineStore } from 'pinia'
+import type { Permission } from '@/types/permissions'
+import { usePermissionsStore } from '@/stores/permissions'
 
 export type UserRole = 'artist' | 'moderator' | 'admin'
 
@@ -67,6 +69,30 @@ export const useAuthStore = defineStore('auth', () => {
     persist()
   }
 
+  function can(permission: Permission): boolean {
+    if (!isAuthenticated.value) return false
+    if (role.value === 'admin') return true
+    const perm = usePermissionsStore()
+    perm.hydrate()
+    return perm.permissionsFor(email.value || '', role.value).includes(permission)
+  }
+
+  function myPermissions(): Permission[] {
+    if (role.value === 'admin') {
+      return [
+        'releases.moderate',
+        'news.manage',
+        'events.manage',
+        'guides.manage',
+        'users.manage',
+        'permissions.manage',
+      ]
+    }
+    const perm = usePermissionsStore()
+    perm.hydrate()
+    return perm.permissionsFor(email.value || '', role.value)
+  }
+
   async function login(userEmail: string, password: string) {
     isLoading.value = true
     try {
@@ -81,6 +107,18 @@ export const useAuthStore = defineStore('auth', () => {
         (password === 'mod123' || password === 'manager123')
       ) {
         setCredentials('mock-jwt-mod', 'Chief Editor', 'moderator', e)
+        return true
+      }
+      if (e === 'news@label.ru' && password === 'news123') {
+        setCredentials('mock-jwt-news', 'News Desk', 'moderator', e)
+        return true
+      }
+      if (e === 'events@label.ru' && password === 'events123') {
+        setCredentials('mock-jwt-events', 'Events Desk', 'moderator', e)
+        return true
+      }
+      if (e === 'staff@label.ru' && password === 'staff123') {
+        setCredentials('mock-jwt-staff', 'Full Staff', 'moderator', e)
         return true
       }
       if (e === 'demo@label.ru' && password === 'demo123') {
@@ -126,5 +164,7 @@ export const useAuthStore = defineStore('auth', () => {
     login,
     register,
     logout,
+    can,
+    myPermissions,
   }
 })

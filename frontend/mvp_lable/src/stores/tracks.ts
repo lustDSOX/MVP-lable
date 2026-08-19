@@ -18,6 +18,7 @@ export interface ReleaseTrackDetail {
   lyrics: string
   masterFile?: string
   previewFile?: string
+  audioUrl?: string
   contributors: ContributorInput[]
 }
 
@@ -48,24 +49,27 @@ export interface Track {
   artistCity?: string
   socialNetworks?: string
   coverNote?: string
+  coverUrl?: string
+  contractPdfUrl?: string
   tracksDetail?: ReleaseTrackDetail[]
   contract?: ContractInfo
   moderationLog?: { at: string; action: string; by: string; note?: string }[]
 }
+
+const COVER = 'https://picsum.photos/seed/mvp-cover/600/600'
+const PDF = 'https://www.w3.org/WAI/ER/tests/xhtml/testfiles/resources/pdf/dummy.pdf'
+const AUDIO = 'https://www.soundhelix.com/examples/mp3/SoundHelix-Song-1.mp3'
 
 export const useTracksStore = defineStore('tracks', {
   state: () => ({
     tracks: [] as Track[],
     isLoading: false,
   }),
-
   getters: {
     totalPlays: (state) => state.tracks.reduce((sum, t) => sum + t.plays, 0),
     totalRoyalties: (state) => state.tracks.reduce((sum, t) => sum + t.royalties, 0),
-    byStatus: (state) => (status: TrackStatus) =>
-      state.tracks.filter((t) => t.status === status),
+    byStatus: (state) => (status: TrackStatus) => state.tracks.filter((t) => t.status === status),
   },
-
   actions: {
     async fetchTracks() {
       this.isLoading = true
@@ -89,6 +93,8 @@ export const useTracksStore = defineStore('tracks', {
           artistCity: 'Moscow',
           socialNetworks: '@djneon',
           coverNote: '3000×3000 RGB',
+          coverUrl: COVER,
+          contractPdfUrl: PDF,
           tracksDetail: [
             {
               localId: 't1',
@@ -97,22 +103,15 @@ export const useTracksStore = defineStore('tracks', {
               isExplicit: false,
               lyrics: 'Neon veins under glass rain...\nGrid runner, midnight lane.',
               masterFile: 'cyber_city_master.wav',
+              audioUrl: AUDIO,
               contributors: [
                 { role: 'main_artist', creditName: 'DJ Neon' },
                 { role: 'producer', creditName: 'Void Lab' },
               ],
             },
           ],
-          contract: {
-            signed: true,
-            signedAt: '2026-01-09T18:00:00Z',
-            version: 'v0.3',
-            artistFullName: 'Ivan Ivanov',
-            status: 'signed',
-          },
-          moderationLog: [
-            { at: '2026-01-10T10:00:00Z', action: 'approved', by: 'moderator@label.ru' },
-          ],
+          contract: { signed: true, signedAt: '2026-01-09T18:00:00Z', version: 'v0.3', artistFullName: 'Ivan Ivanov', status: 'signed' },
+          moderationLog: [{ at: '2026-01-10T10:00:00Z', action: 'approved', by: 'moderator@label.ru' }],
         },
         {
           id: '2',
@@ -133,6 +132,8 @@ export const useTracksStore = defineStore('tracks', {
           artistCity: 'Moscow',
           socialNetworks: '@djneon',
           coverNote: '1500×1500 (INVALID)',
+          coverUrl: COVER,
+          contractPdfUrl: PDF,
           tracksDetail: [
             {
               localId: 't1',
@@ -141,24 +142,12 @@ export const useTracksStore = defineStore('tracks', {
               isExplicit: true,
               lyrics: '[explicit verse]\nLights cut through the fog...',
               masterFile: 'neon_lights.wav',
+              audioUrl: AUDIO,
               contributors: [{ role: 'main_artist', creditName: 'DJ Neon' }],
             },
           ],
-          contract: {
-            signed: true,
-            signedAt: '2026-01-28T12:00:00Z',
-            version: 'v0.3',
-            artistFullName: 'Ivan Ivanov',
-            status: 'signed',
-          },
-          moderationLog: [
-            {
-              at: '2026-02-02T09:00:00Z',
-              action: 'rejected',
-              by: 'moderator@label.ru',
-              note: 'Обложка не 3000×3000',
-            },
-          ],
+          contract: { signed: true, signedAt: '2026-01-28T12:00:00Z', version: 'v0.3', artistFullName: 'Ivan Ivanov', status: 'signed' },
+          moderationLog: [{ at: '2026-02-02T09:00:00Z', action: 'rejected', by: 'moderator@label.ru', note: 'Обложка не 3000×3000' }],
         },
         {
           id: '3',
@@ -178,6 +167,8 @@ export const useTracksStore = defineStore('tracks', {
           artistCity: 'Moscow',
           socialNetworks: '@djneon',
           coverNote: '3000×3000 OK',
+          coverUrl: COVER,
+          contractPdfUrl: PDF,
           tracksDetail: [
             {
               localId: 't1',
@@ -186,6 +177,7 @@ export const useTracksStore = defineStore('tracks', {
               isExplicit: false,
               lyrics: 'Run the grid, break the wall...',
               masterFile: 'grid_runner.wav',
+              audioUrl: AUDIO,
               contributors: [
                 { role: 'main_artist', creditName: 'DJ Neon' },
                 { role: 'featured', creditName: 'Kai' },
@@ -198,6 +190,7 @@ export const useTracksStore = defineStore('tracks', {
               isExplicit: false,
               lyrics: 'Sector seven, signal lost...',
               masterFile: 'sector_7.wav',
+              audioUrl: AUDIO,
               contributors: [
                 { role: 'main_artist', creditName: 'DJ Neon' },
                 { role: 'producer', creditName: 'Lab Unit' },
@@ -210,24 +203,16 @@ export const useTracksStore = defineStore('tracks', {
               isExplicit: true,
               lyrics: '[explicit]\nExit ramp at dawn...',
               masterFile: 'exit_ramp.wav',
+              audioUrl: AUDIO,
               contributors: [{ role: 'main_artist', creditName: 'DJ Neon' }],
             },
           ],
-          contract: {
-            signed: true,
-            signedAt: '2026-03-14T20:00:00Z',
-            version: 'v0.3',
-            artistFullName: 'Ivan Ivanov',
-            status: 'signed',
-          },
-          moderationLog: [
-            { at: '2026-03-15T08:00:00Z', action: 'submitted', by: 'demo@label.ru' },
-          ],
+          contract: { signed: true, signedAt: '2026-03-14T20:00:00Z', version: 'v0.3', artistFullName: 'Ivan Ivanov', status: 'signed' },
+          moderationLog: [{ at: '2026-03-15T08:00:00Z', action: 'submitted', by: 'demo@label.ru' }],
         },
       ]
       this.isLoading = false
     },
-
     createFromRelease(meta: { title: string; trackCount?: number; type?: string }) {
       const newTrack: Track = {
         id: Date.now().toString(),
@@ -240,37 +225,24 @@ export const useTracksStore = defineStore('tracks', {
         createdAt: new Date().toISOString().slice(0, 10),
         type: (meta.type as ReleaseType) || 'single',
         tracksDetail: [],
-        contract: {
-          signed: true,
-          signedAt: new Date().toISOString(),
-          version: 'v0.3',
-          artistFullName: '—',
-          status: 'signed',
-        },
+        contract: { signed: true, signedAt: new Date().toISOString(), version: 'v0.3', artistFullName: '—', status: 'signed' },
         moderationLog: [],
       }
       this.tracks.unshift(newTrack)
       return newTrack.id
     },
-
     createDraftContract(title: string) {
       return this.createFromRelease({ title, trackCount: 1 })
     },
-
     completeTrackUpload(id: string) {
       const track = this.tracks.find((t) => t.id === id)
       if (track) {
         track.status = 'pending'
         track.rejectReason = undefined
         track.moderationLog = track.moderationLog || []
-        track.moderationLog.push({
-          at: new Date().toISOString(),
-          action: 'submitted',
-          by: 'artist',
-        })
+        track.moderationLog.push({ at: new Date().toISOString(), action: 'submitted', by: 'artist' })
       }
     },
-
     setStatus(id: string, status: TrackStatus, reason?: string, by = 'moderator') {
       const track = this.tracks.find((t) => t.id === id)
       if (!track) return
@@ -278,14 +250,8 @@ export const useTracksStore = defineStore('tracks', {
       if (status === 'rejected') track.rejectReason = reason || 'Rejected'
       else track.rejectReason = undefined
       track.moderationLog = track.moderationLog || []
-      track.moderationLog.push({
-        at: new Date().toISOString(),
-        action: status,
-        by,
-        note: reason,
-      })
+      track.moderationLog.push({ at: new Date().toISOString(), action: status, by, note: reason })
     },
-
     requeue(id: string, by = 'moderator') {
       this.setStatus(id, 'pending', undefined, by)
     },

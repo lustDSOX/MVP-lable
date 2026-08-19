@@ -35,27 +35,23 @@ const router = createRouter({
         {
           path: 'dashboard',
           component: () => import('@/pages/Dashboard.vue'),
-          meta: { requiresAuth: true, roles: ['artist', 'admin', 'moderator'], title: 'Dashboard' },
-        },
-        {
-          path: 'moderator',
-          component: () => import('@/pages/ModeratorCabinet.vue'),
-          meta: {
-            requiresAuth: true,
-            roles: ['moderator', 'admin'],
-            permission: 'releases.moderate' as Permission,
-            title: 'Moderator',
-          },
+          meta: { requiresAuth: true, roles: ['artist'], title: 'Artist Cabinet' },
         },
         {
           path: 'staff',
           component: () => import('@/pages/StaffHub.vue'),
-          meta: { requiresAuth: true, roles: ['moderator', 'admin'], title: 'Staff' },
+          meta: { requiresAuth: true, roles: ['moderator', 'admin'], title: 'Staff Cabinet' },
         },
+        { path: 'moderator', redirect: '/staff' },
+        { path: 'admin', redirect: '/staff' },
         {
-          path: 'admin',
-          component: () => import('@/pages/AdminCabinet.vue'),
-          meta: { requiresAuth: true, roles: ['admin'], title: 'Admin' },
+          path: 'cabinet',
+          redirect: () => {
+            const auth = useAuthStore()
+            if (auth.role === 'admin' || auth.role === 'moderator') return '/staff'
+            if (auth.isAuthenticated) return '/dashboard'
+            return '/login'
+          },
         },
       ],
     },
@@ -66,8 +62,7 @@ const router = createRouter({
 })
 
 function homeForRole(role: string | null): string {
-  if (role === 'admin') return '/staff'
-  if (role === 'moderator') return '/staff'
+  if (role === 'admin' || role === 'moderator') return '/staff'
   return '/dashboard'
 }
 
@@ -86,7 +81,7 @@ router.beforeEach((to, _from, next) => {
     return
   }
   if (needPerm && !authStore.can(needPerm)) {
-    next('/staff')
+    next(homeForRole(authStore.role))
     return
   }
   next()

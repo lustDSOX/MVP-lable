@@ -26,6 +26,8 @@ export interface EventItem {
 
 const NEWS_KEY = 'mvp_lable_cms_news'
 const EVENTS_KEY = 'mvp_lable_cms_events'
+const CMS_VER = 'mvp_lable_cms_v'
+const CMS_VER_VAL = '2'
 
 function seedNews(): NewsItem[] {
   return [
@@ -59,18 +61,40 @@ function seedEvents(): EventItem[] {
       city: 'Moscow',
       date: '15 AUG',
       time: '23:00',
-      description: 'Live set night',
+      description: 'Live set · CLASS TICKETS night',
       status: 'published',
       updatedAt: new Date().toISOString(),
     },
     {
       id: 'e2',
-      title: 'LABEL_SHOWCASE',
+      title: 'WAREHOUSE_RITUAL',
       venue: 'Warehouse 7',
       city: 'SPB',
-      date: '02 SEP',
+      date: '22 AUG',
+      time: '22:00',
+      description: 'Label showcase + guest DJs',
+      status: 'published',
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 'e3',
+      title: 'NEON_OPEN_AIR',
+      venue: 'Roof Base',
+      city: 'Moscow',
+      date: '05 SEP',
+      time: '20:00',
+      description: 'Open-air set, limited capacity',
+      status: 'published',
+      updatedAt: new Date().toISOString(),
+    },
+    {
+      id: 'e4',
+      title: 'LABEL_SHOWCASE_DRAFT',
+      venue: 'TBA',
+      city: 'SPB',
+      date: '12 SEP',
       time: '21:00',
-      description: 'Artists of the label',
+      description: 'Draft event (not public)',
       status: 'draft',
       updatedAt: new Date().toISOString(),
     },
@@ -89,6 +113,11 @@ export const useCmsStore = defineStore('cms', {
   actions: {
     hydrate() {
       try {
+        if (localStorage.getItem(CMS_VER) !== CMS_VER_VAL) {
+          localStorage.removeItem(NEWS_KEY)
+          localStorage.removeItem(EVENTS_KEY)
+          localStorage.setItem(CMS_VER, CMS_VER_VAL)
+        }
         const n = localStorage.getItem(NEWS_KEY)
         const e = localStorage.getItem(EVENTS_KEY)
         if (n) this.news = JSON.parse(n)

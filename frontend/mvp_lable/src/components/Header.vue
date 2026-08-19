@@ -31,7 +31,7 @@
             </div>
           </li>
           <li v-else class="flex items-center pl-6 gap-2">
-            <router-link :to="cabinetPath" class="bg-[#39FF14] text-black uppercase text-sm px-4 py-2 border-2 border-black font-black hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14]">[ КАБИНЕТ ]</router-link>
+            <router-link :to="cabinetPath" class="bg-[#39FF14] text-black uppercase text-sm px-4 py-2 border-2 border-black font-black hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14]">{{ cabinetLabel }}</router-link>
             <button type="button" class="bg-black text-[#ff0000] uppercase text-sm px-3 py-2 border-2 border-[#ff0000] font-black hover:bg-[#ff0000] hover:text-black min-h-[44px]" @click="logout">[ ВЫХОД ]</button>
           </li>
         </ul>
@@ -54,7 +54,7 @@
         <li class="p-4">
           <router-link v-if="!authed.isAuthenticated" to="/login" @click="menuOpen = false" class="block w-full bg-[#39FF14] text-black uppercase text-lg text-center py-3 border-2 border-black font-black min-h-[48px]">[ ВХОД ]</router-link>
           <template v-else>
-            <router-link :to="cabinetPath" @click="menuOpen = false" class="block w-full bg-[#39FF14] text-black uppercase text-lg text-center py-3 border-2 border-black font-black min-h-[48px]">[ КАБИНЕТ ]</router-link>
+            <router-link :to="cabinetPath" @click="menuOpen = false" class="block w-full bg-[#39FF14] text-black uppercase text-lg text-center py-3 border-2 border-black font-black min-h-[48px]">{{ cabinetLabel }}</router-link>
             <button type="button" class="mt-2 block w-full bg-black text-[#ff0000] uppercase text-lg text-center py-3 border-2 border-[#ff0000] font-black min-h-[48px]" @click="logout">[ ВЫХОД ]</button>
           </template>
         </li>
@@ -95,6 +95,12 @@ export default defineComponent({
       if (role === 'admin' || role === 'moderator') return '/staff'
       return '/dashboard'
     })
+    const cabinetLabel = computed(() => {
+      const role = authed.role
+      if (role === 'admin') return '[ ADMIN ]'
+      if (role === 'moderator') return '[ STAFF ]'
+      return '[ КАБИНЕТ ]'
+    })
 
     function logout() {
       authed.logout()
@@ -102,7 +108,7 @@ export default defineComponent({
       router.push('/')
     }
 
-    return { authed, menuOpen, navLinks, cabinetPath, isNavActive, logout }
+    return { authed, menuOpen, navLinks, cabinetPath, cabinetLabel, isNavActive, logout }
   },
 })
 </script>

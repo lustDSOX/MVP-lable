@@ -19,8 +19,12 @@
       <p v-if="!filteredReqs.length" class="font-mono text-gray-600 text-sm">Нет заявок</p>
     </div>
     <div v-else class="space-y-4">
-      <form ref="formEl" class="border border-[#333] p-4 space-y-3 pb-20 relative" @submit.prevent="save">
+      <form ref="formEl" class="border border-[#333] p-4 space-y-3 relative" @submit.prevent="save">
         <p class="font-mono text-[10px] text-[#39FF14] uppercase">{{ editingId ? 'Редактировать' : 'Новый' }} аккаунт</p>
+        <div class="sticky-actions">
+          <button type="submit" class="btn-green">Сохранить</button>
+          <button v-if="editingId" type="button" class="btn-muted" @click="reset">Отмена</button>
+        </div>
         <label class="block"><span class="lbl">Имя / ник</span><input v-model="form.name" required class="field" placeholder="DJ Neon" /></label>
         <label class="block"><span class="lbl">Email</span><input v-model="form.email" required type="email" class="field" placeholder="user@mail.ru" /></label>
         <fieldset>
@@ -33,10 +37,6 @@
           </div>
         </fieldset>
         <label class="block"><span class="lbl">Статус</span><select v-model="form.status" class="field"><option value="active">active</option><option value="blocked">blocked</option></select></label>
-        <div class="sticky-actions">
-          <button type="submit" class="btn-green">Сохранить</button>
-          <button v-if="editingId" type="button" class="btn-muted" @click="reset">Отмена</button>
-        </div>
       </form>
       <article
         v-for="u in filteredUsers"
@@ -132,15 +132,16 @@ function confirmReject(reason: string) {
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; }
 .sticky-actions {
   position: sticky;
-  bottom: 0;
-  z-index: 20;
+  top: 4.5rem;
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.75rem;
-  margin: 0 -1rem -1rem;
-  background: rgba(10, 10, 10, 0.95);
-  border-top: 2px solid #39ff14;
+  margin: 0 -1rem 1rem;
+  background: rgba(10, 10, 10, 0.97);
+  border-bottom: 2px solid #39ff14;
   backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 </style>

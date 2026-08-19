@@ -1,7 +1,11 @@
 <template>
   <section class="space-y-6">
-    <form ref="formEl" class="border-2 border-[#333] p-4 space-y-3 pb-20 relative" @submit.prevent="save">
+    <form ref="formEl" class="border-2 border-[#333] p-4 space-y-3 relative" @submit.prevent="save">
       <p class="font-mono text-xs text-[#39FF14] uppercase">{{ editingId ? 'Редактирование' : 'Новая' }} новость · Markdown</p>
+      <div class="sticky-actions">
+        <button type="submit" class="btn-green">Сохранить</button>
+        <button v-if="editingId" type="button" class="btn-muted" @click="reset">Отмена</button>
+      </div>
       <label class="block"><span class="lbl">Заголовок</span><input v-model="form.title" required class="field" placeholder="GRID_OPENING" /></label>
       <label class="block"><span class="lbl">Краткое описание</span><input v-model="form.excerpt" class="field" placeholder="Лейбл открывает сезон" /></label>
       <div class="grid sm:grid-cols-2 gap-3">
@@ -25,10 +29,6 @@
           <p v-if="form.excerpt" class="text-gray-400 font-mono text-sm mb-4">{{ form.excerpt }}</p>
           <div class="prose-preview text-gray-200" v-html="mdPreview(form.body)" />
         </div>
-      </div>
-      <div class="sticky-actions">
-        <button type="submit" class="btn-green">Сохранить</button>
-        <button v-if="editingId" type="button" class="btn-muted" @click="reset">Отмена</button>
       </div>
     </form>
     <article
@@ -78,7 +78,7 @@ const filtered = computed(() => {
 function insert(md: string) { form.body = (form.body || '') + (form.body && !form.body.endsWith('\n') ? '\n' : '') + md }
 function mdPreview(src: string): string {
   let s = src || ''
-  s = s.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
+  s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
   s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full my-3 border border-[#333]" />')
   s = s.replace(/^### (.*)$/gm, '<h3 class="text-lg font-black uppercase mt-3">$1</h3>')
   s = s.replace(/^## (.*)$/gm, '<h2 class="text-xl font-black uppercase mt-3">$1</h2>')
@@ -120,15 +120,16 @@ function save() {
 .prose-preview :deep(h1), .prose-preview :deep(h2), .prose-preview :deep(h3) { font-weight: 900; text-transform: uppercase; margin: 0.5em 0; }
 .sticky-actions {
   position: sticky;
-  bottom: 0;
-  z-index: 20;
+  top: 4.5rem;
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.75rem;
-  margin: 0 -1rem -1rem;
-  background: rgba(10, 10, 10, 0.95);
-  border-top: 2px solid #39ff14;
+  margin: 0 -1rem 1rem;
+  background: rgba(10, 10, 10, 0.97);
+  border-bottom: 2px solid #39ff14;
   backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 </style>

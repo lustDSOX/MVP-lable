@@ -8,9 +8,15 @@
           <p class="font-mono text-[9px] text-gray-500">{{ ev.status }} · {{ ev.date }} · {{ ev.city }}</p>
         </button>
       </div>
-      <div ref="formEl" class="border-2 border-[#333] p-4 space-y-3 pb-20 relative">
+      <div ref="formEl" class="border-2 border-[#333] p-4 space-y-3 relative">
         <template v-if="selectedId || creating || form.title">
           <p class="font-mono text-xs text-[#39FF14] uppercase">{{ editingId ? 'Редактирование' : 'Новое' }} событие</p>
+          <div class="sticky-actions">
+            <button type="button" class="btn-green" @click="save">Сохранить</button>
+            <a v-if="form.ticketUrl" :href="form.ticketUrl" class="btn-muted inline-flex items-center" target="_blank" rel="noopener">Открыть оплату</a>
+            <button v-if="editingId" type="button" class="btn-red" @click="remove">Удалить</button>
+            <button type="button" class="btn-muted" @click="reset">Очистить</button>
+          </div>
           <label class="block"><span class="lbl">Название</span><input v-model="form.title" required class="field" placeholder="UNDERGROUND_NIGHT" /></label>
           <div class="grid sm:grid-cols-2 gap-2">
             <label class="block"><span class="lbl">Площадка</span><input v-model="form.venue" class="field" placeholder="Club Void" /></label>
@@ -24,12 +30,6 @@
           </div>
           <label class="block"><span class="lbl">Описание</span><textarea v-model="form.description" rows="3" class="field" placeholder="Live set…" /></label>
           <label class="block"><span class="lbl">Статус</span><select v-model="form.status" class="field"><option value="draft">draft</option><option value="published">published</option></select></label>
-          <div class="sticky-actions">
-            <button type="button" class="btn-green" @click="save">Сохранить</button>
-            <a v-if="form.ticketUrl" :href="form.ticketUrl" class="btn-muted inline-flex items-center" target="_blank" rel="noopener">Открыть оплату</a>
-            <button v-if="editingId" type="button" class="btn-red" @click="remove">Удалить</button>
-            <button type="button" class="btn-muted" @click="reset">Очистить</button>
-          </div>
         </template>
         <p v-else class="font-mono text-sm text-gray-500">Выбери событие слева или создай новое</p>
       </div>
@@ -89,15 +89,16 @@ function remove() { if (editingId.value) { cms.deleteEvent(editingId.value); res
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; }
 .sticky-actions {
   position: sticky;
-  bottom: 0;
-  z-index: 20;
+  top: 4.5rem;
+  z-index: 30;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
   padding: 0.75rem;
-  margin: 0 -1rem -1rem;
-  background: rgba(10, 10, 10, 0.95);
-  border-top: 2px solid #39ff14;
+  margin: 0 -1rem 1rem;
+  background: rgba(10, 10, 10, 0.97);
+  border-bottom: 2px solid #39ff14;
   backdrop-filter: blur(8px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
 }
 </style>

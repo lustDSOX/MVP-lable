@@ -21,15 +21,13 @@
       <p v-if="!filtered.length" class="font-mono text-gray-600 text-sm">Ничего не найдено</p>
     </div>
 
-    <div v-else-if="sel && !trackView" ref="detailEl" class="space-y-6 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505]">
+    <div v-else-if="sel && !trackView" ref="detailEl" class="space-y-6 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505] pb-28">
       <div class="flex flex-wrap gap-2 justify-between items-start">
-        <button type="button" class="btn-muted" @click="selectedId = null">← К списку</button>
+        <h2 class="text-2xl font-black uppercase italic">{{ sel.title }}</h2>
         <span class="font-mono text-xs uppercase text-[#39FF14]">{{ sel.status }}</span>
       </div>
-
-      <h2 class="text-2xl font-black uppercase italic">{{ sel.title }}</h2>
-      <div class="sticky-actions">
-        <button type="button" class="btn-muted" @click="selectedId = null">← Список</button>
+      <div class="form-actions-fixed">
+        <button type="button" class="btn-muted" @click="selectedId = null">← К списку</button>
         <button v-if="sel.status === 'pending' || sel.status === 'draft'" type="button" class="btn-green" @click="approve">Одобрить</button>
         <button v-if="sel.status === 'pending' || sel.status === 'draft'" type="button" class="btn-red" @click="rejectOpen = true">Отклонить</button>
         <button v-if="sel.status === 'published' || sel.status === 'rejected'" type="button" class="btn-muted" @click="requeue">На модерацию</button>
@@ -84,10 +82,9 @@
       </div>
     </div>
 
-    <div v-else-if="sel && trackView" class="space-y-4 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505]">
-      <button type="button" class="btn-muted" @click="trackViewId = null">← К релизу</button>
+    <div v-else-if="sel && trackView" class="space-y-4 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505] pb-28">
       <h2 class="text-3xl font-black uppercase italic">{{ trackView.title }}</h2>
-      <div class="sticky-actions">
+      <div class="form-actions-fixed">
         <button type="button" class="btn-muted" @click="trackViewId = null">← К релизу</button>
       </div>
       <p class="font-mono text-xs text-gray-400" v-for="(c, i) in trackView.contributors" :key="i">{{ c.role }}: <span class="text-white">{{ c.creditName }}</span></p>
@@ -175,18 +172,19 @@ function requeue() {
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; display: inline-block; }
 .chip { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; padding: 0.35rem 0.75rem; border: 1px solid #333; color: #666; }
 .chip.on { background: #39ff14; color: #000; border-color: #000; }
-.sticky-actions {
-  position: sticky;
-  top: 4.5rem;
-  z-index: 30;
+.form-actions-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.75rem;
-  margin: 0 -1rem 1rem;
-  background: rgba(5, 5, 5, 0.97);
-  border-bottom: 2px solid #39ff14;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: rgba(0, 0, 0, 0.96);
+  border-top: 2px solid #39ff14;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+  justify-content: center;
 }
 </style>

@@ -2,6 +2,7 @@ import Layout from '@/layouts/Layout.vue'
 import Home from '@/pages/Home.vue'
 import { createRouter, createWebHistory } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
+import type { Permission } from '@/types/permissions'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -34,12 +35,22 @@ const router = createRouter({
         {
           path: 'dashboard',
           component: () => import('@/pages/Dashboard.vue'),
-          meta: { requiresAuth: true, roles: ['artist'], title: 'Dashboard' },
+          meta: { requiresAuth: true, roles: ['artist', 'admin', 'moderator'], title: 'Dashboard' },
         },
         {
           path: 'moderator',
           component: () => import('@/pages/ModeratorCabinet.vue'),
-          meta: { requiresAuth: true, roles: ['moderator', 'admin'], title: 'Moderator' },
+          meta: {
+            requiresAuth: true,
+            roles: ['moderator', 'admin'],
+            permission: 'releases.moderate' as Permission,
+            title: 'Moderator',
+          },
+        },
+        {
+          path: 'staff',
+          component: () => import('@/pages/StaffHub.vue'),
+          meta: { requiresAuth: true, roles: ['moderator', 'admin'], title: 'Staff' },
         },
         {
           path: 'admin',
@@ -54,18 +65,31 @@ const router = createRouter({
   },
 })
 
+function homeForRole(role: string | null): string {
+  if (role === 'admin') return '/staff'
+  if (role === 'moderator') return '/staff'
+  return '/dashboard'
+}
+
 router.beforeEach((to, _from, next) => {
   const authStore = useAuthStore()
   const requiresAuth = to.matched.some((record) => record.meta.requiresAuth)
   const allowedRoles = to.meta.roles as string[] | undefined
+  const needPerm = to.meta.permission as Permission | undefined
 
   if (requiresAuth && !authStore.isAuthenticated) {
     next('/login')
-  } else if (requiresAuth && allowedRoles && !allowedRoles.includes(authStore.role || '')) {
-    next('/dashboard')
-  } else {
-    next()
+    return
   }
+  if (requiresAuth && allowedRoles && !allowedRoles.includes(authStore.role || '')) {
+    next(homeForRole(authStore.role))
+    return
+  }
+  if (needPerm && !authStore.can(needPerm)) {
+    next('/staff')
+    return
+  }
+  next()
 })
 
 router.afterEach((to) => {

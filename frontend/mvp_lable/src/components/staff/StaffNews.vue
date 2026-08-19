@@ -1,6 +1,6 @@
 <template>
   <section class="space-y-6">
-    <form class="border-2 border-[#333] p-4 space-y-3" @submit.prevent="save">
+    <form ref="formEl" class="border-2 border-[#333] p-4 space-y-3 pb-20 relative" @submit.prevent="save">
       <p class="font-mono text-xs text-[#39FF14] uppercase">{{ editingId ? 'Редактирование' : 'Новая' }} новость · Markdown</p>
       <label class="block"><span class="lbl">Заголовок</span><input v-model="form.title" required class="field" placeholder="GRID_OPENING" /></label>
       <label class="block"><span class="lbl">Краткое описание</span><input v-model="form.excerpt" class="field" placeholder="Лейбл открывает сезон" /></label>
@@ -15,7 +15,7 @@
         <div class="flex flex-wrap gap-1 mt-1 mb-1">
           <button v-for="b in toolbar" :key="b.tip" type="button" class="tool" :title="b.tip" @click="insert(b.md)">{{ b.label }}</button>
         </div>
-        <textarea v-model="form.body" rows="12" class="field font-mono text-sm" placeholder="# Заголовок\n\n**жирный**, [ссылка](url), ![img](url)" />
+        <textarea v-model="form.body" rows="12" class="field font-mono text-sm" placeholder="# Заголовок" />
       </div>
       <div class="border-2 border-[#39FF14]/20 p-4">
         <p class="font-mono text-[10px] text-gray-500 uppercase mb-3">Предпросмотр как на /news</p>
@@ -26,26 +26,43 @@
           <div class="prose-preview text-gray-200" v-html="mdPreview(form.body)" />
         </div>
       </div>
-      <div class="flex gap-2 flex-wrap">
+      <div class="sticky-actions">
         <button type="submit" class="btn-green">Сохранить</button>
         <button v-if="editingId" type="button" class="btn-muted" @click="reset">Отмена</button>
       </div>
     </form>
-    <article v-for="n in filtered" :key="n.id" class="border border-[#333] p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between">
-      <div><p class="font-mono text-sm uppercase text-white">{{ n.title }}</p><p class="font-mono text-[10px] text-gray-500">{{ n.status }} · {{ n.date }}</p></div>
-      <div class="flex gap-2"><button type="button" class="btn-muted" @click="edit(n)">Изменить</button><button type="button" class="btn-red" @click="cms.deleteNews(n.id)">Удалить</button></div>
+    <article
+      v-for="n in filtered"
+      :key="n.id"
+      class="border border-[#333] p-4 flex flex-col sm:flex-row sm:items-center gap-3 justify-between cursor-pointer hover:border-[#39FF14]"
+      :class="editingId === n.id ? 'border-[#39FF14]' : ''"
+      @click="edit(n)"
+    >
+      <div>
+        <p class="font-mono text-sm uppercase text-white">{{ n.title }}</p>
+        <p class="font-mono text-[10px] text-gray-500">{{ n.status }} · {{ n.date }}</p>
+      </div>
+      <div class="flex gap-2" @click.stop>
+        <button type="button" class="btn-muted" @click="edit(n)">Изменить</button>
+        <button type="button" class="btn-red" @click="cms.deleteNews(n.id)">Удалить</button>
+      </div>
     </article>
   </section>
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { useCmsStore, type NewsItem } from '@/stores/cms'
 
 const props = defineProps<{ tabQuery: string; focusId?: string | null }>()
 const cms = useCmsStore()
 const editingId = ref<string | null>(null)
-const form = reactive({ title: '', excerpt: '', body: '', date: new Date().toISOString().slice(0, 10), status: 'draft' as 'draft' | 'published' })
+const formEl = ref<HTMLElement | null>(null)
+const form = reactive({
+  title: '', excerpt: '', body: '',
+  date: new Date().toISOString().slice(0, 10),
+  status: 'draft' as 'draft' | 'published',
+})
 const toolbar = [
   { label: 'H1', tip: 'H1', md: '# ' }, { label: 'H2', tip: 'H2', md: '## ' },
   { label: 'B', tip: 'Bold', md: '**текст**' }, { label: 'I', tip: 'Italic', md: '*текст*' },
@@ -75,9 +92,20 @@ function mdPreview(src: string): string {
   s = s.replace(/\n\n/g, '</p><p class="my-2">')
   return `<p class="my-2">${s}</p>`
 }
-function reset() { editingId.value = null; form.title = ''; form.excerpt = ''; form.body = ''; form.date = new Date().toISOString().slice(0, 10); form.status = 'draft' }
-function edit(n: NewsItem) { editingId.value = n.id; form.title = n.title; form.excerpt = n.excerpt; form.body = n.body; form.date = n.date; form.status = n.status }
-function save() { cms.upsertNews({ id: editingId.value || undefined, title: form.title, excerpt: form.excerpt, body: form.body, date: form.date, status: form.status }); reset() }
+function reset() {
+  editingId.value = null; form.title = ''; form.excerpt = ''; form.body = ''
+  form.date = new Date().toISOString().slice(0, 10); form.status = 'draft'
+}
+async function edit(n: NewsItem) {
+  editingId.value = n.id
+  form.title = n.title; form.excerpt = n.excerpt; form.body = n.body; form.date = n.date; form.status = n.status
+  await nextTick()
+  formEl.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+function save() {
+  cms.upsertNews({ id: editingId.value || undefined, title: form.title, excerpt: form.excerpt, body: form.body, date: form.date, status: form.status })
+  reset()
+}
 </script>
 
 <style scoped>
@@ -90,4 +118,17 @@ function save() { cms.upsertNews({ id: editingId.value || undefined, title: form
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; }
 .y2k-preview { background: linear-gradient(135deg, #1a1a1a, #0d0d0d); border: 1px solid #333; }
 .prose-preview :deep(h1), .prose-preview :deep(h2), .prose-preview :deep(h3) { font-weight: 900; text-transform: uppercase; margin: 0.5em 0; }
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  margin: 0 -1rem -1rem;
+  background: rgba(10, 10, 10, 0.95);
+  border-top: 2px solid #39ff14;
+  backdrop-filter: blur(8px);
+}
 </style>

@@ -1,88 +1,67 @@
 import { defineStore } from 'pinia'
-import type { Permission } from '@/types/permissions'
-import { ROLE_DEFAULTS } from '@/types/permissions'
+import type { Permission, SystemRole } from '@/types/permissions'
+import { ROLE_DEFAULTS, ALL_ROLES } from '@/types/permissions'
 
-const STORAGE = 'mvp_lable_perm_matrix'
+const STORAGE = 'mvp_lable_role_matrix_v2'
 
-export interface StaffUser {
-  id: string
-  email: string
-  name: string
-  role: 'moderator' | 'admin' | 'artist'
-  permissions: Permission[]
-}
+export type RoleMatrix = Record<SystemRole, Permission[]>
 
-function seed(): StaffUser[] {
-  return [
-    {
-      id: 'u-admin',
-      email: 'admin@label.ru',
-      name: 'System Overlord',
-      role: 'admin',
-      permissions: [...ROLE_DEFAULTS.admin],
-    },
-    {
-      id: 'u-mod',
-      email: 'moderator@label.ru',
-      name: 'Chief Editor',
-      role: 'moderator',
-      permissions: ['releases.moderate'],
-    },
-    {
-      id: 'u-news',
-      email: 'news@label.ru',
-      name: 'News Desk',
-      role: 'moderator',
-      permissions: ['news.manage'],
-    },
-    {
-      id: 'u-events',
-      email: 'events@label.ru',
-      name: 'Events Desk',
-      role: 'moderator',
-      permissions: ['events.manage'],
-    },
-    {
-      id: 'u-full',
-      email: 'staff@label.ru',
-      name: 'Full Staff',
-      role: 'moderator',
-      permissions: ['releases.moderate', 'news.manage', 'events.manage'],
-    },
-  ]
+function seedMatrix(): RoleMatrix {
+  return {
+    artist: [...ROLE_DEFAULTS.artist],
+    moderator: [...ROLE_DEFAULTS.moderator],
+    news_editor: [...ROLE_DEFAULTS.news_editor],
+    events_editor: [...ROLE_DEFAULTS.events_editor],
+    admin: [...ROLE_DEFAULTS.admin],
+  }
 }
 
 export const usePermissionsStore = defineStore('permissions', {
   state: () => ({
-    staff: seed() as StaffUser[],
+    matrix: seedMatrix() as RoleMatrix,
     matrixDirty: false,
   }),
+  getters: {
+    roles: () => ALL_ROLES,
+  },
   actions: {
     hydrate() {
       try {
         const raw = localStorage.getItem(STORAGE)
-        if (raw) this.staff = JSON.parse(raw)
+        if (raw) this.matrix = { ...seedMatrix(), ...JSON.parse(raw) }
         this.matrixDirty = false
       } catch {
-        /* keep seed */
+        /* seed */
       }
     },
     persist() {
-      localStorage.setItem(STORAGE, JSON.stringify(this.staff))
+      localStorage.setItem(STORAGE, JSON.stringify(this.matrix))
     },
-    permissionsFor(email: string, role: string | null): Permission[] {
-      const e = (email || '').toLowerCase()
-      const row = this.staff.find((s) => s.email.toLowerCase() === e)
-      if (row) return [...row.permissions]
-      if (role === 'admin') return [...ROLE_DEFAULTS.admin]
-      if (role === 'moderator') return [...ROLE_DEFAULTS.moderator]
-      return []
+    permissionsForRoles(roles: SystemRole[] | string | null): Permission[] {
+      const list = Array.isArray(roles)
+        ? roles
+        : roles
+          ? [roles as SystemRole]
+          : []
+      const set = new Set<Permission>()
+      for (const r of list) {
+        if (r === 'admin') {
+          ;(ROLE_DEFAULTS.admin as Permission[]).forEach((p) => set.add(p))
+        }
+        const perms = this.matrix[r as SystemRole] || ROLE_DEFAULTS[r as SystemRole] || []
+        perms.forEach((p) => set.add(p))
+      }
+      return [...set]
     },
-    setPermission(userId: string, key: Permission, on: boolean) {
-      const u = this.staff.find((s) => s.id === userId)
-      if (!u) return
-      if (on && !u.permissions.includes(key)) u.permissions.push(key)
-      if (!on) u.permissions = u.permissions.filter((p) => p !== key)
+    permissionsFor(_email: string, role: string | null): Permission[] {
+      return this.permissionsForRoles(role)
+    },
+    setRolePermission(role: SystemRole, key: Permission, on: boolean) {
+      if (role === 'admin' && key === 'permissions.manage') return
+      const cur = new Set(this.matrix[role] || [])
+      if (on) cur.add(key)
+      else cur.delete(key)
+      this.matrix[role] = [...cur]
       this.matrixDirty = true
     },
     saveMatrix() {
@@ -92,16 +71,6 @@ export const usePermissionsStore = defineStore('permissions', {
     discardMatrix() {
       this.hydrate()
       this.matrixDirty = false
-    },
-    addStaff(email: string, name: string, role: 'moderator' | 'admin') {
-      this.staff.push({
-        id: `u-${Date.now()}`,
-        email: email.toLowerCase(),
-        name,
-        role,
-        permissions: role === 'admin' ? [...ROLE_DEFAULTS.admin] : [...ROLE_DEFAULTS.moderator],
-      })
-      this.matrixDirty = true
     },
   },
 })

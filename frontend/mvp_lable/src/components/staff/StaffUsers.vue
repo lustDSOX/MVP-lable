@@ -12,14 +12,14 @@
           <p v-if="req.note" class="font-mono text-[10px] text-gray-400 mt-1">{{ req.note }}</p>
         </div>
         <div class="flex flex-wrap gap-2">
-          <button type="button" class="btn-green" @click="admin.approveRequest(req.id, ['artist'])">Одобрить (artist)</button>
+          <button type="button" class="btn-green" @click="admin.approveRequest(req.id, ['artist'])">Одобрить</button>
           <button type="button" class="btn-red" @click="openReject(req.id)">Отказать</button>
         </div>
       </article>
       <p v-if="!filteredReqs.length" class="font-mono text-gray-600 text-sm">Нет заявок</p>
     </div>
     <div v-else class="space-y-4">
-      <form class="border border-[#333] p-4 space-y-3" @submit.prevent="save">
+      <form ref="formEl" class="border border-[#333] p-4 space-y-3 pb-20 relative" @submit.prevent="save">
         <p class="font-mono text-[10px] text-[#39FF14] uppercase">{{ editingId ? 'Редактировать' : 'Новый' }} аккаунт</p>
         <label class="block"><span class="lbl">Имя / ник</span><input v-model="form.name" required class="field" placeholder="DJ Neon" /></label>
         <label class="block"><span class="lbl">Email</span><input v-model="form.email" required type="email" class="field" placeholder="user@mail.ru" /></label>
@@ -33,15 +33,24 @@
           </div>
         </fieldset>
         <label class="block"><span class="lbl">Статус</span><select v-model="form.status" class="field"><option value="active">active</option><option value="blocked">blocked</option></select></label>
-        <div class="flex gap-2"><button type="submit" class="btn-green">Сохранить</button><button v-if="editingId" type="button" class="btn-muted" @click="reset">Отмена</button></div>
+        <div class="sticky-actions">
+          <button type="submit" class="btn-green">Сохранить</button>
+          <button v-if="editingId" type="button" class="btn-muted" @click="reset">Отмена</button>
+        </div>
       </form>
-      <article v-for="u in filteredUsers" :key="u.id" class="border border-[#333] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+      <article
+        v-for="u in filteredUsers"
+        :key="u.id"
+        class="border border-[#333] p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 cursor-pointer hover:border-[#39FF14]"
+        :class="editingId === u.id ? 'border-[#39FF14]' : ''"
+        @click="edit(u)"
+      >
         <div>
           <p class="font-mono text-sm text-white">{{ u.name }}</p>
           <p class="font-mono text-[10px] text-gray-500">{{ u.email }} · {{ u.status }}</p>
           <p class="font-mono text-[10px] text-[#39FF14] mt-1">{{ u.roles.join(', ') }}</p>
         </div>
-        <div class="flex flex-wrap gap-2">
+        <div class="flex flex-wrap gap-2" @click.stop>
           <button type="button" class="btn-muted" @click="edit(u)">Изменить</button>
           <button v-if="u.status !== 'blocked'" type="button" class="btn-red" @click="admin.blockUser(u.id)">Блок</button>
           <button v-else type="button" class="btn-green" @click="admin.unblockUser(u.id)">Разблок</button>
@@ -54,7 +63,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref } from 'vue'
+import { computed, nextTick, reactive, ref } from 'vue'
 import { useAdminStore, type Account } from '@/stores/admin'
 import { ALL_ROLES, type SystemRole } from '@/types/permissions'
 import ReasonModal from './ReasonModal.vue'
@@ -65,6 +74,7 @@ const sub = ref<'requests' | 'accounts'>('requests')
 const editingId = ref<string | null>(null)
 const rejectOpen = ref(false)
 const rejectId = ref<string | null>(null)
+const formEl = ref<HTMLElement | null>(null)
 const form = reactive({ name: '', email: '', roles: ['artist'] as SystemRole[], status: 'active' as Account['status'] })
 
 const filteredUsers = computed(() => {
@@ -83,11 +93,35 @@ function toggleRole(key: SystemRole, on: boolean) {
   if (!on) form.roles = form.roles.filter((r) => r !== key)
   if (!form.roles.length) form.roles = ['artist']
 }
-function reset() { editingId.value = null; form.name = ''; form.email = ''; form.roles = ['artist']; form.status = 'active' }
-function edit(u: Account) { editingId.value = u.id; form.name = u.name; form.email = u.email; form.roles = [...u.roles]; form.status = u.status }
-function save() { admin.upsertUser({ id: editingId.value || undefined, name: form.name, email: form.email, roles: [...form.roles], status: form.status }); reset() }
-function openReject(id: string) { rejectId.value = id; rejectOpen.value = true }
-function confirmReject(reason: string) { if (rejectId.value) admin.rejectRequest(rejectId.value, reason); rejectOpen.value = false; rejectId.value = null }
+function reset() {
+  editingId.value = null
+  form.name = ''
+  form.email = ''
+  form.roles = ['artist']
+  form.status = 'active'
+}
+async function edit(u: Account) {
+  editingId.value = u.id
+  form.name = u.name
+  form.email = u.email
+  form.roles = [...u.roles]
+  form.status = u.status
+  await nextTick()
+  formEl.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+}
+function save() {
+  admin.upsertUser({ id: editingId.value || undefined, name: form.name, email: form.email, roles: [...form.roles], status: form.status })
+  reset()
+}
+function openReject(id: string) {
+  rejectId.value = id
+  rejectOpen.value = true
+}
+function confirmReject(reason: string) {
+  if (rejectId.value) admin.rejectRequest(rejectId.value, reason)
+  rejectOpen.value = false
+  rejectId.value = null
+}
 </script>
 
 <style scoped>
@@ -96,4 +130,17 @@ function confirmReject(reason: string) { if (rejectId.value) admin.rejectRequest
 .btn-green { background: #39ff14; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; font-weight: 700; }
 .btn-red { background: #ff0000; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; }
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; }
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  margin: 0 -1rem -1rem;
+  background: rgba(10, 10, 10, 0.95);
+  border-top: 2px solid #39ff14;
+  backdrop-filter: blur(8px);
+}
 </style>

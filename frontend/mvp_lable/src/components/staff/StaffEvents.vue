@@ -8,7 +8,7 @@
           <p class="font-mono text-[9px] text-gray-500">{{ ev.status }} · {{ ev.date }} · {{ ev.city }}</p>
         </button>
       </div>
-      <div class="border-2 border-[#333] p-4 space-y-3">
+      <div ref="formEl" class="border-2 border-[#333] p-4 space-y-3 pb-20 relative">
         <template v-if="selectedId || creating || form.title">
           <p class="font-mono text-xs text-[#39FF14] uppercase">{{ editingId ? 'Редактирование' : 'Новое' }} событие</p>
           <label class="block"><span class="lbl">Название</span><input v-model="form.title" required class="field" placeholder="UNDERGROUND_NIGHT" /></label>
@@ -24,7 +24,7 @@
           </div>
           <label class="block"><span class="lbl">Описание</span><textarea v-model="form.description" rows="3" class="field" placeholder="Live set…" /></label>
           <label class="block"><span class="lbl">Статус</span><select v-model="form.status" class="field"><option value="draft">draft</option><option value="published">published</option></select></label>
-          <div class="flex flex-wrap gap-2">
+          <div class="sticky-actions">
             <button type="button" class="btn-green" @click="save">Сохранить</button>
             <a v-if="form.ticketUrl" :href="form.ticketUrl" class="btn-muted inline-flex items-center" target="_blank" rel="noopener">Открыть оплату</a>
             <button v-if="editingId" type="button" class="btn-red" @click="remove">Удалить</button>
@@ -38,7 +38,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, reactive, ref, watch } from 'vue'
+import { computed, nextTick, reactive, ref, watch } from 'vue'
 import { useCmsStore, type EventItem } from '@/stores/cms'
 
 const props = defineProps<{ tabQuery: string; focusId?: string | null }>()
@@ -46,6 +46,7 @@ const cms = useCmsStore()
 const selectedId = ref<string | null>(null)
 const editingId = ref<string | null>(null)
 const creating = ref(false)
+const formEl = ref<HTMLElement | null>(null)
 const form = reactive({
   title: '', venue: '', city: '', date: '15 AUG', time: '23:00', description: '',
   status: 'draft' as 'draft' | 'published', ticketUrl: '/purchase', price: '', capacity: '', ageLimit: '18+',
@@ -65,11 +66,13 @@ function reset() {
   form.description = ''; form.status = 'draft'; form.ticketUrl = '/purchase'; form.price = ''; form.capacity = ''; form.ageLimit = '18+'
 }
 function startNew() { reset(); creating.value = true }
-function select(ev: EventItem) {
+async function select(ev: EventItem) {
   selectedId.value = ev.id; editingId.value = ev.id; creating.value = false
   form.title = ev.title; form.venue = ev.venue; form.city = ev.city; form.date = ev.date; form.time = ev.time
   form.description = ev.description; form.status = ev.status
   form.ticketUrl = ev.ticketUrl || '/purchase'; form.price = ev.price || ''; form.capacity = ev.capacity || ''; form.ageLimit = ev.ageLimit || '18+'
+  await nextTick()
+  formEl.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 function save() {
   cms.upsertEvent({ id: editingId.value || undefined, title: form.title, venue: form.venue, city: form.city, date: form.date, time: form.time, description: form.description, status: form.status, ticketUrl: form.ticketUrl, price: form.price, capacity: form.capacity, ageLimit: form.ageLimit })
@@ -84,4 +87,17 @@ function remove() { if (editingId.value) { cms.deleteEvent(editingId.value); res
 .btn-green { background: #39ff14; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; font-weight: 700; }
 .btn-red { background: #ff0000; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; }
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; }
+.sticky-actions {
+  position: sticky;
+  bottom: 0;
+  z-index: 20;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  padding: 0.75rem;
+  margin: 0 -1rem -1rem;
+  background: rgba(10, 10, 10, 0.95);
+  border-top: 2px solid #39ff14;
+  backdrop-filter: blur(8px);
+}
 </style>

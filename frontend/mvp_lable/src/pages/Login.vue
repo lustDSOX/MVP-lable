@@ -1,158 +1,142 @@
 <template>
-  <div class="flex flex-1 items-center justify-center text-white p-7 font-['Inter',sans-serif] selection:bg-[#ff0000] selection:text-white overflow-hidden relative">
-    
-    <div class="bg-chain-placeholder absolute w-[120%] h-16 bg-repeat-x bg-center bg-size-[auto_100%] rotate-25 -right-30 top-2/4 z-10 mix-blend-screen pointer-events-none"></div>
-    <div class="bg-chain-placeholder absolute w-[120%] h-16 bg-repeat-x bg-center bg-size-[auto_100%] -rotate-12 -left-10 bottom-1/4 z-10  mix-blend-screen pointer-events-none"></div>
+  <div class="flex flex-1 items-center justify-center text-white p-4 sm:p-7 font-['Inter',sans-serif] selection:bg-[#ff0000] selection:text-white overflow-hidden relative">
+    <div class="bg-chain-placeholder absolute w-[120%] h-16 bg-repeat-x bg-center bg-size-[auto_100%] rotate-25 -right-30 top-2/4 z-10 mix-blend-screen pointer-events-none hidden md:block"></div>
 
-    <form 
-      @submit.prevent="handleSubmit" 
+    <form
+      @submit.prevent="handleSubmit"
       class="relative w-full max-w-3xl bg-black border border-white/20 p-0 shadow-[0_40px_80px_rgba(0,0,0,0.7)] z-20 overflow-hidden"
     >
-      <!-- HEADER -->
-      <div class=" bg-white/20 text-black p-2 flex justify-between items-center">
+      <div class="bg-white/20 text-black p-2 flex justify-between items-center">
         <div class="flex items-center gap-3">
           <div class="w-3 h-3 bg-[#ff0000] animate-pulse"></div>
-          <span class="text-[10px] font-['JetBrains_Mono',monospace] font-black uppercase tracking-widest italic">
-            AUTH_PROTOCOL // SECURITY_LEVEL: RED
+          <span class="text-[10px] font-mono font-black uppercase tracking-widest italic">
+            AUTH_PROTOCOL // {{ mode === 'login' ? 'LOGIN' : 'REGISTER' }}
           </span>
         </div>
-        <span class="text-[10px] font-['JetBrains_Mono',monospace] opacity-50 uppercase">V.2026.03</span>
+        <span class="text-[10px] font-mono opacity-50 uppercase">MOCK</span>
       </div>
 
-      <!-- ВНУТРЕННИЙ КОНТЕНТ -->
       <div class="p-6 md:p-10 relative">
-        
-        <!-- ЛОГОТИП: Используем ваш стиль с коррекцией -->
-        <div class="mb-8 relative text-center">
-           <h1 class="h1-metal-textured text-6xl md:text-7xl m-0 leading-[0.8]" data-text="CLASS TICKETS">
-             CLASS TICKETS
-           </h1>
-           <div class="mt-6 flex justify-center items-center gap-2">
-              <div class="h-px w-12 bg-[#ff0000]"></div>
-              <span class="text-[8px] font-['JetBrains_Mono',monospace] text-gray-500 uppercase tracking-[0.6em]">Artist_Terminal</span>
-              <div class="h-px w-12 bg-[#ff0000]"></div>
-           </div>
+        <div class="mb-6 relative text-center">
+          <h1 class="h1-metal-textured text-5xl sm:text-6xl md:text-7xl m-0 leading-[0.8]" data-text="CLASS TICKETS">
+            CLASS TICKETS
+          </h1>
+          <div class="mt-4 flex justify-center items-center gap-2">
+            <div class="h-px w-12 bg-[#ff0000]"></div>
+            <span class="text-[8px] font-mono text-gray-500 uppercase tracking-[0.4em]">Artist_Terminal</span>
+            <div class="h-px w-12 bg-[#ff0000]"></div>
+          </div>
         </div>
 
-        <!-- ПОЛЯ ВВОДА -->
-        <div class="space-y-10">
-          <!-- EMAIL -->
-          <div class="relative group/input">
-            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-['JetBrains_Mono',monospace] text-[#ff0000] uppercase tracking-widest z-20">
+        <div class="flex gap-2 mb-8 border border-[#333] p-1">
+          <button
+            type="button"
+            class="flex-1 py-2 text-xs font-mono uppercase tracking-widest transition-colors min-h-[44px]"
+            :class="mode === 'login' ? 'bg-[#39FF14] text-black' : 'text-gray-500 hover:text-white'"
+            @click="mode = 'login'; error = ''"
+          >
+            Login
+          </button>
+          <button
+            type="button"
+            class="flex-1 py-2 text-xs font-mono uppercase tracking-widest transition-colors min-h-[44px]"
+            :class="mode === 'register' ? 'bg-[#39FF14] text-black' : 'text-gray-500 hover:text-white'"
+            @click="mode = 'register'; error = ''"
+          >
+            Register
+          </button>
+        </div>
+
+        <div class="space-y-8">
+          <div v-if="mode === 'register'" class="relative">
+            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">
+              Artist_Name
+            </label>
+            <input
+              v-model="artistName"
+              type="text"
+              class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]"
+              placeholder="DJ Neon"
+            />
+          </div>
+
+          <div class="relative">
+            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">
               User_ID
             </label>
             <input
               v-model="email"
               type="email"
               required
-              class="w-full bg-transparent border-2 border-white/10 p-3 font-['Archivo_Black',sans-serif] text-xl focus:outline-none focus:border-[#ff0000] transition-colors placeholder:opacity-10 uppercase tracking-tighter"
-              placeholder="YOUR_IDENTIFIER"
+              class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]"
+              placeholder="demo@label.ru"
             />
-            <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-[#ff0000] group-focus-within/input:w-full transition-all"></div>
           </div>
 
-          <!-- PASSWORD -->
-          <div class="relative group/input">
-            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-['JetBrains_Mono',monospace] text-[#ff0000] uppercase tracking-widest z-20">
+          <div class="relative">
+            <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">
               Access_Key
             </label>
             <input
               v-model="password"
               type="password"
               required
-              class="w-full bg-transparent border-2 border-white/10 p-3 font-['Archivo_Black',sans-serif] text-xl focus:outline-none focus:border-[#ff0000] transition-colors placeholder:opacity-10 uppercase tracking-tighter"
+              minlength="6"
+              class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]"
               placeholder="••••••••"
             />
-            <div class="absolute bottom-0 right-0 w-4 h-4 border-r-2 border-b-2 border-[#ff0000] group-focus-within/input:w-full transition-all"></div>
           </div>
         </div>
 
-        <!-- ERROR MESSAGE (с animate-ping) -->
-        <div v-if="error" class="mt-8 bg-[#ff0000]/10 border-2 border-[#ff0000] text-white p-4 font-['Archivo_Black',sans-serif] uppercase text-xs flex items-center gap-4">
-          <div class="relative flex h-5 w-5 items-center justify-center">
-             <span class="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff0000] opacity-75"></span>
-             <span class="relative inline-flex h-3 w-3 items-center justify-center rounded-full bg-[#ff0000] text-black text-xs font-black">!</span>
-          </div>
-          <div class="leading-none tracking-tighter">
-            Access_Denied: {{ error }}
-          </div>
-        </div>
+        <p v-if="error" class="mt-4 text-[#ff0000] font-mono text-sm">{{ error }}</p>
 
-        <!-- SUBMIT BUTTON -->
-        <div class="mt-14 relative group">
-            <button
-              type="submit"
-              :disabled="authStore.isLoading"
-              class="relative w-full bg-white text-black font-['Archivo_Black',sans-serif] text-2xl uppercase py-3 transition-all hover:bg-[#ff0000] hover:text-white overflow-hidden disabled:opacity-30 z-10"
-            >
-              <span class="relative z-10 flex items-center justify-center gap-4">
-                {{ authStore.isLoading ? 'Processing...' : 'Enter_System' }}
-                <span class="text-sm">>>></span>
-              </span>
-              <div class="absolute inset-0 crt-noise opacity-20 pointer-events-none"></div>
-            </button>
-            <div class="absolute inset-0 bg-white/20 translate-x-2 translate-y-2 -z-10 group-hover:translate-x-0 group-hover:translate-y-0 transition-transform"></div>
+        <button
+          type="submit"
+          :disabled="authStore.isLoading"
+          class="mt-8 w-full bg-[#39FF14] text-black font-black text-lg sm:text-xl p-4 uppercase border-4 border-black shadow-[6px_6px_0_#ff0000] hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14] transition-colors min-h-[52px] disabled:opacity-50"
+        >
+          {{ authStore.isLoading ? 'PROCESSING…' : mode === 'login' ? 'ENTER_SYSTEM' : 'CREATE_ARTIST' }}
+        </button>
+
+        <div class="mt-6 font-mono text-[10px] text-gray-600 uppercase space-y-1 leading-relaxed">
+          <p>Demo: demo@label.ru / demo123 (artist)</p>
+          <p>Demo: moderator@label.ru / mod123</p>
+          <p>Demo: admin@label.ru / admin123</p>
+          <p class="text-[#39FF14]/70">Mock auth — session in localStorage</p>
         </div>
       </div>
     </form>
   </div>
 </template>
 
-<style scoped>
-/* СТИЛЬ ДЛЯ ЦЕПЕЙ (из вашего примера) */
-.bg-chain-placeholder {
-    background-image: url("@/assets/chrome/chain_bg.png");
-}
-.bg-size-\[auto_100\%\] {
-  background-size: auto 100%;
-}
-
-/* Archivo Black + align shine with glyph box (no fixed 2rem — broke mobile) */
-.h1-metal-textured {
-  font-family: 'Archivo Black', 'Impact', sans-serif;
-  letter-spacing: -0.05em;
-  padding-right: 0;
-  padding-top: 0 !important;
-  padding-bottom: 0 !important;
-}
-.h1-metal-textured::after {
-  top: 0 !important;
-  animation: metal-shine 6s linear infinite;
-}
-
-/* СЕТКА */
-.y2k-bg-grid {
-  background-size: 24px 24px;
-  background-image: radial-gradient(circle, #222 1px, transparent 1px);
-}
-
-/* ШУМ */
-.crt-noise {
-  background-image: url('data:image/svg+xml;utf8,%3Csvg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg"%3E%3Cfilter id="noiseFilter"%3E%3CfeTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="3" stitchTiles="stitch"/%3E%3C/filter%3E%3Crect width="100%25" height="100%25" filter="url(%23noiseFilter)"/%3E%3C/svg%3E');
-}
-</style>
-
-<script lang="ts" setup>
-// Ваш JS-код остается без изменений
-import { useAuthStore } from '@/stores/auth'
-import { useRouter } from 'vue-router'
+<script setup lang="ts">
 import { ref } from 'vue'
+import { useRouter } from 'vue-router'
+import { useAuthStore } from '@/stores/auth'
 
 const authStore = useAuthStore()
 const router = useRouter()
+
+const mode = ref<'login' | 'register'>('login')
 const email = ref('')
 const password = ref('')
+const artistName = ref('')
 const error = ref('')
 
 async function handleSubmit() {
+  error.value = ''
   try {
-    error.value = ''
-    const success = await authStore.login(email.value, password.value)
-    if (success) {
-      router.push('/dashboard')
+    if (mode.value === 'register') {
+      await authStore.register(email.value, password.value, artistName.value)
+    } else {
+      await authStore.login(email.value, password.value)
     }
-  } catch (err: any) {
-    error.value = err.message || 'AUTH_FAILURE'
+    const role = authStore.role
+    if (role === 'admin') router.push('/admin')
+    else if (role === 'moderator') router.push('/moderator')
+    else router.push('/dashboard')
+  } catch (e: unknown) {
+    error.value = e instanceof Error ? e.message : 'Auth failed'
   }
 }
 </script>

@@ -54,11 +54,11 @@
           </div>
           <div class="relative">
             <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">User_ID</label>
-            <input v-model="email" type="email" required class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]" placeholder="demo@label.ru" />
+            <input v-model="email" type="email" required class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]" placeholder="admin@label.ru" />
           </div>
           <div class="relative">
             <label class="absolute -top-3 left-4 bg-black px-2 text-xs font-mono text-[#ff0000] uppercase tracking-widest z-20">Access_Key</label>
-            <input v-model="password" type="password" required minlength="6" class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]" placeholder="••••••••" />
+            <input v-model="password" type="password" required minlength="6" class="w-full bg-transparent border-2 border-white/10 p-3 font-mono text-white focus:border-[#39FF14] outline-none min-h-[48px]" placeholder="admin123" />
           </div>
         </div>
 
@@ -73,12 +73,12 @@
         </button>
 
         <div class="mt-6 font-mono text-[10px] text-gray-600 uppercase space-y-1 leading-relaxed">
-          <p>demo@label.ru / demo123 — artist</p>
-          <p>moderator@label.ru / mod123 — only releases</p>
-          <p>news@label.ru / news123 — only news CMS</p>
-          <p>events@label.ru / events123 — only events CMS</p>
-          <p>staff@label.ru / staff123 — releases+news+events</p>
-          <p>admin@label.ru / admin123 — matrix + all</p>
+          <p>demo@label.ru / demo123 — artist → /dashboard</p>
+          <p>moderator@label.ru / mod123 — staff releases → /staff</p>
+          <p>news@label.ru / news123 — staff news → /staff</p>
+          <p>events@label.ru / events123 — staff events → /staff</p>
+          <p>staff@label.ru / staff123 — full staff → /staff</p>
+          <p>admin@label.ru / admin123 — matrix → /staff</p>
         </div>
       </div>
     </form>
@@ -102,14 +102,17 @@ const error = ref('')
 async function handleSubmit() {
   error.value = ''
   try {
+    let role: string
     if (mode.value === 'register') {
-      await authStore.register(email.value, password.value, artistName.value)
+      role = await authStore.register(email.value, password.value, artistName.value)
     } else {
-      await authStore.login(email.value, password.value)
+      role = await authStore.login(email.value, password.value)
     }
-    const role = authStore.role
-    if (role === 'admin' || role === 'moderator') router.push('/staff')
-    else router.push('/dashboard')
+    if (role === 'admin' || role === 'moderator') {
+      await router.replace('/staff')
+    } else {
+      await router.replace('/dashboard')
+    }
   } catch (e: unknown) {
     error.value = e instanceof Error ? e.message : 'Auth failed'
   }

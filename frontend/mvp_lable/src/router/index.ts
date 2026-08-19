@@ -39,7 +39,7 @@ const router = createRouter({
         {
           path: 'moderator',
           component: () => import('@/pages/ModeratorCabinet.vue'),
-          meta: { requiresAuth: true, roles: ['manager', 'admin'], title: 'Moderator' },
+          meta: { requiresAuth: true, roles: ['moderator', 'admin'], title: 'Moderator' },
         },
         {
           path: 'admin',

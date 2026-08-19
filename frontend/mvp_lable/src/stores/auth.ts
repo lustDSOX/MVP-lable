@@ -1,61 +1,130 @@
-// src/stores/auth.ts
-import { defineStore } from 'pinia'
 import { ref, computed } from 'vue'
+import { defineStore } from 'pinia'
 
-const TOKEN_KEY = 'jwt_token'
-const ARTIST_NAME_KEY = 'artist_name'
-const ROLE_KEY = 'user_role' // Добавляем ключ для роли
+export type UserRole = 'artist' | 'moderator' | 'admin'
 
-export type UserRole = 'artist' | 'manager' | 'admin'
+const STORAGE_KEY = 'mvp_lable_auth'
+
+function loadSaved() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY)
+    if (!raw) return null
+    return JSON.parse(raw) as {
+      token: string
+      artistName: string
+      role: UserRole
+      email: string
+    }
+  } catch {
+    return null
+  }
+}
 
 export const useAuthStore = defineStore('auth', () => {
-  const token = ref<string | null>(localStorage.getItem(TOKEN_KEY))
-  const artistName = ref<string>(localStorage.getItem(ARTIST_NAME_KEY) || '')
-  const role = ref<UserRole | null>(localStorage.getItem(ROLE_KEY) as UserRole)
+  const saved = loadSaved()
+  const token = ref<string | null>(saved?.token ?? null)
+  const artistName = ref<string | null>(saved?.artistName ?? null)
+  const role = ref<UserRole | null>(saved?.role ?? null)
+  const email = ref<string | null>(saved?.email ?? null)
   const isLoading = ref(false)
 
   const isAuthenticated = computed(() => !!token.value)
 
-  function setCredentials(jwtToken: string, name: string, userRole: UserRole) {
-    token.value = jwtToken
+  function persist() {
+    if (!token.value) {
+      localStorage.removeItem(STORAGE_KEY)
+      return
+    }
+    localStorage.setItem(
+      STORAGE_KEY,
+      JSON.stringify({
+        token: token.value,
+        artistName: artistName.value,
+        role: role.value,
+        email: email.value,
+      }),
+    )
+  }
+
+  function setCredentials(
+    newToken: string,
+    name: string,
+    newRole: UserRole,
+    userEmail: string,
+  ) {
+    token.value = newToken
     artistName.value = name
-    role.value = userRole
-    localStorage.setItem(TOKEN_KEY, jwtToken)
-    localStorage.setItem(ARTIST_NAME_KEY, name)
-    localStorage.setItem(ROLE_KEY, userRole)
+    role.value = newRole
+    email.value = userEmail
+    persist()
   }
 
   function logout() {
     token.value = null
-    artistName.value = ''
+    artistName.value = null
     role.value = null
-    localStorage.removeItem(TOKEN_KEY)
-    localStorage.removeItem(ARTIST_NAME_KEY)
-    localStorage.removeItem(ROLE_KEY)
+    email.value = null
+    persist()
   }
 
-  async function login(email: string, password: string) {
+  async function login(userEmail: string, password: string) {
     isLoading.value = true
     try {
-      await new Promise(resolve => setTimeout(resolve, 1000))
-      
-      // Имитация разных ролей для тестов
-      if (email === 'admin@label.ru' && password === 'admin123') {
-        setCredentials('fake-jwt-admin', 'System Overlord', 'admin')
+      await new Promise((r) => setTimeout(r, 400))
+      const e = userEmail.trim().toLowerCase()
+      if (e === 'admin@label.ru' && password === 'admin123') {
+        setCredentials('mock-jwt-admin', 'System Overlord', 'admin', e)
         return true
-      } else if (email === 'manager@label.ru' && password === 'manager123') {
-        setCredentials('fake-jwt-manager', 'Chief Editor', 'manager')
-        return true
-      } else if (email === 'demo@label.ru' && password === 'demo123') {
-        setCredentials('fake-jwt-artist', 'DJ Neon', 'artist')
-        return true
-      } else {
-        throw new Error('Неверные данные')
       }
+      if (
+        (e === 'moderator@label.ru' || e === 'manager@label.ru') &&
+        (password === 'mod123' || password === 'manager123')
+      ) {
+        setCredentials('mock-jwt-mod', 'Chief Editor', 'moderator', e)
+        return true
+      }
+      if (e === 'demo@label.ru' && password === 'demo123') {
+        setCredentials('mock-jwt-artist', 'DJ Neon', 'artist', e)
+        return true
+      }
+      if (password.length >= 6) {
+        const name = e.split('@')[0] || 'Artist'
+        setCredentials(`mock-jwt-${Date.now()}`, name, 'artist', e)
+        return true
+      }
+      throw new Error('Неверные данные')
     } finally {
       isLoading.value = false
     }
   }
 
-  return { token, artistName, role, isAuthenticated, isLoading, login, logout }
+  async function register(userEmail: string, password: string, name: string) {
+    isLoading.value = true
+    try {
+      await new Promise((r) => setTimeout(r, 500))
+      if (password.length < 6) throw new Error('Пароль минимум 6 символов')
+      if (!userEmail.includes('@')) throw new Error('Некорректный email')
+      setCredentials(
+        `mock-jwt-${Date.now()}`,
+        name || userEmail.split('@')[0],
+        'artist',
+        userEmail.trim().toLowerCase(),
+      )
+      return true
+    } finally {
+      isLoading.value = false
+    }
+  }
+
+  return {
+    token,
+    artistName,
+    role,
+    email,
+    isAuthenticated,
+    isLoading,
+    login,
+    register,
+    logout,
+  }
 })

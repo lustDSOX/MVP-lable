@@ -1,11 +1,19 @@
 <template>
   <section class="min-h-screen py-10 sm:py-16 lg:py-20 px-4 lg:px-10 font-['Impact','Arial_Black',sans-serif] text-white overflow-hidden relative selection:bg-[#ff0000]">
+
     <div class="max-w-7xl mx-auto relative z-10">
+      
       <div class="mb-10 sm:mb-20 flex flex-col md:flex-row items-start md:items-end justify-between border-b-5 border-[#333] p-4 sm:p-6 border-double gap-4">
-        <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-[140px] leading-none scale-y-110 sm:scale-y-125 uppercase tracking-tight text-white drop-shadow-[3px_3px_0_#39FF14] sm:drop-shadow-[5px_5px_0_#39FF14]">
-          EV<span class="text-[#ff0000]">E</span>NTS_
-        </h1>
-        <div class="bg-[#ff0000] text-black px-4 py-2 font-mono text-xs font-bold animate-pulse shadow-[4px_4px_0_#fff]">
+        <div>
+          <h1 class="text-4xl sm:text-5xl md:text-7xl lg:text-[140px] leading-none scale-y-110 sm:scale-y-125 uppercase tracking-tight text-white drop-shadow-[3px_3px_0_#39FF14] sm:drop-shadow-[5px_5px_0_#39FF14]">
+            EV<span class="text-[#ff0000]">E</span>NTS_
+          </h1>
+          <div class="mt-3 flex flex-wrap gap-2">
+            <Tag tone="alert">CALENDAR</Tag>
+            <Tag tone="acid">{{ events.length }} LIVE</Tag>
+          </div>
+        </div>
+        <div class="bg-[#ff0000] text-black px-4 py-2 font-mono text-xs font-bold animate-pulse mt-4 md:mt-0 shadow-[4px_4px_0_#fff] bottom-0">
           STATUS: SELLING_OUT_FAST
         </div>
       </div>
@@ -19,42 +27,116 @@
           <div class="lg:w-48 bg-[#111] border-b-4 lg:border-b-0 lg:border-r-4 border-dashed border-[#333] p-6 flex flex-col items-center justify-center relative group-hover:bg-[#ff0000] transition-none">
             <div class="absolute -top-4 -right-4 w-8 h-8 bg-[#050505] rounded-full border-4 border-[#222] hidden lg:block"></div>
             <div class="absolute -bottom-4 -right-4 w-8 h-8 bg-[#050505] rounded-full border-4 border-[#222] hidden lg:block"></div>
+
             <div class="text-center group-hover:text-black transition-none">
-              <span class="block text-4xl leading-none uppercase italic">{{ dateParts(event.date).day }}</span>
-              <span class="block text-xl font-bold border-t-2 border-current mt-2 pt-2">{{ dateParts(event.date).mon }}</span>
-              <span class="block text-sm font-mono mt-4 opacity-50">{{ event.time }}</span>
+              <span class="block text-4xl leading-none uppercase italic">{{ event.date.split(' ')[0] }}</span>
+              <span class="block text-xl font-bold border-t-2 border-current mt-2 pt-2">{{ event.date.split(' ')[1] }}</span>
+              <span class="block text-sm font-mono mt-4 opacity-50 group-hover:text-lg group-hover:font-black">{{ event.time }}</span>
             </div>
           </div>
 
           <div class="flex-1 p-4 sm:p-6 md:p-8 relative overflow-hidden">
-            <h2 class="text-2xl sm:text-4xl uppercase italic mb-2 tracking-tight">{{ event.title }}</h2>
-            <p class="font-mono text-xs text-gray-400 uppercase mb-3">{{ event.city }} · {{ event.venue }}</p>
-            <p class="font-mono text-sm text-gray-300 normal-case tracking-normal mb-6">{{ event.description }}</p>
-            <router-link
-              to="/purchase"
-              class="inline-flex items-center justify-center min-h-[48px] px-6 bg-[#39FF14] text-black border-4 border-black font-black uppercase text-sm shadow-[4px_4px_0_#ff0000] hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14]"
+            <div class="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dust.png')] opacity-10 pointer-events-none"></div>
+            <div class="relative z-10">
+              <h2 class="text-3xl sm:text-4xl md:text-5xl uppercase italic tracking-tighter mb-2 group-hover:text-[#39FF14] transition-none">
+                {{ event.title }}
+              </h2>
+              <div class="flex flex-wrap gap-2 mb-4">
+                <span class="bg-[#ff0000] text-black text-sm px-2 py-0.5 font-mono font-bold uppercase italic">{{ event.date.split(' ')[0] || 'NIGHT' }}_ENTRY</span>
+                <span class="bg-[#333] text-sm px-2 py-0.5 font-mono text-gray-400 group-hover:bg-white group-hover:text-black transition-none uppercase italic">Location: [REDACTED]</span>
+              </div>
+              <p class="text-gray-400 font-mono text-sm sm:text-base md:text-lg leading-tight uppercase group-hover:text-white transition-none mb-4 max-w-2xl">
+                {{ event.description }}
+              </p>
+            </div>
+          </div>
+
+          <div class="lg:w-72 bg-[#050505] p-4 sm:p-6 md:p-8 flex flex-col justify-between border-t-4 lg:border-t-0 lg:border-l-4 border-[#222] group-hover:bg-black transition-none">
+            <div class="opacity-20 group-hover:opacity-100 transition-opacity mb-8 flex justify-center">
+               <img src="https://pngimg.com/uploads/barcode/barcode_PNG13.png" class="h-10 sm:h-16 max-w-full object-contain invert contrast-200" alt="code">
+            </div>
+            <a
+              :href="event.link"
+              class="block w-full bg-[#39FF14] text-black uppercase text-xl py-4 text-center border-4 border-black shadow-[6px_6px_0_#fff] hover:shadow-none hover:translate-x-1.5 hover:translate-y-1.5 transition-none relative group/btn"
             >
-              Купить билет
-            </router-link>
+              GET_TICKET
+              <span class="absolute top-1 right-1 text-[10px] animate-ping text-red-600">●</span>
+            </a>
           </div>
         </div>
       </div>
 
-      <p v-if="!events.length" class="font-mono text-[#ff0000] mt-8">NO_EVENTS</p>
+      <div class="mt-24 border-t-4 border-[#222] pt-8 flex flex-wrap gap-12 opacity-30">
+        <div v-for="i in 3" :key="i" class="flex items-center gap-4">
+           <div class="w-12 h-12 rounded-full border-4 border-[#333] flex items-center justify-center">
+              <span class="text-xl">✖</span>
+           </div>
+           <div class="text-[10px] font-mono leading-none">
+              URBAN_CULTURE_CONTROL<br>VERIFIED_BY_.SOX
+           </div>
+        </div>
+      </div>
     </div>
+
+    <div class="absolute left-0 top-0 h-full w-1 bg-[#ff0000] blur-2xl opacity-100 drop-shadow-[0px_0px_20px_#ff0000] animate-ping"></div>
+    <div class="absolute right-0 top-0 h-full w-1 bg-[#ff0000] blur-2xl opacity-100 drop-shadow-[0px_0px_20px_#ff0000] animate-ping"></div>
+
   </section>
 </template>
 
-<script setup lang="ts">
-import { computed, onMounted } from 'vue'
+<style scoped>
+@keyframes flicker-red {
+  0%, 100% { background-color: #ff0000; color: #000; }
+  50% { background-color: #000; color: #ff0000; }
+}
+.animate-pulse {
+  animation: flicker-red 0.5s infinite steps(1);
+}
+section::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%), 
+              linear-gradient(90deg, rgba(255, 0, 0, 0.05), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.05));
+  background-size: 100% 4px, 3px 100%;
+  pointer-events: none;
+  z-index: 50;
+}
+</style>
+
+<script lang="ts">
+import { defineComponent } from 'vue'
+import Tag from '@/components/ui/Tag.vue'
 import { useCmsStore } from '@/stores/cms'
 
-const cms = useCmsStore()
-onMounted(() => cms.hydrate())
-const events = computed(() => cms.publishedEvents)
+export default defineComponent({
+  name: 'EventsPage',
+  components: { Tag },
+  data() {
+    return {
+      events: [] as EventData[],
+    }
+  },
+  mounted() {
+    const cms = useCmsStore()
+    cms.hydrate()
+    this.events = cms.publishedEvents.map((e, i) => ({
+      id: i + 1,
+      title: e.title,
+      date: e.date.includes(' ') ? e.date : e.date.replace(/-/g, '.'),
+      time: e.time,
+      description: e.description,
+      link: '/purchase',
+    }))
+  },
+})
 
-function dateParts(d: string) {
-  const parts = (d || '').trim().split(/\s+/)
-  return { day: parts[0] || d, mon: parts[1] || '' }
+interface EventData {
+  id: number
+  title: string
+  date: string
+  time: string
+  description: string
+  link: string
 }
 </script>

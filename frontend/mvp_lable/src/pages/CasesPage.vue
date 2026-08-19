@@ -34,11 +34,6 @@
         <div class="text-[10px] font-mono text-[#ff0000] mt-2 animate-pulse tracking-[0.5em]">
           SCANNING_DATABASE... 100% COMPLETE
         </div>
-        <div class="mt-3 flex flex-wrap gap-2">
-          <Tag tone="acid">LIVE_ARCHIVE</Tag>
-          <Tag tone="alert">{{ cases.length }} RECORDS</Tag>
-          <Tag tone="muted">v0.3_beta</Tag>
-        </div>
       </div>
 
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-0 border-4 border-[#222] bg-[#222]">
@@ -69,7 +64,6 @@
 import { defineComponent } from 'vue'
 import CaseItem from '@/components/cases/CaseItem.vue'
 import CaseDetail from '@/components/cases/CaseDetail.vue'
-import Tag from '@/components/ui/Tag.vue'
 
 export default defineComponent({
   name: 'CasesPage',
@@ -77,7 +71,6 @@ export default defineComponent({
   components: {
     CaseItem,
     CaseDetail,
-    Tag,
   },
 
   data() {

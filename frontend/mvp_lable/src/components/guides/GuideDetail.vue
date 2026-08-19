@@ -1,16 +1,14 @@
 <template>
-  <section class="min-h-screen px-4 sm:px-6 pb-16 pt-20 sm:pt-24 font-['Impact','Arial_Black',sans-serif] text-white relative overflow-x-hidden">
-    <div class="max-w-3xl mx-auto relative z-10">
-      <!-- Back -->
+  <section class="min-h-screen pt-24 sm:pt-28 px-4 pb-16 text-white">
+    <div class="max-w-3xl mx-auto">
       <router-link
         to="/guides"
-        class="inline-flex items-center gap-2 min-h-[44px] px-3 py-2 mb-6 border-2 border-[#39FF14] bg-black text-[#39FF14] text-sm sm:text-base font-black uppercase hover:bg-[#39FF14] hover:text-black active:translate-x-0.5 active:translate-y-0.5"
+        class="font-mono text-xs text-gray-500 uppercase hover:text-[#39FF14] mb-6 inline-block"
       >
-        ← BACK_TO_GUIDES
+        ← guides
       </router-link>
 
       <template v-if="guide">
-        <!-- Meta bar -->
         <div class="flex flex-wrap gap-2 mb-4 font-mono text-[10px] sm:text-xs tracking-wider">
           <span class="bg-[#39FF14] text-black px-2 py-1 font-bold">ID_{{ String(guide.id).padStart(2, '0') }}</span>
           <span v-if="guide.level" class="border border-[#333] text-gray-400 px-2 py-1">{{ guide.level }}</span>
@@ -18,41 +16,28 @@
           <span
             v-for="tag in guide.tags || []"
             :key="tag"
-            class="border border-[#222] text-[#39FF14]/80 px-2 py-1"
-          >#{{ tag }}</span>
+            class="border border-[#333] text-gray-500 px-2 py-1"
+          >{{ tag }}</span>
         </div>
 
-        <!-- Title -->
-        <h1 class="text-3xl sm:text-4xl md:text-5xl font-black uppercase italic leading-[1.05] mb-6 text-white drop-shadow-[3px_3px_0_#39FF14]">
+        <h1 class="text-3xl sm:text-5xl font-black uppercase italic tracking-tight mb-6">
           {{ guide.title }}
         </h1>
 
-        <div class="h-1 w-full bg-[#39FF14] mb-8 shadow-[0_0_12px_#39FF14]"></div>
+        <div class="prose-invert font-mono text-sm text-gray-300 space-y-4 leading-relaxed">
+          <p class="whitespace-pre-wrap">{{ guide.content }}</p>
+        </div>
 
-        <!-- Body panel -->
-        <article class="border-4 border-black bg-[#0a0a0a] shadow-[8px_8px_0_#222] p-4 sm:p-8 relative">
-          <div class="absolute top-0 right-0 bg-[#ff0000] text-black text-[10px] font-mono px-2 py-0.5 font-bold">
-            CLASSIFIED_GUIDE
-          </div>
-          <p class="font-mono text-sm sm:text-base text-gray-300 leading-relaxed whitespace-pre-line">
-            {{ guide.content }}
-          </p>
-        </article>
-
-        <!-- Steps hint -->
-        <div class="mt-8 border-2 border-[#333] bg-[#111] p-4 sm:p-6">
-          <h2 class="text-lg sm:text-xl font-black text-[#39FF14] uppercase mb-3">NEXT_ACTIONS</h2>
-          <ol class="font-mono text-xs sm:text-sm text-gray-400 space-y-2 list-decimal list-inside">
-            <li>Прочитай материал до конца</li>
-            <li>Примени 1 пункт на ближайшей сессии</li>
-            <li>Залей черновик через кабинет артиста</li>
+        <div v-if="guide.steps?.length" class="mt-8 space-y-3">
+          <h2 class="font-mono text-xs text-[#39FF14] uppercase">Steps</h2>
+          <ol class="list-decimal list-inside space-y-2 font-mono text-sm text-gray-300">
+            <li v-for="(s, i) in guide.steps" :key="i">{{ s }}</li>
           </ol>
         </div>
 
-        <!-- CTA -->
         <div class="mt-8 flex flex-col sm:flex-row gap-3">
           <router-link
-            to="/login"
+            :to="cabinetPath"
             class="flex-1 text-center min-h-[48px] flex items-center justify-center bg-[#39FF14] text-black border-4 border-black font-black text-lg uppercase shadow-[4px_4px_0_#ff0000] hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14]"
           >
             OPEN_CABINET
@@ -70,16 +55,16 @@
         </p>
       </template>
 
-      <div v-else class="border-4 border-[#ff0000] bg-[#111] p-8 text-center shadow-[8px_8px_0_#000]">
-        <h2 class="text-2xl sm:text-3xl font-black text-[#ff0000] uppercase italic mb-3">GUIDE_NOT_FOUND</h2>
-        <p class="font-mono text-gray-500 text-sm mb-6">Packet missing or id invalid.</p>
+      <template v-else>
+        <p class="font-mono text-[#ff0000]">Guide not found</p>
         <router-link to="/guides" class="text-[#39FF14] font-bold underline">← guides index</router-link>
-      </div>
+      </template>
     </div>
   </section>
 </template>
 
 <script lang="ts">
+import { useAuthStore } from '@/stores/auth'
 import { defineComponent } from 'vue'
 import { getGuideById, type GuideItem } from '@/data/guides'
 
@@ -89,6 +74,12 @@ export default defineComponent({
     id: { type: String, required: true },
   },
   computed: {
+    cabinetPath() {
+      const auth = useAuthStore()
+      if (!auth.isAuthenticated) return '/login'
+      if (auth.role === 'admin' || auth.role === 'moderator') return '/staff'
+      return '/dashboard'
+    },
     guide(): GuideItem | undefined {
       return getGuideById(this.id)
     },

@@ -1,8 +1,8 @@
 <template>
   <section class="space-y-6">
-    <form ref="formEl" class="border-2 border-[#333] p-4 space-y-3 relative" @submit.prevent="save">
+    <form ref="formEl" class="border-2 border-[#333] p-4 space-y-3 relative pb-28" @submit.prevent="save">
       <p class="font-mono text-xs text-[#39FF14] uppercase">{{ editingId ? 'Редактирование' : 'Новая' }} новость · Markdown</p>
-      <div class="sticky-actions">
+      <div v-if="editingId || form.title || form.body" class="form-actions-fixed">
         <button type="submit" class="btn-green">Сохранить</button>
         <button v-if="editingId" type="button" class="btn-muted" @click="reset">Отмена</button>
       </div>
@@ -118,18 +118,19 @@ function save() {
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; }
 .y2k-preview { background: linear-gradient(135deg, #1a1a1a, #0d0d0d); border: 1px solid #333; }
 .prose-preview :deep(h1), .prose-preview :deep(h2), .prose-preview :deep(h3) { font-weight: 900; text-transform: uppercase; margin: 0.5em 0; }
-.sticky-actions {
-  position: sticky;
-  top: 4.5rem;
-  z-index: 30;
+.form-actions-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.75rem;
-  margin: 0 -1rem 1rem;
-  background: rgba(10, 10, 10, 0.97);
-  border-bottom: 2px solid #39ff14;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: rgba(0, 0, 0, 0.96);
+  border-top: 2px solid #39ff14;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+  justify-content: center;
 }
 </style>

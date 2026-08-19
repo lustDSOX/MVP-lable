@@ -8,10 +8,10 @@
           <p class="font-mono text-[9px] text-gray-500">{{ ev.status }} · {{ ev.date }} · {{ ev.city }}</p>
         </button>
       </div>
-      <div ref="formEl" class="border-2 border-[#333] p-4 space-y-3 relative">
+      <div ref="formEl" class="border-2 border-[#333] p-4 space-y-3 relative pb-28">
         <template v-if="selectedId || creating || form.title">
           <p class="font-mono text-xs text-[#39FF14] uppercase">{{ editingId ? 'Редактирование' : 'Новое' }} событие</p>
-          <div class="sticky-actions">
+          <div class="form-actions-fixed">
             <button type="button" class="btn-green" @click="save">Сохранить</button>
             <a v-if="form.ticketUrl" :href="form.ticketUrl" class="btn-muted inline-flex items-center" target="_blank" rel="noopener">Открыть оплату</a>
             <button v-if="editingId" type="button" class="btn-red" @click="remove">Удалить</button>
@@ -87,18 +87,19 @@ function remove() { if (editingId.value) { cms.deleteEvent(editingId.value); res
 .btn-green { background: #39ff14; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; font-weight: 700; }
 .btn-red { background: #ff0000; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; }
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; }
-.sticky-actions {
-  position: sticky;
-  top: 4.5rem;
-  z-index: 30;
+.form-actions-fixed {
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 60;
   display: flex;
   flex-wrap: wrap;
   gap: 0.5rem;
-  padding: 0.75rem;
-  margin: 0 -1rem 1rem;
-  background: rgba(10, 10, 10, 0.97);
-  border-bottom: 2px solid #39ff14;
-  backdrop-filter: blur(8px);
-  box-shadow: 0 4px 12px rgba(0,0,0,0.5);
+  padding: 0.75rem 1rem calc(0.75rem + env(safe-area-inset-bottom));
+  background: rgba(0, 0, 0, 0.96);
+  border-top: 2px solid #39ff14;
+  box-shadow: 0 -4px 20px rgba(0,0,0,0.6);
+  justify-content: center;
 }
 </style>

@@ -22,12 +22,16 @@ export interface EventItem {
   description: string
   status: CmsStatus
   updatedAt: string
+  ticketUrl: string
+  price: string
+  capacity: string
+  ageLimit: string
 }
 
 const NEWS_KEY = 'mvp_lable_cms_news'
 const EVENTS_KEY = 'mvp_lable_cms_events'
 const CMS_VER = 'mvp_lable_cms_v'
-const CMS_VER_VAL = '2'
+const CMS_VER_VAL = '3'
 
 function seedNews(): NewsItem[] {
   return [
@@ -35,7 +39,7 @@ function seedNews(): NewsItem[] {
       id: 'n1',
       title: 'GRID_OPENING',
       excerpt: 'Лейбл открывает сезон',
-      body: 'Полный текст анонса сезона.',
+      body: '## Сезон открыт\n\nЛейбл запускает **новый цикл** релизов.\n\n- CLASS TICKETS\n- Live events\n\n[Кабинет](/dashboard)',
       date: '2026-03-01',
       status: 'published',
       updatedAt: new Date().toISOString(),
@@ -44,7 +48,7 @@ function seedNews(): NewsItem[] {
       id: 'n2',
       title: 'NEON_DROP',
       excerpt: 'Новый релиз в сети',
-      body: 'Details of the drop.',
+      body: '### NEON_DROP\n\nСтриминг со **всех площадок**.\n\n`premiere 2026-04-12`',
       date: '2026-04-12',
       status: 'published',
       updatedAt: new Date().toISOString(),
@@ -53,6 +57,7 @@ function seedNews(): NewsItem[] {
 }
 
 function seedEvents(): EventItem[] {
+  const now = new Date().toISOString()
   return [
     {
       id: 'e1',
@@ -63,7 +68,11 @@ function seedEvents(): EventItem[] {
       time: '23:00',
       description: 'Live set · CLASS TICKETS night',
       status: 'published',
-      updatedAt: new Date().toISOString(),
+      updatedAt: now,
+      ticketUrl: '/purchase',
+      price: '1500 RUB',
+      capacity: '400',
+      ageLimit: '18+',
     },
     {
       id: 'e2',
@@ -74,7 +83,11 @@ function seedEvents(): EventItem[] {
       time: '22:00',
       description: 'Label showcase + guest DJs',
       status: 'published',
-      updatedAt: new Date().toISOString(),
+      updatedAt: now,
+      ticketUrl: '/purchase',
+      price: '2000 RUB',
+      capacity: '800',
+      ageLimit: '18+',
     },
     {
       id: 'e3',
@@ -85,7 +98,11 @@ function seedEvents(): EventItem[] {
       time: '20:00',
       description: 'Open-air set, limited capacity',
       status: 'published',
-      updatedAt: new Date().toISOString(),
+      updatedAt: now,
+      ticketUrl: '/purchase',
+      price: '2500 RUB',
+      capacity: '300',
+      ageLimit: '16+',
     },
     {
       id: 'e4',
@@ -96,7 +113,11 @@ function seedEvents(): EventItem[] {
       time: '21:00',
       description: 'Draft event (not public)',
       status: 'draft',
-      updatedAt: new Date().toISOString(),
+      updatedAt: now,
+      ticketUrl: '/purchase',
+      price: 'TBA',
+      capacity: 'TBA',
+      ageLimit: '18+',
     },
   ]
 }
@@ -178,6 +199,10 @@ export const useCmsStore = defineStore('cms', {
         description: item.description,
         status: item.status,
         updatedAt: now,
+        ticketUrl: item.ticketUrl || '/purchase',
+        price: item.price || '',
+        capacity: item.capacity || '',
+        ageLimit: item.ageLimit || '',
       })
       this.persist()
       return id

@@ -28,6 +28,7 @@
 
       <StaffReleases v-if="active === 'releases'" :tab-query="tabQuery" :focus-id="focusReleaseId" />
       <StaffNews v-else-if="active === 'news'" :tab-query="tabQuery" :focus-id="focusNewsId" />
+      <StaffGuides v-else-if="active === 'guides'" :tab-query="tabQuery" :focus-id="focusGuideId" />
       <StaffEvents v-else-if="active === 'events'" :tab-query="tabQuery" :focus-id="focusEventId" />
       <StaffMatrix v-else-if="active === 'matrix'" :tab-query="tabQuery" />
       <StaffUsers v-else-if="active === 'users'" :tab-query="tabQuery" />
@@ -47,6 +48,7 @@ import StaffNews from '@/components/staff/StaffNews.vue'
 import StaffEvents from '@/components/staff/StaffEvents.vue'
 import StaffMatrix from '@/components/staff/StaffMatrix.vue'
 import StaffUsers from '@/components/staff/StaffUsers.vue'
+import StaffGuides from '@/components/staff/StaffGuides.vue'
 
 const auth = useAuthStore()
 const cms = useCmsStore()
@@ -61,12 +63,14 @@ const tabQuery = ref('')
 const focusNewsId = ref<string | null>(null)
 const focusEventId = ref<string | null>(null)
 const focusReleaseId = ref<string | null>(null)
+const focusGuideId = ref<string | null>(null)
 
 const availableTabs = computed(() => {
   const tabs: { id: string; label: string }[] = []
   if (auth.can('releases.moderate')) tabs.push({ id: 'releases', label: 'Релизы' })
   if (auth.can('news.manage')) tabs.push({ id: 'news', label: 'Новости' })
   if (auth.can('events.manage')) tabs.push({ id: 'events', label: 'События' })
+  if (auth.can('guides.manage')) tabs.push({ id: 'guides', label: 'Гайды' })
   if (auth.can('permissions.manage')) tabs.push({ id: 'matrix', label: 'Matrix' })
   if (auth.can('users.manage')) tabs.push({ id: 'users', label: 'Аккаунты' })
   return tabs
@@ -83,6 +87,7 @@ function switchTab(id: string) {
   focusNewsId.value = null
   focusEventId.value = null
   focusReleaseId.value = null
+  focusGuideId.value = null
 }
 
 type Hit = { tab: string; label: string; tabId: string; id?: string }
@@ -108,6 +113,12 @@ const globalHits = computed((): Hit[] => {
         hits.push({ tab: 'События', tabId: 'events', label: e.title, id: e.id })
     }
   }
+  if (auth.can('guides.manage')) {
+    for (const g of cms.guides) {
+      if (g.title.toLowerCase().includes(q) || g.body.toLowerCase().includes(q))
+        hits.push({ tab: 'Гайды', tabId: 'guides', label: g.title, id: g.id })
+    }
+  }
   if (auth.can('users.manage')) {
     for (const u of admin.users) {
       if (u.email.toLowerCase().includes(q) || u.name.toLowerCase().includes(q))
@@ -124,6 +135,7 @@ function goHit(h: Hit) {
   focusNewsId.value = h.tabId === 'news' ? h.id || null : null
   focusEventId.value = h.tabId === 'events' ? h.id || null : null
   focusReleaseId.value = h.tabId === 'releases' ? h.id || null : null
+  focusGuideId.value = h.tabId === 'guides' ? h.id || null : null
 }
 
 onMounted(() => {

@@ -7,16 +7,36 @@ export type UserRole = 'artist' | 'moderator' | 'admin'
 
 const STORAGE_KEY = 'mvp_lable_auth'
 
+/** Demo accounts: email → credentials (exact password match required) */
+const DEMO_ACCOUNTS: Record<
+  string,
+  { password: string; role: UserRole; name: string }
+> = {
+  'admin@label.ru': { password: 'admin123', role: 'admin', name: 'System Overlord' },
+  'moderator@label.ru': { password: 'mod123', role: 'moderator', name: 'Chief Editor' },
+  'manager@label.ru': { password: 'mod123', role: 'moderator', name: 'Chief Editor' },
+  'news@label.ru': { password: 'news123', role: 'moderator', name: 'News Desk' },
+  'events@label.ru': { password: 'events123', role: 'moderator', name: 'Events Desk' },
+  'staff@label.ru': { password: 'staff123', role: 'moderator', name: 'Full Staff' },
+  'demo@label.ru': { password: 'demo123', role: 'artist', name: 'DJ Neon' },
+}
+
 function loadSaved() {
   try {
     const raw = localStorage.getItem(STORAGE_KEY)
     if (!raw) return null
-    return JSON.parse(raw) as {
+    const data = JSON.parse(raw) as {
       token: string
       artistName: string
       role: UserRole
       email: string
     }
+    if (!data.token) return null
+    const email = (data.email || '').toLowerCase()
+    if (DEMO_ACCOUNTS[email] && data.role !== DEMO_ACCOUNTS[email].role) {
+      data.role = DEMO_ACCOUNTS[email].role
+    }
+    return data
   } catch {
     return null
   }
@@ -57,7 +77,7 @@ export const useAuthStore = defineStore('auth', () => {
     token.value = newToken
     artistName.value = name
     role.value = newRole
-    email.value = userEmail
+    email.value = userEmail.toLowerCase()
     persist()
   }
 
@@ -69,16 +89,24 @@ export const useAuthStore = defineStore('auth', () => {
     persist()
   }
 
+  function effectiveRole(): UserRole | null {
+    const e = (email.value || '').toLowerCase()
+    if (e && DEMO_ACCOUNTS[e]) return DEMO_ACCOUNTS[e].role
+    return role.value
+  }
+
   function can(permission: Permission): boolean {
     if (!isAuthenticated.value) return false
-    if (role.value === 'admin') return true
+    const r = effectiveRole()
+    if (r === 'admin') return true
     const perm = usePermissionsStore()
     perm.hydrate()
-    return perm.permissionsFor(email.value || '', role.value).includes(permission)
+    return perm.permissionsFor(email.value || '', r).includes(permission)
   }
 
   function myPermissions(): Permission[] {
-    if (role.value === 'admin') {
+    const r = effectiveRole()
+    if (r === 'admin') {
       return [
         'releases.moderate',
         'news.manage',
@@ -90,45 +118,29 @@ export const useAuthStore = defineStore('auth', () => {
     }
     const perm = usePermissionsStore()
     perm.hydrate()
-    return perm.permissionsFor(email.value || '', role.value)
+    return perm.permissionsFor(email.value || '', r)
   }
 
-  async function login(userEmail: string, password: string) {
+  async function login(userEmail: string, password: string): Promise<UserRole> {
     isLoading.value = true
     try {
-      await new Promise((r) => setTimeout(r, 400))
+      await new Promise((r) => setTimeout(r, 200))
       const e = userEmail.trim().toLowerCase()
-      if (e === 'admin@label.ru' && password === 'admin123') {
-        setCredentials('mock-jwt-admin', 'System Overlord', 'admin', e)
-        return true
+      const pwd = password.trim()
+
+      const demo = DEMO_ACCOUNTS[e]
+      if (demo) {
+        if (pwd !== demo.password) {
+          throw new Error(`Неверный пароль для ${e}`)
+        }
+        setCredentials(`mock-jwt-${demo.role}`, demo.name, demo.role, e)
+        return demo.role
       }
-      if (
-        (e === 'moderator@label.ru' || e === 'manager@label.ru') &&
-        (password === 'mod123' || password === 'manager123')
-      ) {
-        setCredentials('mock-jwt-mod', 'Chief Editor', 'moderator', e)
-        return true
-      }
-      if (e === 'news@label.ru' && password === 'news123') {
-        setCredentials('mock-jwt-news', 'News Desk', 'moderator', e)
-        return true
-      }
-      if (e === 'events@label.ru' && password === 'events123') {
-        setCredentials('mock-jwt-events', 'Events Desk', 'moderator', e)
-        return true
-      }
-      if (e === 'staff@label.ru' && password === 'staff123') {
-        setCredentials('mock-jwt-staff', 'Full Staff', 'moderator', e)
-        return true
-      }
-      if (e === 'demo@label.ru' && password === 'demo123') {
-        setCredentials('mock-jwt-artist', 'DJ Neon', 'artist', e)
-        return true
-      }
-      if (password.length >= 6) {
+
+      if (pwd.length >= 6) {
         const name = e.split('@')[0] || 'Artist'
-        setCredentials(`mock-jwt-${Date.now()}`, name, 'artist', e)
-        return true
+        setCredentials(`mock-jwt-artist-${Date.now()}`, name, 'artist', e)
+        return 'artist'
       }
       throw new Error('Неверные данные')
     } finally {
@@ -136,19 +148,23 @@ export const useAuthStore = defineStore('auth', () => {
     }
   }
 
-  async function register(userEmail: string, password: string, name: string) {
+  async function register(userEmail: string, password: string, name: string): Promise<UserRole> {
     isLoading.value = true
     try {
-      await new Promise((r) => setTimeout(r, 500))
+      await new Promise((r) => setTimeout(r, 300))
       if (password.length < 6) throw new Error('Пароль минимум 6 символов')
       if (!userEmail.includes('@')) throw new Error('Некорректный email')
+      const e = userEmail.trim().toLowerCase()
+      if (DEMO_ACCOUNTS[e]) {
+        throw new Error('Этот email зарезервирован. Войдите с demo-паролем.')
+      }
       setCredentials(
         `mock-jwt-${Date.now()}`,
-        name || userEmail.split('@')[0],
+        name || e.split('@')[0],
         'artist',
-        userEmail.trim().toLowerCase(),
+        e,
       )
-      return true
+      return 'artist'
     } finally {
       isLoading.value = false
     }
@@ -166,5 +182,6 @@ export const useAuthStore = defineStore('auth', () => {
     logout,
     can,
     myPermissions,
+    effectiveRole,
   }
 })

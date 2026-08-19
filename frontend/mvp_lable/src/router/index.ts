@@ -48,7 +48,8 @@ const router = createRouter({
           path: 'cabinet',
           redirect: () => {
             const auth = useAuthStore()
-            if (auth.role === 'admin' || auth.role === 'moderator') return '/staff'
+            const r = auth.effectiveRole()
+            if (r === 'admin' || r === 'moderator') return '/staff'
             if (auth.isAuthenticated) return '/dashboard'
             return '/login'
           },
@@ -72,16 +73,18 @@ router.beforeEach((to, _from, next) => {
   const allowedRoles = to.meta.roles as string[] | undefined
   const needPerm = to.meta.permission as Permission | undefined
 
+  const role = authStore.effectiveRole() || authStore.role
+
   if (requiresAuth && !authStore.isAuthenticated) {
-    next('/login')
+    next({ path: '/login', query: { redirect: to.fullPath } })
     return
   }
-  if (requiresAuth && allowedRoles && !allowedRoles.includes(authStore.role || '')) {
-    next(homeForRole(authStore.role))
+  if (requiresAuth && allowedRoles && !allowedRoles.includes(role || '')) {
+    next(homeForRole(role))
     return
   }
   if (needPerm && !authStore.can(needPerm)) {
-    next(homeForRole(authStore.role))
+    next(homeForRole(role))
     return
   }
   next()

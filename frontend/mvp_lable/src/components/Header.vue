@@ -31,11 +31,13 @@
             </div>
           </li>
           <li v-else class="flex items-center pl-6 gap-2">
+            <NotificationBell />
             <router-link :to="cabinetPath" class="bg-[#39FF14] text-black uppercase text-sm px-4 py-2 border-2 border-black font-black hover:bg-black hover:text-[#39FF14] hover:border-[#39FF14]">{{ cabinetLabel }}</router-link>
             <button type="button" class="bg-black text-[#ff0000] uppercase text-sm px-3 py-2 border-2 border-[#ff0000] font-black hover:bg-[#ff0000] hover:text-black min-h-[44px]" @click="logout">[ ВЫХОД ]</button>
           </li>
         </ul>
-        <div class="flex items-center lg:hidden">
+        <div class="flex items-center gap-2 lg:hidden">
+          <NotificationBell v-if="authed.isAuthenticated" />
           <button type="button" @click="menuOpen = !menuOpen" class="bg-[#111] border-2 border-[#444] p-2.5 text-[#39FF14] shadow-[3px_3px_0_#ff0000] hover:bg-[#39FF14] hover:text-black min-w-[44px] min-h-[44px]" :aria-expanded="menuOpen" aria-controls="mobile-nav" aria-label="Toggle menu">
             <div class="w-5 h-0.5 bg-current mb-1"></div>
             <div class="w-5 h-0.5 bg-current mb-1"></div>
@@ -65,11 +67,13 @@
 
 <script lang="ts">
 import { useAuthStore } from '@/stores/auth'
+import NotificationBell from '@/components/ui/NotificationBell.vue'
 import { defineComponent, computed, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 
 export default defineComponent({
   name: 'Header',
+  components: { NotificationBell },
   setup() {
     const authed = useAuthStore()
     const menuOpen = ref(false)

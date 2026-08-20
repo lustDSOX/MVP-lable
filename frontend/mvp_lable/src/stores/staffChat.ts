@@ -24,6 +24,9 @@ export const ALL_CHAT_USERS: ChatUser[] = [
   { email: 'events@label.ru', name: 'Events Desk' },
   { email: 'staff@label.ru', name: 'Full Staff' },
   { email: 'demo@label.ru', name: 'DJ Neon' },
+  { email: 'void@label.db', name: 'VoidStalker' },
+  { email: 'alex.grid@mail.ru', name: 'Alex Grid' },
+  { email: 'mira@bass.lab', name: 'Mira Bass' },
 ]
 
 function loadMsgs(): DmMessage[] {
@@ -60,11 +63,6 @@ export const useStaffChatStore = defineStore('staffChat', {
     peersFor: (s) => (myEmail: string) => {
       const me = (myEmail || '').toLowerCase()
       const emails = new Set<string>()
-      for (const u of ALL_CHAT_USERS) {
-        if (u.email.toLowerCase() === me) continue
-        const isStaff = !u.email.startsWith('demo@')
-        if (isStaff) emails.add(u.email)
-      }
       for (const e of s.extraPeers) emails.add(e)
       for (const m of s.messages) {
         if (m.fromEmail.toLowerCase() === me) emails.add(m.toEmail)

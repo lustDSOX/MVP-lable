@@ -45,34 +45,28 @@
 
       <section v-if="cabinetTab === 'releases' && !selectedReleaseId" class="bg-black border border-[#333]">
         <div class="md:hidden space-y-3 p-3">
-          <article v-for="track in filteredTracks" :key="'m-'+track.id" class="border-2 border-[#333] bg-[#0a0a0a] p-4 flex flex-col gap-2">
-            <div class="flex justify-between gap-2 cursor-pointer" @click="openRelease(track.id)"><h3 class="font-bold text-white uppercase text-sm">{{ track.title }}</h3><span class="text-[10px] font-mono uppercase border border-[#444] px-2">{{ track.status }}</span></div>
+          <article v-for="track in filteredTracks" :key="'m-'+track.id" class="border-2 border-[#333] bg-[#0a0a0a] p-4 flex flex-col gap-2 cursor-pointer hover:border-[#39FF14]" @click="openRelease(track.id)">
+            <div class="flex justify-between gap-2"><h3 class="font-bold text-white uppercase text-sm">{{ track.title }}</h3><span class="text-[10px] font-mono uppercase border border-[#444] px-2">{{ track.status }}</span></div>
             <p class="text-xs text-gray-500 font-mono">Plays: {{ track.plays ?? 0 }}</p>
-            <button v-if="track.status === 'draft'" type="button" @click="continueDraft(track.id)" class="action-button draft-button min-h-[44px] w-full">[CONTINUE]</button>
-            <button v-else type="button" @click="openRelease(track.id)" class="action-button draft-button min-h-[44px] w-full">[OPEN]</button>
+            <button v-if="track.status === 'draft'" type="button" @click.stop="continueDraft(track.id)" class="action-button draft-button min-h-[44px] w-full">[CONTINUE]</button>
           </article>
         </div>
         <div class="overflow-x-auto hidden md:block">
-          <table class="w-full text-left min-w-[700px]">
-            <thead class="table-header"><tr><th class="table-th">Title</th><th class="table-th text-center">Status</th><th class="table-th text-right">Plays</th><th class="table-th text-center">Actions</th></tr></thead>
+          <table class="w-full text-left min-w-[600px]">
+            <thead class="table-header"><tr><th class="table-th">Title</th><th class="table-th text-center">Status</th><th class="table-th text-right">Plays</th></tr></thead>
             <tbody>
-              <tr v-if="tracksStore.isLoading"><td colspan="4" class="p-8 text-center text-[#ff0000] font-mono">LOADING...</td></tr>
-              <tr v-for="track in filteredTracks" :key="track.id" class="table-row">
-                <td class="p-4 cursor-pointer" @click="openRelease(track.id)"><h3 class="track-title">{{ track.title }}</h3>
+              <tr v-if="tracksStore.isLoading"><td colspan="3" class="p-8 text-center text-[#ff0000] font-mono">LOADING...</td></tr>
+              <tr v-for="track in filteredTracks" :key="track.id" class="table-row row-clickable" @click="openRelease(track.id)">
+                <td class="p-4"><h3 class="track-title">{{ track.title }}</h3>
                   <div v-if="track.status === 'rejected'" class="rejection-reason">REASON: {{ track.rejectReason }}</div></td>
                 <td class="p-4 text-center">
                   <span v-if="track.status === 'published'" class="status-badge status-online">ONLINE</span>
                   <span v-else-if="track.status === 'pending'" class="status-badge status-scanning">SCANNING</span>
                   <span v-else-if="track.status === 'rejected'" class="status-badge status-error">ERROR</span>
+                  <span v-else-if="track.status === 'changes_requested'" class="status-badge status-error">CHANGES</span>
                   <span v-else class="status-badge status-draft">{{ track.status }}</span>
                 </td>
                 <td class="p-4 text-right font-mono text-xl">{{ track.plays.toLocaleString() }}</td>
-                <td class="p-4">
-                  <div class="flex items-center justify-center gap-2">
-                    <button type="button" class="action-button" title="Open" @click="openRelease(track.id)">✎</button>
-                    <button type="button" class="action-button" title="Stats" @click="focusStats(track.id)">◉</button>
-                  </div>
-                </td>
               </tr>
             </tbody>
           </table>
@@ -102,6 +96,9 @@
 .table-header { border-bottom: 2px solid #333; }
 .table-th { padding: 1rem; text-transform: uppercase; font-family: 'JetBrains Mono', monospace; font-size: 0.875rem; color: #6b7280; }
 .table-row { border-bottom: 1px solid #222; }
+.row-clickable { cursor: pointer; transition: background 0.15s; }
+.row-clickable:hover { background: #111; }
+.row-clickable:hover .track-title { color: #39FF14; }
 .track-title { font-family: 'Archivo Black', sans-serif; font-size: 1.25rem; text-transform: uppercase; }
 .rejection-reason { margin-top: 0.5rem; padding-left: 0.75rem; border-left: 2px solid #ff0000; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; color: #ff0000; }
 .status-badge { font-family: 'JetBrains Mono', monospace; font-weight: 700; font-size: 0.75rem; padding: 0.25rem 0.5rem; text-transform: uppercase; }
@@ -110,7 +107,6 @@
 .status-error { background: #ff0000; color: #fff; }
 .status-draft { background: #f59e0b; color: #000; }
 .action-button { background: #222; color: #9ca3af; padding: 0.5rem; border: none; cursor: pointer; }
-.action-button:hover { background: #ff0000; color: #000; }
 .action-button.draft-button { background: #39FF14; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 0.5rem 0.75rem; }
 .cab-tab { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #333; color: #888; background: #0a0a0a; }
 .cab-tab.on { background: #39FF14; color: #000; border-color: #000; font-weight: 700; }
@@ -177,15 +173,6 @@ const onTrackUploaded = (id: string) => { tracksStore.completeTrackUpload(id); a
 function openRelease(id: string) {
   selectedReleaseId.value = id
   cabinetTab.value = 'releases'
-}
-function focusStats(id?: string) {
-  if (id) {
-    selectedReleaseId.value = id
-    cabinetTab.value = 'releases'
-    return
-  }
-  activePlatform.value = 'Total'
-  document.querySelector('.data-panel-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 
 onMounted(() => tracksStore.fetchTracks())

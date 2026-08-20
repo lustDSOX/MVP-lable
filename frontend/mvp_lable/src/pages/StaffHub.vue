@@ -32,6 +32,8 @@
       <StaffEvents v-else-if="active === 'events'" :tab-query="tabQuery" :focus-id="focusEventId" />
       <StaffMatrix v-else-if="active === 'matrix'" :tab-query="tabQuery" />
       <StaffUsers v-else-if="active === 'users'" :tab-query="tabQuery" />
+      <StaffChat v-else-if="active === 'chat'" />
+      <AdminBroadcast v-else-if="active === 'broadcast'" />
     </div>
   </div>
 </template>
@@ -49,6 +51,8 @@ import StaffEvents from '@/components/staff/StaffEvents.vue'
 import StaffMatrix from '@/components/staff/StaffMatrix.vue'
 import StaffUsers from '@/components/staff/StaffUsers.vue'
 import StaffGuides from '@/components/staff/StaffGuides.vue'
+import StaffChat from '@/components/staff/StaffChat.vue'
+import AdminBroadcast from '@/components/staff/AdminBroadcast.vue'
 
 const auth = useAuthStore()
 const cms = useCmsStore()
@@ -73,6 +77,10 @@ const availableTabs = computed(() => {
   if (auth.can('guides.manage')) tabs.push({ id: 'guides', label: 'Гайды' })
   if (auth.can('permissions.manage')) tabs.push({ id: 'matrix', label: 'Matrix' })
   if (auth.can('users.manage')) tabs.push({ id: 'users', label: 'Аккаунты' })
+  tabs.push({ id: 'chat', label: 'Staff Chat' })
+  if (auth.role === 'admin' || auth.can('permissions.manage')) {
+    tabs.push({ id: 'broadcast', label: 'Рассылка' })
+  }
   return tabs
 })
 const activeLabel = computed(() => availableTabs.value.find((t) => t.id === active.value)?.label || '')

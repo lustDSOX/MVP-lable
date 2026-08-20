@@ -56,13 +56,13 @@
           <label class="input-label"><span>RELEASE_TITLE</span><span class="required-mark">*REQ</span></label>
           <input v-model="releaseTitle" type="text" required placeholder="ALBUM / SINGLE NAME" class="form-input border-red" />
         </div>
-        <div class="input-group">
-          <label class="input-label"><span>GENRE</span></label>
-          <input v-model="genre" type="text" placeholder="TRAP / INDUSTRIAL" class="form-input" />
+        <div class="input-group md:col-span-2">
+          <label class="input-label"><span>GENRES</span></label>
+          <GenrePicker v-model="genres" />
         </div>
         <div class="input-group">
           <label class="input-label"><span>RELEASE_DATE</span></label>
-          <input v-model="releaseDate" type="date" class="form-input" />
+          <input v-model="releaseDate" type="date" class="form-input" :min="minDate" />
         </div>
       </div>
       <p class="hint">Один договор на весь релиз. Треклист — спецификация к договору.</p>
@@ -91,16 +91,19 @@
         </div>
         <div class="mt-3">
           <p class="input-label mb-2"><span>CONTRIBUTORS</span></p>
-          <div v-for="(c, cIdx) in track.contributors" :key="cIdx" class="flex flex-col sm:flex-row gap-2 mb-2">
-            <select v-model="c.role" class="form-input sm:w-40">
+          <div v-for="(c, cIdx) in track.contributors" :key="cIdx" class="space-y-2 mb-3 border border-[#222] p-3">
+            <select v-model="c.role" class="form-input w-full">
               <option value="main_artist">Main artist</option>
               <option value="featured">Featured</option>
               <option value="producer">Producer</option>
               <option value="songwriter">Songwriter</option>
               <option value="other">Other</option>
             </select>
-            <input v-model="c.creditName" type="text" class="form-input flex-1" placeholder="Name / alias" />
-            <button type="button" class="font-mono text-[10px] text-gray-500 uppercase min-h-[44px] px-2" @click="track.contributors.splice(cIdx, 1)">✕</button>
+            <label class="block">
+              <span class="font-mono text-[9px] text-gray-500 uppercase">Имя контрибьютора</span>
+              <input v-model="c.creditName" type="text" class="form-input w-full mt-1" placeholder="Name / alias" />
+            </label>
+            <button type="button" class="font-mono text-[10px] text-gray-500 uppercase min-h-[40px]" @click="track.contributors.splice(cIdx, 1)">Удалить</button>
           </div>
           <button type="button" class="add-btn" @click="addContributor(track)">+ contributor</button>
         </div>
@@ -110,7 +113,7 @@
     </div>
 
     <button type="submit" :disabled="isLoading || !canSubmit" class="submit-button">
-      <span v-if="!isLoading">&gt;&gt;&gt; GENERATE_RELEASE_CONTRACT</span>
+      <span v-if="!isLoading">>>> GENERATE_RELEASE_CONTRACT</span>
       <span v-else>PROCESSING…</span>
     </button>
   </form>
@@ -119,6 +122,7 @@
 <script setup lang="ts">
 import { ref, computed, watch, onMounted } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import GenrePicker from '@/components/ui/GenrePicker.vue'
 import type { ReleaseDraft, ReleaseType, TrackInput, ContributorInput, ArtistProfileSnapshot } from '@/types/release'
 
 defineProps<{ isLoading?: boolean }>()
@@ -130,8 +134,9 @@ const profile = ref<ArtistProfileSnapshot>({
 })
 const releaseType = ref<ReleaseType>('single')
 const releaseTitle = ref('')
-const genre = ref('')
-const releaseDate = ref('')
+const genres = ref<string[]>([])
+const minDate = new Date().toISOString().slice(0, 10)
+const releaseDate = ref(new Date().toISOString().slice(0, 10))
 const tracks = ref<TrackInput[]>([])
 
 function newTrack(order: number): TrackInput {
@@ -156,7 +161,7 @@ function addContributor(track: TrackInput) {
   track.contributors.push({ role: 'featured', creditName: '' } as ContributorInput)
 }
 watch(releaseType, (t) => {
-  if (t === 'single' && tracks.value.length > 1) tracks.value = [tracks.value[0]]
+  if (t === 'single' && tracks.value.length > 1) tracks.value = tracks.value[0] ? [tracks.value[0]] : []
   if (tracks.value.length === 0) addTrack()
 })
 onMounted(() => {
@@ -180,7 +185,8 @@ function onSubmit() {
   emit('submit-form', {
     type: releaseType.value,
     title: releaseTitle.value.trim(),
-    genre: genre.value.trim(),
+    genre: genres.value.join(', '),
+    genres: genres.value,
     releaseDate: releaseDate.value || new Date().toISOString().slice(0, 10),
     contractRequired: true,
     profile: { ...profile.value },

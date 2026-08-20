@@ -12,9 +12,12 @@
         class="border-2 border-[#333] bg-[#0a0a0a] p-4 cursor-pointer hover:border-[#39FF14]"
         @click="openRelease(t.id)"
       >
-        <div class="flex flex-wrap justify-between gap-2">
+        <div class="flex flex-wrap justify-between gap-2 items-center">
           <h3 class="font-black uppercase text-lg">{{ t.title }}</h3>
-          <span class="font-mono text-[10px] uppercase border border-[#444] px-2 py-0.5">{{ t.status }}</span>
+          <div class="flex gap-1 items-center">
+            <span class="font-mono text-[10px] uppercase border border-[#444] px-2 py-0.5">{{ t.status }}</span>
+            <span v-if="t.liveRevision" class="font-mono text-[9px] uppercase bg-[#facc15] text-black px-2 py-0.5">LIVE_REV</span>
+          </div>
         </div>
         <p class="font-mono text-[10px] text-gray-500 mt-1">{{ t.type || '—' }} · {{ t.artistName || '—' }} · {{ t.createdAt }}</p>
       </article>
@@ -24,13 +27,17 @@
     <div v-else-if="sel && !trackView" ref="detailEl" class="space-y-6 border-2 border-[#39FF14] p-4 sm:p-6 bg-[#050505] pb-28">
       <div class="flex flex-wrap gap-2 justify-between items-start">
         <h2 class="text-2xl font-black uppercase italic">{{ sel.title }}</h2>
-        <span class="font-mono text-xs uppercase text-[#39FF14]">{{ sel.status }}</span>
+        <div class="flex flex-wrap gap-2 items-center">
+          <span class="font-mono text-xs uppercase text-[#39FF14]">{{ sel.status }}</span>
+          <span v-if="sel.liveRevision" class="font-mono text-[10px] bg-[#facc15] text-black px-2 py-0.5 uppercase">published under review</span>
+        </div>
       </div>
       <div class="form-actions-fixed">
         <button type="button" class="btn-muted" @click="selectedId = null">← К списку</button>
         <button v-if="sel.status === 'pending' || sel.status === 'draft'" type="button" class="btn-green" @click="approve">Одобрить</button>
-        <button v-if="sel.status === 'pending' || sel.status === 'draft'" type="button" class="btn-red" @click="rejectOpen = true">Отклонить</button>
-        <button v-if="sel.status === 'published' || sel.status === 'rejected'" type="button" class="btn-muted" @click="requeue">На модерацию</button>
+        <button v-if="sel.status === 'pending' || sel.status === 'draft' || sel.status === 'published' || sel.status === 'changes_requested'" type="button" class="btn-red" @click="rejectOpen = true">Отклонить</button>
+        <button v-if="sel.status === 'pending' || sel.status === 'published' || sel.status === 'draft'" type="button" class="btn-orange" @click="changesOpen = true">Требовать правки</button>
+        <button v-if="sel.status === 'published' || sel.status === 'rejected' || sel.status === 'changes_requested'" type="button" class="btn-muted" @click="requeue">На модерацию</button>
       </div>
 
       <div class="grid sm:grid-cols-[180px_1fr] gap-4">
@@ -98,10 +105,18 @@
     <ReasonModal
       :open="rejectOpen"
       title="Отклонение релиза"
-      hint="Причина уйдёт на email артиста (mock)."
+      hint="Причина уйдёт артисту уведомлением."
       initial="Не соответствует гайду"
       @cancel="rejectOpen = false"
       @confirm="confirmReject"
+    />
+    <ReasonModal
+      :open="changesOpen"
+      title="Требование правок"
+      hint="Артист получит уведомление и статус changes_requested."
+      initial="Нужно исправить: "
+      @cancel="changesOpen = false"
+      @confirm="confirmChanges"
     />
   </section>
 </template>
@@ -109,6 +124,7 @@
 <script setup lang="ts">
 import { computed, nextTick, ref, watch } from 'vue'
 import { useAuthStore } from '@/stores/auth'
+import { useNotificationsStore } from '@/stores/notifications'
 import { useTracksStore } from '@/stores/tracks'
 import { forceDownload, openInNewTab } from '@/utils/download'
 import ReasonModal from './ReasonModal.vue'
@@ -117,17 +133,24 @@ import AudioPlayer from '@/components/ui/AudioPlayer.vue'
 const props = defineProps<{ tabQuery: string; focusId?: string | null }>()
 const tracks = useTracksStore()
 const auth = useAuthStore()
+const notif = useNotificationsStore()
+notif.hydrate()
 const queueFilter = ref<'pending' | 'all'>('pending')
 const selectedId = ref<string | null>(null)
 const trackViewId = ref<string | null>(null)
 const rejectOpen = ref(false)
+const changesOpen = ref(false)
 const detailEl = ref<HTMLElement | null>(null)
 
 watch(() => props.focusId, (id) => { if (id) openRelease(id) }, { immediate: true })
 
 const filtered = computed(() => {
   let list = tracks.tracks
-  if (queueFilter.value === 'pending') list = list.filter((t) => t.status === 'pending' || t.status === 'draft')
+  if (queueFilter.value === 'pending') {
+    list = list.filter(
+      (t) => t.status === 'pending' || t.status === 'draft' || t.status === 'changes_requested' || t.liveRevision,
+    )
+  }
   const q = props.tabQuery.trim().toLowerCase()
   if (q) {
     list = list.filter(
@@ -151,13 +174,39 @@ async function openRelease(id: string) {
 
 function approve() {
   if (!sel.value) return
+  const live = !!sel.value.liveRevision
   tracks.setStatus(sel.value.id, 'published', undefined, auth.email || 'mod')
+  const artist = sel.value.artistEmail || 'demo@label.ru'
+  notif.notifyUser(
+    artist,
+    live ? 'Обновление релиза одобрено' : 'Релиз опубликован',
+    `«${sel.value.title}» ${live ? 'обновление принято' : 'одобрен и опубликован'}.`,
+    'moderation_decision',
+  )
   selectedId.value = null
 }
 function confirmReject(reason: string) {
   if (!sel.value) return
   tracks.setStatus(sel.value.id, 'rejected', reason, auth.email || 'mod')
+  notif.notifyUser(
+    sel.value.artistEmail || 'demo@label.ru',
+    'Релиз отклонён',
+    `«${sel.value.title}»: ${reason}`,
+    'moderation_decision',
+  )
   rejectOpen.value = false
+  selectedId.value = null
+}
+function confirmChanges(reason: string) {
+  if (!sel.value) return
+  tracks.requestChanges(sel.value.id, reason, auth.email || 'mod')
+  notif.notifyUser(
+    sel.value.artistEmail || 'demo@label.ru',
+    'Требуются правки по релизу',
+    `«${sel.value.title}»: ${reason}`,
+    'change_request',
+  )
+  changesOpen.value = false
   selectedId.value = null
 }
 function requeue() {
@@ -169,6 +218,7 @@ function requeue() {
 <style scoped>
 .lbl { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; color: #9ca3af; }
 .btn-green { background: #39ff14; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; font-weight: 700; }
+.btn-orange { background: #f97316; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; font-weight: 700; }
 .btn-red { background: #ff0000; color: #fff; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #000; }
 .btn-muted { background: #222; color: #ccc; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #444; display: inline-block; }
 .chip { font-family: 'JetBrains Mono', monospace; font-size: 10px; text-transform: uppercase; padding: 0.35rem 0.75rem; border: 1px solid #333; color: #666; }

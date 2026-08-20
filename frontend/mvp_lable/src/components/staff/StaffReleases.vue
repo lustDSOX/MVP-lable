@@ -99,7 +99,7 @@
         <p class="lbl mb-2">Плеер</p>
         <AudioPlayer :src="trackView.audioUrl" :title="trackView.title" subtitle="preview" />
       </div>
-      <pre class="whitespace-pre-wrap font-serif text-lg leading-relaxed text-gray-100 border border-[#333] p-4 bg-black">{{ trackView.lyrics || '(нет текста)' }}</pre>
+      <pre class="whitespace-pre-wrap font-serif text-lg leading-relaxed text-gray-100 border border-[#333] p-4 bg-black min-h-[320px] max-h-[70vh] overflow-y-auto">{{ trackView.lyrics || '(нет текста)' }}</pre>
     </div>
 
     <ReasonModal

@@ -21,6 +21,7 @@ export interface ReleaseTrackDetail {
   masterFile?: string
   previewFile?: string
   audioUrl?: string
+  plays?: number
   contributors: ContributorInput[]
 }
 
@@ -44,6 +45,7 @@ export interface Track {
   createdAt: string
   type?: ReleaseType
   genre?: string
+  genres?: string[]
   releaseDate?: string
   artistName?: string
   artistEmail?: string
@@ -90,6 +92,7 @@ export const useTracksStore = defineStore('tracks', {
           createdAt: '2026-01-10',
           type: 'single',
           genre: 'electronic',
+          genres: ['electronic', 'synthwave'],
           releaseDate: '2026-01-15',
           artistName: 'DJ Neon',
           artistEmail: 'demo@label.ru',
@@ -108,6 +111,7 @@ export const useTracksStore = defineStore('tracks', {
               lyrics: 'Neon veins under glass rain...\nGrid runner, midnight lane.',
               masterFile: 'cyber_city_master.wav',
               audioUrl: AUDIO,
+              plays: 12500,
               contributors: [
                 { role: 'main_artist', creditName: 'DJ Neon' },
                 { role: 'producer', creditName: 'Void Lab' },
@@ -129,6 +133,7 @@ export const useTracksStore = defineStore('tracks', {
           createdAt: '2026-02-01',
           type: 'single',
           genre: 'synthwave',
+          genres: ['synthwave'],
           releaseDate: '2026-02-20',
           artistName: 'DJ Neon',
           artistEmail: 'demo@label.ru',
@@ -147,6 +152,7 @@ export const useTracksStore = defineStore('tracks', {
               lyrics: '[explicit verse]\nLights cut through the fog...',
               masterFile: 'neon_lights.wav',
               audioUrl: AUDIO,
+              plays: 0,
               contributors: [{ role: 'main_artist', creditName: 'DJ Neon' }],
             },
           ],
@@ -161,13 +167,14 @@ export const useTracksStore = defineStore('tracks', {
           id: '3',
           title: 'Grid Runner EP',
           status: 'pending',
-          plays: 0,
+          plays: 9100,
           royalties: 0,
           contractSigned: true,
-          platforms: { spotify: 0, apple: 0, yandex: 0, vk: 0 },
+          platforms: { spotify: 4100, apple: 2200, yandex: 1800, vk: 1000 },
           createdAt: '2026-03-15',
           type: 'ep',
           genre: 'bass / experimental',
+          genres: ['bass', 'experimental'],
           releaseDate: '2026-04-01',
           artistName: 'DJ Neon',
           artistEmail: 'demo@label.ru',
@@ -186,6 +193,7 @@ export const useTracksStore = defineStore('tracks', {
               lyrics: 'Run the grid, break the wall...',
               masterFile: 'grid_runner.wav',
               audioUrl: AUDIO,
+              plays: 4200,
               contributors: [
                 { role: 'main_artist', creditName: 'DJ Neon' },
                 { role: 'featured', creditName: 'Kai' },
@@ -199,6 +207,7 @@ export const useTracksStore = defineStore('tracks', {
               lyrics: 'Sector seven, signal lost...',
               masterFile: 'sector_7.wav',
               audioUrl: AUDIO,
+              plays: 3100,
               contributors: [
                 { role: 'main_artist', creditName: 'DJ Neon' },
                 { role: 'producer', creditName: 'Lab Unit' },
@@ -212,6 +221,7 @@ export const useTracksStore = defineStore('tracks', {
               lyrics: '[explicit]\nExit ramp at dawn...',
               masterFile: 'exit_ramp.wav',
               audioUrl: AUDIO,
+              plays: 1800,
               contributors: [{ role: 'main_artist', creditName: 'DJ Neon' }],
             },
           ],

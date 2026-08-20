@@ -40,6 +40,7 @@ export interface ReleaseDraft {
   type: ReleaseType
   title: string
   genre: string
+  genres?: string[]
   releaseDate: string
   contractRequired: true
   profile: ArtistProfileSnapshot

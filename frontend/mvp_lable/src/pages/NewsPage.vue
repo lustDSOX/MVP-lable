@@ -83,7 +83,18 @@
       </template>
     </div>
 
-    <img src="@/assets/chrome/chain.png" alt="" class="absolute h-250 rotate-35 -top-28 -left-70 pointer-events-none hidden md:block" />
+    <img src="@/assets/chrome/chain.png" alt="chrome_chain" class="absolute h-250 rotate-35 -top-28 -left-70 pointer-events-none hidden md:block" />
+
+    <div class="absolute bg-chain-placeholder w-[110%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] rotate-10 -right-10 top-1/4 pointer-events-none hidden md:block"></div>
+    <div class="absolute bg-chain-placeholder w-[110%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] -rotate-10 -right-10 top-1/2 pointer-events-none hidden md:block"></div>
+    <div class="absolute bg-chain-placeholder w-[120%] h-10 bg-repeat-x bg-center bg-size-[auto_300%] rotate-30 -right-40 bottom-1/3 pointer-events-none hidden md:block"></div>
+
+    <img src="@/assets/chrome/chain_circle.png" alt="chrome_chain" class="absolute h-180 top-5/11 -right-25 rotate-2 z-10 pointer-events-none hidden md:block" />
+    <img src="@/assets/chrome/chain_flow.png" alt="chrome_chain" class="absolute h-180 -left-50 bottom-10 rotate-100 pointer-events-none hidden md:block" />
+
+    <div class="absolute h-30 w-30 left-20 top-5/11 mask-star-face bg-[#1b1b1b11] -rotate-25 pointer-events-none hidden md:block"></div>
+    <div class="absolute h-80 w-80 right-20 -bottom-15 mask-fairy-cat bg-[linear-gradient(135deg,#333_0%,#999_38%,#fff_48%,#fff_50%,#000_52%,#333_75%,#111_100%)] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] pointer-events-none hidden md:block"></div>
+    <div class="absolute h-80 w-80 right-20 -bottom-15 mask-text bg-[linear-gradient(135deg,#333_0%,#999_38%,#fff_48%,#fff_50%,#000_52%,#333_75%,#111_100%)] drop-shadow-[0_0_10px_rgba(255,255,255,0.2)] pointer-events-none hidden md:block"></div>
   </section>
 </template>
 
@@ -149,6 +160,36 @@ function openNews(id: string) {
 <style scoped>
 .bg-chain-placeholder {
   background-image: url('@/assets/chrome/chain_bg.png');
+}
+.mask-star-face {
+  -webkit-mask-image: url('@/assets/svg/face/star_face.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url('@/assets/svg/face/star_face.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+.mask-fairy-cat {
+  -webkit-mask-image: url('@/assets/svg/pic/fairy_cat.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url('@/assets/svg/pic/fairy_cat.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+}
+.mask-text {
+  -webkit-mask-image: url('@/assets/svg/text/together.svg');
+  -webkit-mask-size: contain;
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  mask-image: url('@/assets/svg/text/together.svg');
+  mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
 }
 .y2k-metal {
   background: linear-gradient(145deg, #1a1a1a, #0a0a0a);

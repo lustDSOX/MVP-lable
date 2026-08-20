@@ -88,9 +88,9 @@
         <button type="button" class="btn-muted" @click="trackViewId = null">← К релизу</button>
       </div>
       <p class="font-mono text-xs text-gray-400" v-for="(c, i) in trackView.contributors" :key="i">{{ c.role }}: <span class="text-white">{{ c.creditName }}</span></p>
-      <div v-if="trackView.audioUrl" class="border border-[#333] p-3">
+      <div v-if="trackView.audioUrl">
         <p class="lbl mb-2">Плеер</p>
-        <audio :src="trackView.audioUrl" controls class="w-full" />
+        <AudioPlayer :src="trackView.audioUrl" :title="trackView.title" subtitle="preview" />
       </div>
       <pre class="whitespace-pre-wrap font-serif text-lg leading-relaxed text-gray-100 border border-[#333] p-4 bg-black">{{ trackView.lyrics || '(нет текста)' }}</pre>
     </div>
@@ -112,6 +112,7 @@ import { useAuthStore } from '@/stores/auth'
 import { useTracksStore } from '@/stores/tracks'
 import { forceDownload, openInNewTab } from '@/utils/download'
 import ReasonModal from './ReasonModal.vue'
+import AudioPlayer from '@/components/ui/AudioPlayer.vue'
 
 const props = defineProps<{ tabQuery: string; focusId?: string | null }>()
 const tracks = useTracksStore()

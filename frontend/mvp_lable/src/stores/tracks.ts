@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import type { ReleaseType, ContributorInput } from '@/types/release'
 
-export type TrackStatus = 'draft' | 'pending' | 'approved' | 'published' | 'rejected'
+export type TrackStatus = 'draft' | 'pending' | 'approved' | 'published' | 'rejected' | 'changes_requested'
 
 export type HistoryKind = 'moderation' | 'artist_edit' | 'contract' | 'submit' | 'system'
 
@@ -56,6 +56,8 @@ export interface Track {
   tracksDetail?: ReleaseTrackDetail[]
   contract?: ContractInfo
   moderationLog?: { at: string; action: string; by: string; note?: string; kind?: HistoryKind }[]
+  liveRevision?: boolean
+  changeRequestNote?: string
 }
 
 const COVER = 'https://picsum.photos/seed/mvp-cover/600/600'
@@ -94,7 +96,7 @@ export const useTracksStore = defineStore('tracks', {
           artistPhone: '+7 900 000-00-00',
           artistCity: 'Moscow',
           socialNetworks: '@djneon',
-          coverNote: '3000×3000 RGB',
+          coverNote: '3000x3000 RGB',
           coverUrl: COVER,
           contractPdfUrl: PDF,
           tracksDetail: [
@@ -133,7 +135,7 @@ export const useTracksStore = defineStore('tracks', {
           artistPhone: '+7 900 000-00-00',
           artistCity: 'Moscow',
           socialNetworks: '@djneon',
-          coverNote: '1500×1500 (INVALID)',
+          coverNote: '1500x1500 (INVALID)',
           coverUrl: COVER,
           contractPdfUrl: PDF,
           tracksDetail: [
@@ -150,7 +152,7 @@ export const useTracksStore = defineStore('tracks', {
           ],
           contract: { signed: true, signedAt: '2026-01-28T12:00:00Z', version: 'v0.3', artistFullName: 'Ivan Ivanov', status: 'signed' },
           moderationLog: [
-            { at: '2026-01-28T10:00:00Z', action: 'draft_saved', by: 'demo@label.ru', kind: 'artist_edit', note: 'Первый черновик' },
+            { at: '2026-01-28T10:00:00Z', action: 'draft_saved', by: 'demo@label.ru', kind: 'artist_edit', note: 'First draft' },
             { at: '2026-02-01T12:00:00Z', action: 'submitted', by: 'demo@label.ru', kind: 'submit' },
             { at: '2026-02-02T09:00:00Z', action: 'rejected', by: 'moderator@label.ru', kind: 'moderation', note: 'Cover art resolution too low · lyrics incomplete on track 1' },
           ],
@@ -172,7 +174,7 @@ export const useTracksStore = defineStore('tracks', {
           artistPhone: '+7 900 000-00-00',
           artistCity: 'Moscow',
           socialNetworks: '@djneon',
-          coverNote: '3000×3000 OK',
+          coverNote: '3000x3000 OK',
           coverUrl: COVER,
           contractPdfUrl: PDF,
           tracksDetail: [
@@ -222,7 +224,7 @@ export const useTracksStore = defineStore('tracks', {
     createFromRelease(meta: { title: string; trackCount?: number; type?: string }) {
       const newTrack: Track = {
         id: Date.now().toString(),
-        title: meta.title || 'Новый релиз',
+        title: meta.title || 'New release',
         status: 'draft',
         plays: 0,
         royalties: 0,
@@ -231,7 +233,7 @@ export const useTracksStore = defineStore('tracks', {
         createdAt: new Date().toISOString().slice(0, 10),
         type: (meta.type as ReleaseType) || 'single',
         tracksDetail: [],
-        contract: { signed: true, signedAt: new Date().toISOString(), version: 'v0.3', artistFullName: '—', status: 'signed' },
+        contract: { signed: true, signedAt: new Date().toISOString(), version: 'v0.3', artistFullName: '-', status: 'signed' },
         moderationLog: [],
       }
       this.tracks.unshift(newTrack)
@@ -243,20 +245,37 @@ export const useTracksStore = defineStore('tracks', {
     completeTrackUpload(id: string) {
       const track = this.tracks.find((t) => t.id === id)
       if (track) {
+        if (track.status === 'published' || track.liveRevision) track.liveRevision = true
         track.status = 'pending'
         track.rejectReason = undefined
+        track.changeRequestNote = undefined
         track.moderationLog = track.moderationLog || []
-        track.moderationLog.push({ at: new Date().toISOString(), action: 'submitted', by: 'artist', kind: 'submit' })
+        track.moderationLog.push({
+          at: new Date().toISOString(),
+          action: track.liveRevision ? 'resubmit_live' : 'submitted',
+          by: 'artist',
+          kind: 'submit',
+          note: track.liveRevision ? 'Update of already published release' : undefined,
+        })
       }
     },
     setStatus(id: string, status: TrackStatus, reason?: string, by = 'moderator') {
       const track = this.tracks.find((t) => t.id === id)
       if (!track) return
       track.status = status
-      if (status === 'rejected') track.rejectReason = reason || 'Rejected'
-      else track.rejectReason = undefined
+      if (status === 'rejected' || status === 'changes_requested') {
+        track.rejectReason = reason || (status === 'changes_requested' ? 'Changes required' : 'Rejected')
+        if (status === 'changes_requested') track.changeRequestNote = reason
+      } else {
+        track.rejectReason = undefined
+        track.changeRequestNote = undefined
+      }
+      if (status === 'published') track.liveRevision = false
       track.moderationLog = track.moderationLog || []
       track.moderationLog.push({ at: new Date().toISOString(), action: status, by, note: reason, kind: 'moderation' })
+    },
+    requestChanges(id: string, note: string, by = 'moderator') {
+      this.setStatus(id, 'changes_requested', note, by)
     },
     pushHistory(id: string, action: string, by: string, note?: string, kind: HistoryKind = 'system') {
       const track = this.tracks.find((t) => t.id === id)
@@ -271,6 +290,7 @@ export const useTracksStore = defineStore('tracks', {
     ): { needsResign: boolean } {
       const track = this.tracks.find((t) => t.id === id)
       if (!track) return { needsResign: false }
+      const wasPublished = track.status === 'published' || !!track.liveRevision
       const sensitive =
         (patch.title !== undefined && patch.title !== track.title) ||
         (patch.type !== undefined && patch.type !== track.type) ||
@@ -288,11 +308,25 @@ export const useTracksStore = defineStore('tracks', {
           track.contract.status = 'needs_resign'
           track.contractSigned = false
         }
-        track.status = track.status === 'published' || track.status === 'pending' ? 'draft' : track.status
-        this.pushHistory(id, 'artist_edit_sensitive', by, 'Изменения требуют переподписания договора', 'artist_edit')
+        if (wasPublished) {
+          track.liveRevision = true
+          track.status = 'pending'
+          this.pushHistory(id, 'live_edit_pending', by, 'Published release edits need moderation after re-sign', 'artist_edit')
+        } else if (track.status === 'pending') {
+          this.pushHistory(id, 'artist_edit_sensitive', by, 'Edits during moderation need re-sign', 'artist_edit')
+        } else {
+          track.status = track.status === 'changes_requested' ? 'draft' : track.status
+          this.pushHistory(id, 'artist_edit_sensitive', by, 'Edits require contract re-sign', 'artist_edit')
+        }
         return { needsResign: true }
       }
-      this.pushHistory(id, 'artist_edit', by, 'Сохранены правки релиза', 'artist_edit')
+      if (wasPublished && track.status === 'published') {
+        track.liveRevision = true
+        track.status = 'pending'
+        this.pushHistory(id, 'live_edit_pending', by, 'Published release edits under review', 'artist_edit')
+        return { needsResign: false }
+      }
+      this.pushHistory(id, 'artist_edit', by, 'Release edits saved', 'artist_edit')
       return { needsResign: false }
     },
     resignContract(id: string, fullName: string, by = 'artist') {

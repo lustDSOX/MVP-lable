@@ -30,15 +30,26 @@
         </div>
       </section>
 
-      <PlatformsPanel />
+      <div class="flex flex-wrap gap-2 mb-2">
+        <button type="button" class="cab-tab" :class="{ on: cabinetTab === 'releases' }" @click="cabinetTab = 'releases'; selectedReleaseId = null">Релизы</button>
+        <button type="button" class="cab-tab" :class="{ on: cabinetTab === 'platforms' }" @click="cabinetTab = 'platforms'; selectedReleaseId = null">Площадки</button>
+      </div>
 
-      <section class="bg-black border border-[#333]">
+      <PlatformsPanel v-if="cabinetTab === 'platforms'" />
+
+      <ArtistReleaseView
+        v-if="cabinetTab === 'releases' && selectedReleaseId"
+        :track-id="selectedReleaseId"
+        @close="selectedReleaseId = null"
+      />
+
+      <section v-if="cabinetTab === 'releases' && !selectedReleaseId" class="bg-black border border-[#333]">
         <div class="md:hidden space-y-3 p-3">
           <article v-for="track in filteredTracks" :key="'m-'+track.id" class="border-2 border-[#333] bg-[#0a0a0a] p-4 flex flex-col gap-2">
-            <div class="flex justify-between gap-2"><h3 class="font-bold text-white uppercase text-sm">{{ track.title }}</h3><span class="text-[10px] font-mono uppercase border border-[#444] px-2">{{ track.status }}</span></div>
+            <div class="flex justify-between gap-2 cursor-pointer" @click="openRelease(track.id)"><h3 class="font-bold text-white uppercase text-sm">{{ track.title }}</h3><span class="text-[10px] font-mono uppercase border border-[#444] px-2">{{ track.status }}</span></div>
             <p class="text-xs text-gray-500 font-mono">Plays: {{ track.plays ?? 0 }}</p>
             <button v-if="track.status === 'draft'" type="button" @click="continueDraft(track.id)" class="action-button draft-button min-h-[44px] w-full">[CONTINUE]</button>
-            <button v-else type="button" @click="editRelease(track)" class="action-button draft-button min-h-[44px] w-full">[EDIT]</button>
+            <button v-else type="button" @click="openRelease(track.id)" class="action-button draft-button min-h-[44px] w-full">[OPEN]</button>
           </article>
         </div>
         <div class="overflow-x-auto hidden md:block">
@@ -47,7 +58,7 @@
             <tbody>
               <tr v-if="tracksStore.isLoading"><td colspan="4" class="p-8 text-center text-[#ff0000] font-mono">LOADING...</td></tr>
               <tr v-for="track in filteredTracks" :key="track.id" class="table-row">
-                <td class="p-4"><h3 class="track-title">{{ track.title }}</h3>
+                <td class="p-4 cursor-pointer" @click="openRelease(track.id)"><h3 class="track-title">{{ track.title }}</h3>
                   <div v-if="track.status === 'rejected'" class="rejection-reason">REASON: {{ track.rejectReason }}</div></td>
                 <td class="p-4 text-center">
                   <span v-if="track.status === 'published'" class="status-badge status-online">ONLINE</span>
@@ -58,8 +69,8 @@
                 <td class="p-4 text-right font-mono text-xl">{{ track.plays.toLocaleString() }}</td>
                 <td class="p-4">
                   <div class="flex items-center justify-center gap-2">
-                    <button type="button" class="action-button" title="Edit" @click="editRelease(track)">✎</button>
-                    <button type="button" class="action-button" title="Stats" @click="focusStats()">◉</button>
+                    <button type="button" class="action-button" title="Open" @click="openRelease(track.id)">✎</button>
+                    <button type="button" class="action-button" title="Stats" @click="focusStats(track.id)">◉</button>
                   </div>
                 </td>
               </tr>
@@ -101,6 +112,8 @@
 .action-button { background: #222; color: #9ca3af; padding: 0.5rem; border: none; cursor: pointer; }
 .action-button:hover { background: #ff0000; color: #000; }
 .action-button.draft-button { background: #39FF14; color: #000; font-family: 'JetBrains Mono', monospace; font-size: 0.75rem; padding: 0.5rem 0.75rem; }
+.cab-tab { font-family: 'JetBrains Mono', monospace; font-size: 11px; text-transform: uppercase; padding: 0.5rem 1rem; min-height: 44px; border: 2px solid #333; color: #888; background: #0a0a0a; }
+.cab-tab.on { background: #39FF14; color: #000; border-color: #000; font-weight: 700; }
 @media (max-width: 1024px) { .command-center-grid { grid-template-columns: 1fr; } }
 @media (max-width: 768px) { .data-panel-content { grid-template-columns: 1fr; } .stat-item .value { font-size: 2rem; } }
 </style>
@@ -113,6 +126,7 @@ import { usePlatformsStore } from '@/stores/platforms'
 import ContractModal from '@/components/track/ContractModal.vue'
 import TrackUploadForm from '@/components/track/TrackUploadForm.vue'
 import PlatformsPanel from '@/components/dashboard/PlatformsPanel.vue'
+import ArtistReleaseView from '@/components/dashboard/ArtistReleaseView.vue'
 
 const authStore = useAuthStore()
 const tracksStore = useTracksStore()
@@ -120,6 +134,8 @@ const platformsStore = usePlatformsStore()
 platformsStore.hydrate()
 
 const isContractModalOpen = ref(false)
+const cabinetTab = ref<'releases' | 'platforms'>('releases')
+const selectedReleaseId = ref<string | null>(null)
 const activeDraftId = ref<string | null>(null)
 const searchQuery = ref('')
 const activePlatform = ref('Total')
@@ -158,15 +174,16 @@ const handleContractSuccess = (payload: { release?: { title: string; type?: stri
 const continueDraft = (id: string) => { activeDraftId.value = id }
 const onTrackUploaded = (id: string) => { tracksStore.completeTrackUpload(id); activeDraftId.value = null }
 
-function editRelease(track: { id: string; status: string; title: string }) {
-  if (track.status === 'draft') { continueDraft(track.id); return }
-  const next = window.prompt('Название релиза (mock edit)', track.title)
-  if (next?.trim()) {
-    const row = tracksStore.tracks.find((x) => x.id === track.id)
-    if (row) row.title = next.trim()
-  }
+function openRelease(id: string) {
+  selectedReleaseId.value = id
+  cabinetTab.value = 'releases'
 }
-function focusStats() {
+function focusStats(id?: string) {
+  if (id) {
+    selectedReleaseId.value = id
+    cabinetTab.value = 'releases'
+    return
+  }
   activePlatform.value = 'Total'
   document.querySelector('.data-panel-container')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }

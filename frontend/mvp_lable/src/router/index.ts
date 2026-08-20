@@ -31,6 +31,7 @@ const router = createRouter({
         },
         { path: 'upload', component: () => import('@/components/track/TrackForm.vue') },
         { path: 'login', component: () => import('@/pages/Login.vue'), meta: { title: 'Login' } },
+        { path: 'notifications', component: () => import('@/pages/NotificationsPage.vue'), meta: { title: 'Notifications' } },
         { path: 'purchase', component: () => import('@/pages/PurchaseStub.vue'), meta: { title: 'Purchase' } },
         {
           path: 'dashboard',

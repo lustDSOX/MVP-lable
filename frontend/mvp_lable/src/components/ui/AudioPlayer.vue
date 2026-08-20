@@ -21,8 +21,9 @@
 
     <div
       ref="barEl"
-      class="ap-bar relative h-3 border border-[#333] bg-[#111] cursor-pointer"
-      @click="seek"
+      class="ap-bar relative h-4 border border-[#333] bg-[#111] cursor-pointer touch-none"
+      :class="{ dragging }"
+      @pointerdown="onPointerDown"
       @keydown.left.prevent="nudge(-5)"
       @keydown.right.prevent="nudge(5)"
       role="slider"
@@ -31,9 +32,9 @@
       :aria-valuemax="Math.floor(duration || 0)"
       tabindex="0"
     >
-      <div class="absolute inset-y-0 left-0 bg-[#39FF14]" :style="{ width: pct + '%' }" />
+      <div class="absolute inset-y-0 left-0 bg-[#39FF14] pointer-events-none" :style="{ width: pct + '%' }" />
       <div
-        class="absolute top-1/2 -translate-y-1/2 w-3 h-3 bg-white border-2 border-black -ml-1.5"
+        class="ap-knob absolute top-1/2 -translate-y-1/2 -ml-2 pointer-events-none"
         :style="{ left: pct + '%' }"
       />
     </div>
@@ -86,6 +87,7 @@ const current = ref(0)
 const duration = ref(0)
 const volume = ref(0.9)
 const muted = ref(false)
+const dragging = ref(false)
 
 const pct = computed(() => (duration.value > 0 ? (current.value / duration.value) * 100 : 0))
 
@@ -104,6 +106,7 @@ function toggle() {
 }
 
 function onTime() {
+  if (dragging.value) return
   current.value = audioEl.value?.currentTime || 0
 }
 function onMeta() {
@@ -115,20 +118,48 @@ function onEnded() {
   current.value = 0
 }
 
-function seek(e: MouseEvent) {
+function seekFromClientX(clientX: number) {
   const a = audioEl.value
   const bar = barEl.value
   if (!a || !bar || !duration.value) return
   const rect = bar.getBoundingClientRect()
-  const ratio = Math.min(1, Math.max(0, (e.clientX - rect.left) / rect.width))
-  a.currentTime = ratio * duration.value
-  current.value = a.currentTime
+  const ratio = Math.min(1, Math.max(0, (clientX - rect.left) / rect.width))
+  const t = ratio * duration.value
+  a.currentTime = t
+  current.value = t
+}
+
+function onPointerDown(e: PointerEvent) {
+  if (e.button !== 0 && e.pointerType === 'mouse') return
+  e.preventDefault()
+  dragging.value = true
+  barEl.value?.setPointerCapture(e.pointerId)
+  seekFromClientX(e.clientX)
+
+  const onMove = (ev: PointerEvent) => {
+    seekFromClientX(ev.clientX)
+  }
+  const onUp = (ev: PointerEvent) => {
+    dragging.value = false
+    try {
+      barEl.value?.releasePointerCapture(ev.pointerId)
+    } catch {
+      /* ignore */
+    }
+    window.removeEventListener('pointermove', onMove)
+    window.removeEventListener('pointerup', onUp)
+    window.removeEventListener('pointercancel', onUp)
+  }
+  window.addEventListener('pointermove', onMove)
+  window.addEventListener('pointerup', onUp)
+  window.addEventListener('pointercancel', onUp)
 }
 
 function nudge(sec: number) {
   const a = audioEl.value
   if (!a) return
   a.currentTime = Math.min(duration.value || a.duration || 0, Math.max(0, a.currentTime + sec))
+  current.value = a.currentTime
 }
 
 function toggleMute() {
@@ -154,6 +185,7 @@ watch(
     playing.value = false
     current.value = 0
     duration.value = 0
+    dragging.value = false
   },
 )
 
@@ -214,5 +246,15 @@ onBeforeUnmount(() => {
 .ap-bar:focus-visible {
   outline: 2px solid #39ff14;
   outline-offset: 2px;
+}
+.ap-bar.dragging {
+  cursor: grabbing;
+}
+.ap-knob {
+  width: 16px;
+  height: 16px;
+  background: #fff;
+  border: 2px solid #000;
+  box-shadow: 1px 1px 0 #39ff14;
 }
 </style>

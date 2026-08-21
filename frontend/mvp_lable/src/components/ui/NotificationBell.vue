@@ -17,31 +17,27 @@
       class="absolute right-0 top-full mt-2 w-[min(100vw-2rem,22rem)] max-h-[70vh] overflow-y-auto border-2 border-[#39FF14] bg-black z-[80] shadow-[4px_4px_0_#000]"
     >
       <div class="flex justify-between items-center p-2 border-b border-[#333] sticky top-0 bg-black">
-        <span class="font-mono text-[10px] uppercase text-[#39FF14]">Уведомления</span>
-        <div class="flex gap-2">
-          <button type="button" class="font-mono text-[9px] text-gray-500 uppercase" @click="markAll">Все прочит.</button>
-          <router-link to="/notifications" class="font-mono text-[9px] text-[#39FF14] uppercase" @click="open = false">Все →</router-link>
-        </div>
+        <span class="font-mono text-[10px] uppercase text-[#39FF14]">Непрочитанные</span>
+        <router-link to="/notifications" class="font-mono text-[9px] text-[#39FF14] uppercase" @click="open = false">Все →</router-link>
       </div>
       <button
-        v-for="n in list.slice(0, 12)"
+        v-for="n in unreadList"
         :key="n.id"
         type="button"
         class="block w-full text-left p-3 border-b border-[#222] hover:bg-[#111]"
-        :class="{ 'opacity-60': n.read }"
-        @click="onClick(n)"
+        @click="openOne(n.id)"
       >
         <p class="font-mono text-[10px] text-[#39FF14] uppercase">{{ n.title }}</p>
-        <p class="text-xs text-gray-300 mt-1 line-clamp-4 whitespace-pre-wrap">{{ n.body }}</p>
+        <p class="text-xs text-gray-300 mt-1 line-clamp-3 whitespace-pre-wrap">{{ n.body }}</p>
         <p class="font-mono text-[9px] text-gray-600 mt-1">{{ fmt(n.createdAt) }}</p>
       </button>
-      <p v-if="!list.length" class="p-4 font-mono text-xs text-gray-600 text-center">Пусто</p>
+      <p v-if="!unreadList.length" class="p-4 font-mono text-xs text-gray-600 text-center">Нет непрочитанных</p>
       <router-link
         to="/notifications"
         class="block text-center py-3 font-mono text-[10px] uppercase text-[#39FF14] border-t border-[#333]"
         @click="open = false"
       >
-        Открыть центр уведомлений
+        Центр уведомлений
       </router-link>
     </div>
   </div>
@@ -49,20 +45,22 @@
 
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
+import { useRouter } from 'vue-router'
 import { useAuthStore } from '@/stores/auth'
-import { useNotificationsStore, type AppNotification } from '@/stores/notifications'
+import { useNotificationsStore } from '@/stores/notifications'
 
 const authed = useAuthStore()
 const store = useNotificationsStore()
+const router = useRouter()
 const open = ref(false)
 onMounted(() => store.hydrate())
 const list = computed(() => (authed.email ? store.forUser(authed.email) : []))
-const unread = computed(() => (authed.email ? store.unreadCount(authed.email) : 0))
-function markAll() {
-  if (authed.email) store.markAllRead(authed.email)
-}
-function onClick(n: AppNotification) {
-  store.markRead(n.id)
+const unreadList = computed(() => list.value.filter((n) => !n.read))
+const unread = computed(() => unreadList.value.length)
+function openOne(id: string) {
+  store.markRead(id)
+  open.value = false
+  router.push({ path: '/notifications', query: { id } })
 }
 function fmt(iso: string) {
   try {

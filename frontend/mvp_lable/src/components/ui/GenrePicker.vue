@@ -19,9 +19,9 @@
       @focus="open = true"
       @keydown.enter.prevent="addFirst"
     />
-    <ul v-if="open && filtered.length" class="absolute left-0 right-0 z-20 mt-1 max-h-48 overflow-y-auto border-2 border-[#333] bg-black">
+    <ul v-if="open && filtered.length" class="absolute left-0 right-0 z-20 mt-1 max-h-48 overflow-y-auto border-2 border-[#333] bg-black text-gray-200">
       <li v-for="g in filtered" :key="g">
-        <button type="button" class="w-full text-left px-3 py-2 font-mono text-xs uppercase hover:bg-[#111] hover:text-[#39FF14]" @click="add(g)">
+        <button type="button" class="w-full text-left px-3 py-2 font-mono text-xs uppercase text-gray-200 hover:bg-[#111] hover:text-[#39FF14]" @click="add(g)">
           {{ g }}
         </button>
       </li>

@@ -21,6 +21,7 @@ export interface TrackInput {
   order: number
   isExplicit: boolean
   lyrics: string
+  genres?: string[]
   masterFile?: string
   previewFile?: string
   contributors: ContributorInput[]

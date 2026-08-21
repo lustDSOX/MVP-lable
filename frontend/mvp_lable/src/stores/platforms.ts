@@ -10,14 +10,15 @@ export interface PlatformAccount {
   connectedAt: string | null
 }
 
-const STORAGE = 'mvp_lable_platforms'
+const STORAGE = 'mvp_lable_platforms_v2'
 
 function defaults(): PlatformAccount[] {
+  const at = new Date().toISOString()
   return [
-    { id: 'spotify', label: 'Spotify', connected: false, accountName: null, connectedAt: null },
-    { id: 'apple', label: 'Apple Music', connected: false, accountName: null, connectedAt: null },
-    { id: 'yandex', label: 'Яндекс Музыка', connected: false, accountName: null, connectedAt: null },
-    { id: 'vk', label: 'VK Music', connected: false, accountName: null, connectedAt: null },
+    { id: 'spotify', label: 'Spotify', connected: true, accountName: 'mock_spotify_user', connectedAt: at },
+    { id: 'apple', label: 'Apple Music', connected: true, accountName: 'mock_apple_user', connectedAt: at },
+    { id: 'yandex', label: 'Яндекс Музыка', connected: true, accountName: 'mock_yandex_user', connectedAt: at },
+    { id: 'vk', label: 'VK Music', connected: true, accountName: 'mock_vk_user', connectedAt: at },
   ]
 }
 

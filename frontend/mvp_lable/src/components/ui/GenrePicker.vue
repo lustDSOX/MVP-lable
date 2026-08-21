@@ -2,14 +2,14 @@
   <div class="genre-picker relative">
     <div class="flex flex-wrap gap-2 mb-2 min-h-[28px]">
       <span
-        v-for="g in modelValue"
+        v-for="g in selected"
         :key="g"
         class="inline-flex items-center gap-1 border border-[#39FF14] text-[#39FF14] font-mono text-[10px] uppercase px-2 py-1"
       >
         {{ g }}
         <button type="button" class="text-[#ff0000] leading-none" aria-label="remove" @click="remove(g)">×</button>
       </span>
-      <span v-if="!modelValue.length" class="font-mono text-[10px] text-gray-600">Не выбрано</span>
+      <span v-if="!selected.length" class="font-mono text-[10px] text-gray-600">Не выбрано</span>
     </div>
     <input
       v-model="q"
@@ -33,27 +33,28 @@
 import { computed, onMounted, onUnmounted, ref } from 'vue'
 import { GENRE_OPTIONS } from '@/constants/genres'
 
-const props = defineProps<{ modelValue: string[] }>()
+const props = withDefaults(defineProps<{ modelValue?: string[] }>(), { modelValue: () => [] })
 const emit = defineEmits<{ 'update:modelValue': [string[]] }>()
 
 const q = ref('')
 const open = ref(false)
+const selected = computed(() => props.modelValue || [])
 
 const filtered = computed(() => {
   const query = q.value.trim().toLowerCase()
   return GENRE_OPTIONS.filter(
-    (g) => !props.modelValue.includes(g) && (!query || g.toLowerCase().includes(query)),
+    (g) => !selected.value.includes(g) && (!query || g.toLowerCase().includes(query)),
   )
 })
 
 function add(g: string) {
-  if (props.modelValue.includes(g)) return
-  emit('update:modelValue', [...props.modelValue, g])
+  if (selected.value.includes(g)) return
+  emit('update:modelValue', [...selected.value, g])
   q.value = ''
   open.value = false
 }
 function remove(g: string) {
-  emit('update:modelValue', props.modelValue.filter((x) => x !== g))
+  emit('update:modelValue', selected.value.filter((x) => x !== g))
 }
 function addFirst() {
   if (filtered.value[0]) add(filtered.value[0])

@@ -348,7 +348,7 @@ export const useTracksStore = defineStore('tracks', {
         }
         return { needsResign: true }
       }
-      if (wasPublished && track.status === 'published) {
+      if (wasPublished && track.status === 'published') {
         track.liveRevision = true
         track.status = 'pending'
         this.pushHistory(id, 'live_edit_pending', by, 'Published release edits under review', 'artist_edit')

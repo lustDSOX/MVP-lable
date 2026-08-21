@@ -9,7 +9,7 @@
       <label class="block"><span class="lbl">Заголовок</span><input v-model="form.title" required class="field" placeholder="GRID_OPENING" /></label>
       <label class="block"><span class="lbl">Краткое описание</span><input v-model="form.excerpt" class="field" placeholder="Лейбл открывает сезон" /></label>
       <div class="grid sm:grid-cols-2 gap-3">
-        <label class="block"><span class="lbl">Дата</span><input v-model="form.date" type="date" class="field" /></label>
+        <label class="block"><span class="lbl">Дата</span><input v-model="form.date" type="date" class="field" :min="minDate" @change="clampDate" /></label>
         <label class="block"><span class="lbl">Статус</span>
           <select v-model="form.status" class="field"><option value="draft">draft (черновик)</option><option value="published">published</option></select>
         </label>
@@ -56,6 +56,7 @@ import { useCmsStore, type NewsItem } from '@/stores/cms'
 
 const props = defineProps<{ tabQuery: string; focusId?: string | null }>()
 const cms = useCmsStore()
+const minDate = new Date().toISOString().slice(0, 10)
 const editingId = ref<string | null>(null)
 const formEl = ref<HTMLElement | null>(null)
 const form = reactive({
@@ -75,10 +76,13 @@ const filtered = computed(() => {
   if (!q) return cms.news
   return cms.news.filter((n) => n.title.toLowerCase().includes(q) || n.excerpt.toLowerCase().includes(q) || n.body.toLowerCase().includes(q))
 })
+function clampDate() {
+  if (form.date && form.date < minDate) form.date = minDate
+}
 function insert(md: string) { form.body = (form.body || '') + (form.body && !form.body.endsWith('\n') ? '\n' : '') + md }
 function mdPreview(src: string): string {
   let s = src || ''
-  s = s.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  s = s.replace(/&/g, '&').replace(/</g, '<').replace(/>/g, '>')
   s = s.replace(/!\[([^\]]*)\]\(([^)]+)\)/g, '<img src="$2" alt="$1" class="max-w-full my-3 border border-[#333]" />')
   s = s.replace(/^### (.*)$/gm, '<h3 class="text-lg font-black uppercase mt-3">$1</h3>')
   s = s.replace(/^## (.*)$/gm, '<h2 class="text-xl font-black uppercase mt-3">$1</h2>')
@@ -103,6 +107,7 @@ async function edit(n: NewsItem) {
   formEl.value?.scrollIntoView({ behavior: 'smooth', block: 'start' })
 }
 function save() {
+  clampDate()
   cms.upsertNews({ id: editingId.value || undefined, title: form.title, excerpt: form.excerpt, body: form.body, date: form.date, status: form.status })
   reset()
 }

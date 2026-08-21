@@ -37,6 +37,8 @@
       </div>
       <button v-for="tr in track.tracksDetail || []" :key="tr.localId" type="button" class="w-full text-left border border-[#333] p-3 mb-2 hover:border-[#39FF14]" @click="listenId = tr.localId; tab = 'listen'">
         <span class="font-bold uppercase">#{{ tr.order }} {{ tr.title }}</span>
+        <p v-if="tr.genres?.length" class="font-mono text-[10px] text-[#39FF14] mt-1 uppercase">{{ tr.genres.join(' · ') }}</p>
+        <p v-else class="font-mono text-[10px] text-gray-600 mt-1">жанры не указаны</p>
       </button>
     </div>
     <div v-else-if="tab === 'listen'" class="space-y-4">
@@ -50,18 +52,20 @@
     </div>
     <div v-else-if="tab === 'stats'" class="space-y-4">
       <div class="grid grid-cols-2 gap-3">
-        <div class="stat"><span class="lbl">Total Plays</span><span class="val">{{ connectedTotalPlays.toLocaleString() }}</span></div>
+        <div class="stat"><span class="lbl">Total Plays</span><span class="val">{{ platformTotalPlays.toLocaleString() }}</span></div>
         <div class="stat"><span class="lbl">Royalties</span><span class="val">${{ track.royalties || 0 }}</span></div>
       </div>
-      <p class="font-mono text-xs text-[#39FF14] uppercase">Подключённые площадки</p>
-      <div v-if="connectedPlatformStats.length" class="space-y-2">
-        <div v-for="row in connectedPlatformStats" :key="row.id" class="border border-[#333] p-3 font-mono text-xs space-y-1">
-          <span class="uppercase text-gray-400">{{ row.label }}</span>
-          <div class="flex justify-between"><span class="text-gray-600">Plays</span><span>{{ row.plays.toLocaleString() }}</span></div>
-          <div class="flex justify-between"><span class="text-gray-600">Followers</span><span>{{ row.followers.toLocaleString() }}</span></div>
+      <p class="font-mono text-xs text-[#39FF14] uppercase">Площадки · plays + followers</p>
+      <div class="space-y-2">
+        <div v-for="row in platformStats" :key="row.id" class="border border-[#333] p-3 font-mono text-xs space-y-1" :class="{ 'opacity-50': !row.connected }">
+          <div class="flex justify-between items-center">
+            <span class="uppercase text-gray-300">{{ row.label }}</span>
+            <span class="text-[9px] uppercase" :class="row.connected ? 'text-[#39FF14]' : 'text-gray-600'">{{ row.connected ? 'connected' : 'off' }}</span>
+          </div>
+          <div class="flex justify-between"><span class="text-gray-600">Прослушивания</span><span class="text-white">{{ row.plays.toLocaleString() }}</span></div>
+          <div class="flex justify-between"><span class="text-gray-600">Подписчики</span><span class="text-[#39FF14]">{{ row.followers.toLocaleString() }}</span></div>
         </div>
       </div>
-      <p v-else class="font-mono text-xs text-gray-600">Нет подключённых площадок</p>
       <template v-if="track.type && track.type !== 'single'">
         <p class="font-mono text-xs text-[#39FF14] uppercase mt-2">По трекам</p>
         <div v-for="tr in track.tracksDetail || []" :key="tr.localId" class="border border-[#333] p-3 flex justify-between font-mono text-xs">
@@ -107,7 +111,7 @@
         <label class="flex items-center gap-2 font-mono text-xs"><input type="checkbox" v-model="tr.isExplicit" class="accent-[#39FF14]" /> Explicit</label>
         <div>
           <span class="lbl">Жанры (трек)</span>
-          <GenrePicker :model-value="tr.genres || []" @update:model-value="(v) => (tr.genres = v)" />
+          <GenrePicker :model-value="tr.genres || []" @update:model-value="(v: string[]) => { tr.genres = v }" />
         </div>
         <div>
           <span class="lbl">Аудио</span>
@@ -190,30 +194,29 @@ const statusClass = computed(() => {
   return 'border-[#444] text-gray-400'
 })
 const historySorted = computed(() => [...(track.value?.moderationLog || [])].reverse())
-const connectedPlatformStats = computed(() => {
-  const plat = track.value?.platforms
-  const fol = (track.value as any)?.followers
-  if (!plat) return [] as { id: string; label: string; plays: number; followers: number }[]
-  const keyMap: Record<string, 'spotify' | 'apple' | 'yandex' | 'vk'> = {
-    spotify: 'spotify', apple: 'apple', yandex: 'yandex', vk: 'vk',
-  }
-  return platformsStore.accounts
-    .filter((a) => a.connected)
-    .map((a) => {
-      const k = keyMap[a.id]
-      return {
-        id: a.id,
-        label: a.label,
-        plays: k ? Number(plat[k] ?? 0) : 0,
-        followers: k && fol ? Number(fol[k] ?? 0) : 0,
-      }
-    })
+const PLATFORM_META: { id: 'spotify' | 'apple' | 'yandex' | 'vk'; label: string }[] = [
+  { id: 'spotify', label: 'Spotify' },
+  { id: 'apple', label: 'Apple Music' },
+  { id: 'yandex', label: 'Яндекс Музыка' },
+  { id: 'vk', label: 'VK Music' },
+]
+const platformStats = computed(() => {
+  const plat = track.value?.platforms || { spotify: 0, apple: 0, yandex: 0, vk: 0 }
+  const fol = (track.value as any)?.followers || { spotify: 0, apple: 0, yandex: 0, vk: 0 }
+  const connectedIds = new Set(platformsStore.accounts.filter((a) => a.connected).map((a) => a.id))
+  return PLATFORM_META.map((m) => ({
+    id: m.id,
+    label: m.label,
+    plays: Number(plat[m.id] ?? 0),
+    followers: Number(fol[m.id] ?? 0),
+    connected: connectedIds.has(m.id),
+  }))
 })
-const connectedTotalPlays = computed(() => connectedPlatformStats.value.reduce((s, r) => s + r.plays, 0))
+const platformTotalPlays = computed(() => platformStats.value.reduce((s, r) => s + r.plays, 0))
 const trackTracksTotal = computed(() => {
   const list = track.value?.tracksDetail || []
   const sum = list.reduce((s, tr) => s + (tr.plays || 0), 0)
-  return sum || connectedTotalPlays.value
+  return sum || platformTotalPlays.value
 })
 const listenTrack = computed(() => track.value?.tracksDetail?.find((t) => t.localId === listenId.value) || track.value?.tracksDetail?.[0] || null)
 

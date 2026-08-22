@@ -1,8 +1,9 @@
 from typing import Sequence
+
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models.moderation_logs import ModerationLog
+from db.models.moderation_logs import HistoryKind, ModerationLog
 
 
 class ModerationLogManager:
@@ -15,6 +16,7 @@ class ModerationLogManager:
         moderator_id: int | None,
         action: str,
         comment: str | None = None,
+        kind: HistoryKind = HistoryKind.MODERATION,
         commit: bool = True,
     ) -> ModerationLog:
         new_log = ModerationLog(
@@ -22,6 +24,7 @@ class ModerationLogManager:
             moderator_id=moderator_id,
             action=action,
             comment=comment,
+            kind=kind,
         )
         self.session.add(new_log)
         if commit:

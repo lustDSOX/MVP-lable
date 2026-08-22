@@ -25,7 +25,9 @@ class ConnectionStatus(str, enum.Enum):
 class PlatformConnection(Base):
     __tablename__ = "platform_connections"
 
-    __table_args__ = (UniqueConstraint("user_id", "platform", name="uq_platform_user_platform"),
+    __table_args__ = (
+        UniqueConstraint("user_id", "platform", name="uq_platform_user_platform"),
+    )
 
     id = Column(Integer, primary_key=True, index=True)
     user_id = Column(Integer, ForeignKey("users.id", ondelete="CASCADE"), nullable=False)
